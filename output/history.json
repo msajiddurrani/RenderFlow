@@ -1,5 +1,35 @@
 [
   {
+    "id": "rec_1794864917157_y8ywm",
+    "filename": "render-1794864901025-test-preview.mp4",
+    "originalName": "test-preview.html",
+    "fileType": "HTML5 Animation",
+    "resolution": "1280x720",
+    "duration": "00:00:01.02",
+    "durationSec": 1.02,
+    "sizeKb": "113.4",
+    "bytes": 116140,
+    "videoCodec": "h264 (Constrained Baseline) (avc1 / 0x31637661)",
+    "audioCodec": "aac (LC) (mp4a / 0x6134706D)",
+    "metrics": {
+      "fixture": "1794864901015-test-preview.html",
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "durationSec": 1,
+      "totalFrames": 30,
+      "totalRenderTimeSec": "15.92",
+      "avgFrameTimeMs": "79.7",
+      "effectiveFps": "12.6",
+      "realTimeFactor": "15.92",
+      "mp4SizeBytes": 116140,
+      "audioCaptured": "silent",
+      "gpuMode": "Direct3D11 Hardware"
+    },
+    "createdAt": 1794864917157,
+    "url": "/output/render-1794864901025-test-preview.mp4"
+  },
+  {
     "id": "rec_1794857694716_srt9l",
     "filename": "render-1794857386907-PainForge_____Reel__1_.mp4",
     "originalName": "PainForge â Reel (1).html",
@@ -37,11 +67,26 @@
     "resolution": "1080x1920",
     "duration": "00:00:46.02",
     "durationSec": 46.02,
-    "sizeKb": "4687.9",
-    "bytes": 4800365,
+    "sizeKb": "16236.8",
+    "bytes": 16626441,
     "videoCodec": "h264 (High) (avc1 / 0x31637661)",
     "audioCodec": "aac (LC) (mp4a / 0x6134706D)",
     "createdAt": 1794835582144.2727,
     "url": "/output/PainForge-Reel-FULL-46s.mp4"
+  },
+  {
+    "id": "rec_1794865391832_xsppp",
+    "filename": "render-1794865253623-presentation.mp4",
+    "originalName": "presentation.mp4",
+    "fileType": "Video",
+    "resolution": "1920x1080",
+    "duration": "00:00:04.43",
+    "durationSec": 4.43,
+    "sizeKb": "3044.3",
+    "bytes": 3117368,
+    "videoCodec": "h264 (Constrained Baseline) (avc1 / 0x31637661)",
+    "audioCodec": "aac (LC) (mp4a / 0x6134706D)",
+    "createdAt": 1794865301986.4084,
+    "url": "/output/render-1794865253623-presentation.mp4"
   }
 ]

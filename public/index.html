@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jane Motion — HTML5 & Markdown to MP4 Studio</title>
+  <title>Jane Motion Studio — Video Production Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,26 +16,27 @@
       --bg-card: #ffffff;
       --bg-card-subtle: #f1f5f9;
       --border-card: #e2e8f0;
-      --border-focus: #6366f1;
+      --border-focus: #4f46e5;
       --text-main: #0f172a;
       --text-body: #334155;
       --text-muted: #64748b;
       --text-dim: #94a3b8;
       
-      /* Vibrant Radiant Gradients */
-      --grad-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
-      --grad-primary-hover: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #db2777 100%);
+      /* Solid Professional Palettes (Linear / Vercel style) */
+      --brand-primary: #4f46e5;
+      --brand-primary-hover: #4338ca;
+      --brand-success: #059669;
+      --brand-success-hover: #047857;
+      
+      --grad-primary: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #4338ca 100%);
+      --grad-primary-hover: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
       --grad-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
       --grad-success-hover: linear-gradient(135deg, #047857 0%, #059669 100%);
-      --grad-brand: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
-      --grad-accent: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
 
-      /* Ambient Multi-Layer Shadows */
       --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-      --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
-      --shadow-btn: 0 4px 14px rgba(79, 70, 229, 0.35);
-      --shadow-btn-hover: 0 6px 20px rgba(79, 70, 229, 0.45);
-      --shadow-btn-success: 0 4px 14px rgba(16, 185, 129, 0.35);
+      --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.02);
+      --shadow-btn: 0 2px 8px rgba(79, 70, 229, 0.25);
+      --shadow-btn-hover: 0 4px 12px rgba(79, 70, 229, 0.35);
 
       --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
@@ -45,7 +46,7 @@
     
     body {
       background-color: var(--bg-page);
-      background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
       background-size: 24px 24px;
       color: var(--text-main);
       font-family: var(--font-sans);
@@ -55,9 +56,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ========================================================
-       SCREEN 1: 60-40 SPLIT AUTHENTICATION PAGE
-       ======================================================== */
+    /* SCREEN 1: 60-40 SPLIT AUTHENTICATION */
     #authScreen {
       display: flex;
       min-height: 100vh;
@@ -69,60 +68,34 @@
       overflow-y: auto;
     }
 
-    /* LEFT 60% PANE */
     .auth-hero-pane {
       flex: 60%;
-      background: linear-gradient(145deg, #090d16 0%, #111827 50%, #1e1b4b 100%);
+      background: #090d16;
       color: #ffffff;
-      padding: 60px;
+      padding: 64px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
-      overflow: hidden;
-    }
-    .auth-hero-pane::before {
-      content: '';
-      position: absolute;
-      width: 600px;
-      height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, transparent 70%);
-      top: -150px;
-      right: -150px;
-      pointer-events: none;
-    }
-    .auth-hero-pane::after {
-      content: '';
-      position: absolute;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
-      bottom: -100px;
-      left: -100px;
-      pointer-events: none;
     }
 
     .auth-brand-head {
       display: flex;
       align-items: center;
-      gap: 14px;
-      z-index: 2;
+      gap: 12px;
     }
     .swoosh-logo-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: var(--grad-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--brand-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
     }
     .swoosh-logo-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       fill: none;
       stroke: #ffffff;
       stroke-width: 2.5;
@@ -130,76 +103,71 @@
       stroke-linejoin: round;
     }
     .auth-brand-title {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       letter-spacing: -0.02em;
     }
     .auth-brand-tag {
       font-family: var(--font-mono);
       font-size: 11px;
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 3px 8px;
       border-radius: 6px;
-      color: #cbd5e1;
+      color: #94a3b8;
       margin-left: 8px;
     }
 
     .auth-hero-center {
       margin: 48px 0;
-      z-index: 2;
-      max-width: 640px;
+      max-width: 620px;
     }
     .auth-hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(99, 102, 241, 0.18);
-      border: 1px solid rgba(99, 102, 241, 0.35);
+      gap: 6px;
+      background: rgba(79, 70, 229, 0.15);
+      border: 1px solid rgba(79, 70, 229, 0.3);
       color: #a5b4fc;
-      padding: 6px 14px;
-      border-radius: 999px;
+      padding: 5px 12px;
+      border-radius: 6px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
+      font-family: var(--font-mono);
       margin-bottom: 20px;
     }
     .auth-hero-heading {
-      font-size: 46px;
+      font-size: 44px;
       font-weight: 800;
       line-height: 1.15;
       letter-spacing: -0.03em;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .auth-hero-heading span {
-      background: linear-gradient(135deg, #a5b4fc 0%, #f472b6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #818cf8;
     }
     .auth-dynamic-line {
-      font-size: 17px;
+      font-size: 16px;
       color: #94a3b8;
       line-height: 1.6;
       min-height: 52px;
       transition: opacity 0.3s ease;
     }
 
-    /* SHOWCASE PREVIEW BOX */
     .creative-showcase-box {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 16px;
       display: flex;
       align-items: center;
       gap: 16px;
-      z-index: 2;
-      backdrop-filter: blur(12px);
-      max-width: 580px;
+      max-width: 560px;
     }
     .showcase-thumb-wrap {
       width: 72px;
       height: 72px;
-      border-radius: 10px;
+      border-radius: 8px;
       background: #000;
       overflow: hidden;
       flex-shrink: 0;
@@ -233,12 +201,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 2;
       padding-top: 24px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* RIGHT 40% PANE (AUTH / SIGN IN / SIGN UP) */
+    /* RIGHT 40% PANE */
     .auth-form-pane {
       flex: 40%;
       background: #ffffff;
@@ -246,42 +213,42 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      max-width: 560px;
+      max-width: 540px;
     }
     .form-tabs {
       display: flex;
       gap: 6px;
       background: #f1f5f9;
       padding: 4px;
-      border-radius: 10px;
+      border-radius: 8px;
       margin-bottom: 32px;
     }
     .form-tab-btn {
       flex: 1;
-      padding: 10px;
+      padding: 9px;
       text-align: center;
       background: transparent;
       border: none;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
-      border-radius: 7px;
+      border-radius: 6px;
       transition: all 0.2s;
     }
     .form-tab-btn.active {
       background: #ffffff;
       color: var(--text-main);
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
     }
     .auth-form-title {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.02em;
       margin-bottom: 8px;
     }
     .auth-form-sub {
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--text-muted);
       margin-bottom: 24px;
     }
@@ -296,40 +263,38 @@
       line-height: 1.4;
     }
     .field-group {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .field-label {
       display: block;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       margin-bottom: 6px;
       color: var(--text-body);
     }
     .field-input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 11px 14px;
       background: #f8fafc;
       border: 1px solid var(--border-card);
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13.5px;
       font-family: var(--font-sans);
       color: var(--text-main);
-      transition: all 0.2s;
     }
     .field-input:focus {
       outline: none;
       border-color: var(--border-focus);
       background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
     }
     .btn-auth-submit {
       width: 100%;
-      padding: 13px;
-      background: var(--grad-primary);
+      padding: 12px;
+      background: var(--brand-primary);
       color: #ffffff;
       border: none;
-      border-radius: 9px;
-      font-size: 14.5px;
+      border-radius: 8px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       box-shadow: var(--shadow-btn);
@@ -337,32 +302,26 @@
       margin-top: 10px;
     }
     .btn-auth-submit:hover {
-      background: var(--grad-primary-hover);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-btn-hover);
+      background: var(--brand-primary-hover);
     }
     .btn-guest-bypass {
       width: 100%;
       padding: 11px;
       background: transparent;
       border: 1px solid var(--border-card);
-      border-radius: 9px;
-      font-size: 13.5px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
-      margin-top: 12px;
-      transition: all 0.2s;
+      margin-top: 10px;
     }
     .btn-guest-bypass:hover {
       background: #f8fafc;
       color: var(--text-main);
-      border-color: #cbd5e1;
     }
 
-    /* ========================================================
-       SCREEN 2: MAIN DASHBOARD & STUDIO
-       ======================================================== */
+    /* SCREEN 2: MAIN DASHBOARD & STUDIO */
     #mainApp {
       display: flex;
       flex-direction: column;
@@ -370,8 +329,7 @@
     }
 
     header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
+      background: #ffffff;
       border-bottom: 1px solid var(--border-card);
       padding: 12px 32px;
       display: flex;
@@ -393,18 +351,17 @@
       cursor: pointer;
     }
     .header-logo-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: var(--grad-brand);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--brand-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     }
     .header-logo-icon svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       fill: none;
       stroke: #ffffff;
       stroke-width: 2.5;
@@ -412,7 +369,7 @@
       stroke-linejoin: round;
     }
     .header-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--text-main);
@@ -420,10 +377,10 @@
 
     .main-nav-tabs {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       background: #f1f5f9;
-      padding: 4px;
-      border-radius: 10px;
+      padding: 3px;
+      border-radius: 8px;
       border: 1px solid var(--border-card);
     }
     .nav-tab-btn {
@@ -432,21 +389,18 @@
       color: var(--text-muted);
       font-size: 13px;
       font-weight: 600;
-      padding: 7px 16px;
-      border-radius: 7px;
+      padding: 6px 14px;
+      border-radius: 6px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-family: var(--font-sans);
       transition: all 0.15s ease;
     }
     .nav-tab-btn:hover { color: var(--text-main); }
     .nav-tab-btn.active {
       background: #ffffff;
-      color: #4f46e5;
+      color: var(--brand-primary);
       font-weight: 700;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
     }
 
     .header-right {
@@ -467,19 +421,18 @@
       gap: 6px;
     }
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       background: #10b981;
       border-radius: 50%;
-      box-shadow: 0 0 8px #10b981;
     }
     .mode-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 12px;
+      padding: 5px 10px;
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       font-family: var(--font-mono);
     }
@@ -498,115 +451,108 @@
       background: transparent;
       border: 1px solid var(--border-card);
       color: var(--text-muted);
-      padding: 6px 12px;
+      padding: 5px 12px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s;
     }
     .btn-logout:hover {
       color: #ef4444;
       border-color: #fca5a5;
-      background: #fef2f2;
     }
 
-    /* HERO SECTION ON LANDING PAGE */
+    /* LANDING HERO */
     .landing-hero-section {
-      background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.5) 100%);
+      background: #ffffff;
       border-bottom: 1px solid var(--border-card);
-      padding: 44px 32px 36px;
+      padding: 36px 32px 32px;
       text-align: center;
-      position: relative;
     }
     .landing-hero-center {
-      max-width: 880px;
+      max-width: 860px;
       margin: 0 auto;
     }
     .hero-pill-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #2563eb;
-      padding: 5px 14px;
-      border-radius: 999px;
-      font-size: 12px;
+      background: #f1f5f9;
+      border: 1px solid var(--border-card);
+      color: var(--text-muted);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
       font-weight: 700;
       font-family: var(--font-mono);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
     .hero-main-title {
-      font-size: 38px;
+      font-size: 34px;
       font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
       color: var(--text-main);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .hero-main-title span {
-      background: var(--grad-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--brand-primary);
     }
     .hero-main-desc {
-      font-size: 15.5px;
+      font-size: 15px;
       color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto 28px;
-      line-height: 1.6;
+      max-width: 660px;
+      margin: 0 auto 24px;
+      line-height: 1.5;
     }
 
-    /* THE INTERACTIVE FLOW ACTION BAR */
+    /* ACTION BAR */
     .flow-action-card {
       background: #ffffff;
-      border: 1.5px solid var(--border-card);
-      border-radius: 18px;
-      padding: 14px 20px;
-      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08);
-      max-width: 900px;
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: var(--shadow-sm);
+      max-width: 860px;
       margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
       flex-wrap: wrap;
     }
     
     .split-format-picker {
       display: inline-flex;
       align-items: center;
-      background: #f1f5f9;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border-card);
+      border-radius: 8px;
       overflow: hidden;
       position: relative;
     }
     .btn-format-main {
       background: transparent;
       border: none;
-      padding: 10px 18px;
-      font-size: 14px;
+      padding: 9px 16px;
+      font-size: 13.5px;
       font-weight: 700;
       color: var(--text-main);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-family: var(--font-sans);
     }
-    .btn-format-main:hover { background: #e2e8f0; }
+    .btn-format-main:hover { background: #f1f5f9; }
     .btn-format-arrow {
       background: transparent;
       border: none;
-      border-left: 1px solid #cbd5e1;
-      padding: 10px 12px;
+      border-left: 1px solid var(--border-card);
+      padding: 9px 12px;
       cursor: pointer;
       color: var(--text-muted);
-      font-size: 11px;
+      font-size: 10px;
     }
-    .btn-format-arrow:hover { background: #e2e8f0; color: var(--text-main); }
+    .btn-format-arrow:hover { background: #f1f5f9; color: var(--text-main); }
 
     .format-dropdown-menu {
       position: absolute;
@@ -615,20 +561,20 @@
       margin-top: 6px;
       background: #ffffff;
       border: 1px solid var(--border-card);
-      border-radius: 10px;
+      border-radius: 8px;
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
-      width: 260px;
+      width: 240px;
       display: none;
       flex-direction: column;
-      padding: 6px;
+      padding: 4px;
       z-index: 50;
       text-align: left;
     }
     .format-dropdown-menu.show { display: flex; }
     .format-option-item {
-      padding: 10px 14px;
+      padding: 8px 12px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       color: var(--text-body);
       cursor: pointer;
@@ -638,13 +584,13 @@
     }
     .format-option-item:hover {
       background: #f1f5f9;
-      color: #4f46e5;
+      color: var(--brand-primary);
     }
     .format-badge {
       font-family: var(--font-mono);
       font-size: 11px;
       background: #e2e8f0;
-      padding: 2px 6px;
+      padding: 1px 5px;
       border-radius: 4px;
       color: var(--text-muted);
     }
@@ -652,77 +598,63 @@
     .btn-toggle-paste {
       background: #f8fafc;
       border: 1px solid var(--border-card);
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 13.5px;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-body);
       cursor: pointer;
-      transition: all 0.15s;
     }
     .btn-toggle-paste:hover {
       background: #f1f5f9;
-      border-color: #cbd5e1;
     }
 
     .btn-action-command {
-      background: var(--grad-primary);
+      background: var(--brand-primary);
       color: #ffffff;
       border: none;
-      padding: 12px 26px;
-      border-radius: 10px;
-      font-size: 14.5px;
-      font-weight: 800;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
       cursor: pointer;
       box-shadow: var(--shadow-btn);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
     }
     .btn-action-command:hover {
-      background: var(--grad-primary-hover);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-btn-hover);
+      background: var(--brand-primary-hover);
     }
     .btn-action-command:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
     }
 
     .quick-status-chip {
-      margin-top: 14px;
+      margin-top: 12px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       background: #ffffff;
       border: 1px solid var(--border-card);
-      padding: 6px 14px;
-      border-radius: 999px;
+      padding: 4px 12px;
+      border-radius: 6px;
       font-size: 12px;
       box-shadow: var(--shadow-sm);
     }
 
     .mode-guidance-banner {
-      max-width: 900px;
-      margin: 14px auto 0;
+      max-width: 860px;
+      margin: 12px auto 0;
       background: #eff6ff;
       border: 1px solid #bfdbfe;
-      border-radius: 10px;
-      padding: 10px 16px;
-      font-size: 12.5px;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
       color: #1e40af;
       text-align: left;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      line-height: 1.45;
     }
 
-    /* ========================================================
-       STUDIO WORKSPACE & LAYOUT
-       ======================================================== */
+    /* MAIN STUDIO GRID */
     main {
       flex: 1;
       padding: 24px 32px 48px;
@@ -734,7 +666,6 @@
     .app-view-tab { display: none; }
     .app-view-tab.active { display: block; }
 
-    /* TWO-COLUMN STUDIO GRID */
     .studio-grid {
       display: grid;
       grid-template-columns: 460px 1fr;
@@ -745,22 +676,22 @@
     .content-card {
       background: var(--bg-card);
       border: 1px solid var(--border-card);
-      border-radius: 16px;
-      padding: 22px;
+      border-radius: 12px;
+      padding: 20px;
       box-shadow: var(--shadow-card);
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
 
     .card-head-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text-main);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--border-card);
     }
 
@@ -768,7 +699,7 @@
       display: flex;
       background: #f1f5f9;
       padding: 3px;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid var(--border-card);
     }
     .segment-btn {
@@ -778,29 +709,28 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
-      padding: 5px 12px;
-      border-radius: 6px;
+      padding: 4px 10px;
+      border-radius: 4px;
       cursor: pointer;
-      transition: all 0.15s;
     }
     .segment-btn.active {
       background: #ffffff;
       color: var(--text-main);
-      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
     }
 
     .dropzone-box {
-      border: 2px dashed #cbd5e1;
-      border-radius: 12px;
-      padding: 28px 16px;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 24px 16px;
       text-align: center;
       cursor: pointer;
       background: #f8fafc;
-      transition: all 0.2s;
+      transition: all 0.15s;
       position: relative;
     }
     .dropzone-box:hover {
-      border-color: #6366f1;
+      border-color: var(--brand-primary);
       background: #f5f7ff;
     }
     .dropzone-box input[type="file"] {
@@ -812,36 +742,33 @@
       cursor: pointer;
     }
     .dz-icon-wrap {
-      font-size: 28px;
-      margin-bottom: 8px;
+      font-size: 24px;
+      margin-bottom: 6px;
+      color: var(--text-muted);
     }
     .dz-heading {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       color: var(--text-main);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .dz-caption {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
     }
 
     .editor-textarea {
       width: 100%;
-      height: 180px;
-      padding: 12px;
+      height: 170px;
+      padding: 10px;
       background: #0f172a;
       color: #f8fafc;
       border: 1px solid var(--border-card);
-      border-radius: 10px;
+      border-radius: 8px;
       font-family: var(--font-mono);
       font-size: 12px;
       line-height: 1.5;
       resize: vertical;
-    }
-    .editor-textarea:focus {
-      outline: none;
-      border-color: #6366f1;
     }
 
     .presets-row {
@@ -853,105 +780,99 @@
     .btn-preset-pill {
       background: #f1f5f9;
       border: 1px solid var(--border-card);
-      padding: 5px 11px;
-      border-radius: 7px;
+      padding: 5px 10px;
+      border-radius: 6px;
       font-size: 11.5px;
       font-weight: 600;
       color: var(--text-body);
       cursor: pointer;
-      transition: all 0.15s;
     }
     .btn-preset-pill:hover {
       background: #e2e8f0;
-      color: #4f46e5;
+      color: var(--brand-primary);
     }
     .btn-preset-pill.active {
-      background: #eff6ff;
+      background: #e0e7ff;
       border-color: #6366f1;
-      color: #4f46e5;
+      color: var(--brand-primary);
       font-weight: 700;
     }
 
     .opt-matrix-2x2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
     }
     .matrix-field {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
     .matrix-label {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.03em;
     }
     .matrix-control {
-      padding: 9px 12px;
+      padding: 8px 10px;
       background: #f8fafc;
       border: 1px solid var(--border-card);
-      border-radius: 8px;
-      font-size: 13px;
+      border-radius: 6px;
+      font-size: 12.5px;
       font-family: var(--font-sans);
       color: var(--text-main);
-    }
-    .matrix-control:focus {
-      outline: none;
-      border-color: #6366f1;
-      background: #ffffff;
     }
 
     /* TELEMETRY PROGRESS HUD */
     .hud-card {
       background: #ffffff;
-      border: 1.5px solid #6366f1;
-      border-radius: 14px;
-      padding: 16px 20px;
-      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.12);
+      border: 1px solid var(--brand-primary);
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
       display: none;
     }
     .hud-top-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .hud-phase-label {
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
       color: var(--text-main);
     }
     .hud-pct-text {
       font-family: var(--font-mono);
       font-weight: 800;
-      color: #4f46e5;
-      font-size: 15px;
+      color: var(--brand-primary);
+      font-size: 14px;
     }
     .hud-bar-track {
       width: 100%;
-      height: 8px;
+      height: 6px;
       background: #f1f5f9;
       border-radius: 999px;
       overflow: hidden;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .hud-bar-fill {
       width: 0%;
       height: 100%;
-      background: var(--grad-primary);
+      background: var(--brand-primary);
       border-radius: 999px;
       transition: width 0.15s ease;
     }
     .hud-stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 6px;
       background: #f8fafc;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 8px;
+      border-radius: 6px;
       border: 1px solid var(--border-card);
     }
     .hud-stat-cell {
@@ -960,28 +881,28 @@
       gap: 2px;
     }
     .hud-stat-label {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
     }
     .hud-stat-val {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       color: var(--text-main);
     }
 
-    /* RESULT PANEL */
+    /* RESULT CARD WITH PROPER VERTICAL / HORIZONTAL PLAYER */
     .result-card {
       background: #ffffff;
-      border: 2px solid #10b981;
-      border-radius: 14px;
-      padding: 18px 20px;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.18);
+      border: 1px solid #10b981;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
       display: none;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
     .result-head {
       display: flex;
@@ -991,99 +912,111 @@
     .result-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: #ecfdf5;
       color: #059669;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
     }
-    .result-video-preview {
+    
+    /* Dedicated Player Stage within Result Card */
+    .result-player-wrapper {
       width: 100%;
-      max-height: 280px;
-      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #090d16;
       border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid #10b981;
+      padding: 10px;
+      min-height: 320px;
     }
+    .result-video-preview {
+      display: block;
+      background: #000000;
+      border-radius: 8px;
+    }
+    .result-video-preview.vertical-mode {
+      width: 190px;
+      height: 338px; /* Strict 9:16 aspect ratio */
+      border: 1px solid #334155;
+      object-fit: cover;
+    }
+    .result-video-preview.landscape-mode {
+      width: 100%;
+      height: 230px; /* 16:9 aspect ratio */
+      border: 1px solid #334155;
+      object-fit: contain;
+    }
+
     .btn-hero-download {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      background: var(--grad-success);
+      background: var(--brand-success);
       color: #ffffff;
-      font-weight: 800;
-      font-size: 14.5px;
-      padding: 14px;
-      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px;
+      border-radius: 8px;
       text-decoration: none;
-      box-shadow: var(--shadow-btn-success);
-      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+      transition: all 0.15s ease;
     }
     .btn-hero-download:hover {
-      background: var(--grad-success-hover);
-      transform: translateY(-1px);
+      background: var(--brand-success-hover);
     }
 
     /* RIGHT COLUMN: PREVIEW VIEWPORT */
     .preview-viewport-card {
-      background: #0f172a;
+      background: #090d16;
       border: 1px solid #1e293b;
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
       min-height: 640px;
       position: sticky;
-      top: 80px;
+      top: 76px;
     }
     .viewport-top-bar {
-      background: #1e293b;
-      border-bottom: 1px solid #334155;
-      padding: 12px 20px;
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      padding: 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .viewport-stage-area {
       flex: 1;
-      background: radial-gradient(circle at center, #1e1b4b 0%, #090d16 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      position: relative;
-      overflow: hidden;
+      background: radial-gradient(circle at center, #111827 0%, #090d16 100%);
     }
     
-    /* PHONE CHASSIS FRAME (VERTICAL REEL 9:16) */
     .viewport-wrap {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.25s ease;
     }
     .viewport-wrap.reel-frame {
-      width: 360px;
-      height: 640px;
-      border-radius: 28px;
-      border: 4px solid #334155;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255,255,255,0.1);
+      width: 340px;
+      height: 604px; /* Strict 9:16 ratio */
+      border-radius: 20px;
+      border: 3px solid #334155;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
       overflow: hidden;
       background: #000000;
     }
     .viewport-wrap.landscape-frame {
       width: 100%;
       aspect-ratio: 16 / 9;
-      max-height: 540px;
-      border-radius: 12px;
+      max-height: 520px;
+      border-radius: 10px;
       border: 2px solid #334155;
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
       overflow: hidden;
       background: #000000;
     }
@@ -1095,64 +1028,63 @@
       display: block;
     }
 
-    /* HISTORY & VAULT VIEW */
+    /* HISTORY VIEW */
     .vault-view-wrap {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
     .vault-action-bar {
       background: #ffffff;
       border: 1px solid var(--border-card);
-      border-radius: 14px;
-      padding: 16px 22px;
+      border-radius: 12px;
+      padding: 14px 18px;
       box-shadow: var(--shadow-sm);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 14px;
     }
     .vault-summary-stats {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11.5px;
     }
     .stat-badge-chip {
       background: #f8fafc;
       border: 1px solid var(--border-card);
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 5px 10px;
+      border-radius: 6px;
       color: var(--text-muted);
     }
-    .stat-badge-chip b { color: #4f46e5; }
+    .stat-badge-chip b { color: var(--brand-primary); }
 
     .date-filter-chips {
       display: flex;
       background: #f1f5f9;
       padding: 3px;
-      border-radius: 9px;
+      border-radius: 6px;
       border: 1px solid var(--border-card);
     }
     .btn-date-chip {
       background: transparent;
       border: none;
-      padding: 6px 14px;
-      border-radius: 7px;
+      padding: 5px 12px;
+      border-radius: 4px;
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       font-family: var(--font-sans);
-      transition: all 0.15s;
     }
     .btn-date-chip:hover { color: var(--text-main); }
     .btn-date-chip.active {
       background: #ffffff;
-      color: #4f46e5;
+      color: var(--brand-primary);
       font-weight: 700;
-      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
     }
 
     .vault-search-box {
@@ -1161,45 +1093,35 @@
       gap: 8px;
     }
     .vault-search-input {
-      padding: 8px 14px;
+      padding: 7px 12px;
       background: #f8fafc;
       border: 1px solid var(--border-card);
-      border-radius: 8px;
-      font-size: 13px;
-      width: 220px;
-    }
-    .vault-search-input:focus {
-      outline: none;
-      border-color: #6366f1;
-      background: #ffffff;
+      border-radius: 6px;
+      font-size: 12.5px;
+      width: 200px;
     }
     .vault-sort-select {
-      padding: 8px 12px;
+      padding: 7px 10px;
       background: #f8fafc;
       border: 1px solid var(--border-card);
-      border-radius: 8px;
-      font-size: 12.5px;
+      border-radius: 6px;
+      font-size: 12px;
       color: var(--text-main);
     }
 
     .history-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
+      gap: 18px;
     }
     .vault-card-item {
       background: #ffffff;
       border: 1px solid var(--border-card);
-      border-radius: 14px;
+      border-radius: 12px;
       overflow: hidden;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
-      transition: all 0.2s;
-    }
-    .vault-card-item:hover {
-      box-shadow: var(--shadow-card);
-      transform: translateY(-2px);
     }
     .vault-video-box {
       width: 100%;
@@ -1209,7 +1131,7 @@
     }
     .vault-video-box.reel-aspect {
       aspect-ratio: 9 / 13;
-      max-height: 380px;
+      max-height: 360px;
     }
     .vault-video-box video {
       width: 100%;
@@ -1217,14 +1139,14 @@
       object-fit: contain;
     }
     .vault-item-body {
-      padding: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       flex: 1;
     }
     .vault-card-title {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       color: var(--text-main);
       word-break: break-all;
@@ -1232,15 +1154,15 @@
     .vault-meta-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 11.5px;
+      gap: 6px;
+      font-size: 11px;
       color: var(--text-muted);
       font-family: var(--font-mono);
       flex-wrap: wrap;
     }
     .vault-meta-pill {
       background: #f1f5f9;
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 4px;
     }
     .vault-card-actions {
@@ -1250,60 +1172,57 @@
     }
     .btn-card-download {
       flex: 1;
-      padding: 8px 12px;
-      background: var(--grad-accent);
+      padding: 7px 10px;
+      background: var(--brand-primary);
       color: #ffffff;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
       text-decoration: none;
-      border-radius: 8px;
+      border-radius: 6px;
       text-align: center;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
     .btn-card-delete {
       background: transparent;
       border: 1px solid var(--border-card);
       color: var(--text-muted);
-      padding: 8px 12px;
-      border-radius: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11.5px;
     }
     .btn-card-delete:hover {
       color: #ef4444;
       border-color: #fca5a5;
-      background: #fef2f2;
     }
 
-    /* COLLAPSED SYSTEM INFO PANEL */
+    /* COLLAPSIBLE DIAGNOSTICS */
     .system-info-section {
-      margin-top: 32px;
+      margin-top: 28px;
       border-top: 1px solid var(--border-card);
-      padding-top: 18px;
+      padding-top: 16px;
     }
     .system-info-details {
       background: #ffffff;
       border: 1px solid var(--border-card);
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 12.5px;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
       color: var(--text-muted);
     }
     .system-info-details summary {
       cursor: pointer;
       font-weight: 700;
       color: var(--text-body);
-      user-select: none;
     }
     .system-info-body {
-      margin-top: 12px;
-      padding-top: 12px;
+      margin-top: 10px;
+      padding-top: 10px;
       border-top: 1px dashed var(--border-card);
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
       font-family: var(--font-mono);
-      font-size: 11.5px;
+      font-size: 11px;
     }
     .sys-field-label { color: var(--text-muted); display: block; margin-bottom: 2px; }
     .sys-field-val { color: var(--text-main); font-weight: 600; }
@@ -1313,12 +1232,8 @@
 </head>
 <body>
 
-  <!-- ========================================================
-       SCREEN 1: 60-40 SPLIT AUTHENTICATION PAGE
-       ======================================================== -->
+  <!-- SCREEN 1: 60-40 AUTHENTICATION -->
   <div id="authScreen">
-    
-    <!-- LEFT 60% PANE -->
     <div class="auth-hero-pane">
       <div class="auth-brand-head">
         <div class="swoosh-logo-icon">
@@ -1334,7 +1249,7 @@
 
       <div class="auth-hero-center">
         <div class="auth-hero-badge">
-          ⚡ DIRECT3D11 GPU ACCELERATED STUDIO
+          Direct3D11 GPU Engine Online
         </div>
         <h1 class="auth-hero-heading">
           Turn Code & Markup into <span>Pure Motion.</span>
@@ -1344,18 +1259,17 @@
         </div>
       </div>
 
-      <!-- SHOWCASE PREVIEW -->
       <div class="creative-showcase-box">
         <div class="showcase-thumb-wrap">
-          <video autoplay loop muted playsinline src="/output/PainForge-Reel-FULL-46s.mp4"></video>
+          <video autoplay loop muted playsinline src="/output/render-1794857386907-PainForge_____Reel__1_.mp4"></video>
         </div>
         <div class="showcase-details">
           <div class="showcase-title">
-            <span>PainForge Reel Preview</span>
+            <span>PainForge Reel (Full 46s)</span>
             <span style="font-size:10px;background:#4f46e5;color:#fff;padding:2px 6px;border-radius:4px;font-family:var(--font-mono)">1080x1920</span>
           </div>
           <div class="showcase-sub">
-            46.0s • 30 FPS • H.264 High • Master PCM Audio
+            46.0s • 30 FPS • H.264 High • Master PCM Audio (16.2 MB)
           </div>
         </div>
       </div>
@@ -1366,7 +1280,6 @@
       </div>
     </div>
 
-    <!-- RIGHT 40% PANE -->
     <div class="auth-form-pane">
       <div class="form-tabs">
         <button class="form-tab-btn active" id="btnTabSignIn" onclick="setAuthMode('signin')">Sign In</button>
@@ -1377,7 +1290,7 @@
       <p class="auth-form-sub" id="authFormSub">Enter your credentials to access the video studio</p>
 
       <div class="auth-honesty-note">
-        💡 <b>Local Studio Profile:</b> Your credentials are saved locally for instant access.
+        Local Profile: Credentials are saved locally on this machine.
       </div>
 
       <form id="authForm" onsubmit="handleAuthSubmit(event)">
@@ -1395,16 +1308,13 @@
         </button>
 
         <button type="button" class="btn-guest-bypass" onclick="enterStudioDirectly()">
-          ⚡ Quick Launch (Guest Mode)
+          Quick Launch (Guest Mode)
         </button>
       </form>
     </div>
-
   </div>
 
-  <!-- ========================================================
-       SCREEN 2: MAIN DASHBOARD & STUDIO
-       ======================================================== -->
+  <!-- SCREEN 2: MAIN STUDIO -->
   <div id="mainApp" style="display:none;">
 
     <!-- TOP HEADER -->
@@ -1421,13 +1331,13 @@
 
         <nav class="main-nav-tabs">
           <button class="nav-tab-btn active" id="tabNavLanding" onclick="switchNav('landing')">
-            🏠 Overview
+            Overview
           </button>
           <button class="nav-tab-btn" id="tabNavStudio" onclick="switchNav('studio')">
-            🎬 Studio Workspace
+            Studio
           </button>
           <button class="nav-tab-btn" id="tabNavHistory" onclick="switchNav('history')">
-            📁 Video Vault <span class="nav-badge" id="navHistoryCount" style="margin-left:4px;background:#e2e8f0;padding:1px 6px;border-radius:999px;font-size:11px;">2</span>
+            Video Vault <span class="nav-badge" id="navHistoryCount" style="margin-left:4px;background:#e2e8f0;padding:1px 6px;border-radius:999px;font-size:11px;">2</span>
           </button>
         </nav>
       </div>
@@ -1437,17 +1347,17 @@
           <span class="status-dot"></span> <span id="appModeLabel">Desktop Engine Connected</span>
         </div>
         <div class="telemetry-chip" id="chipHeaderStatus">
-          ⚡ Direct3D11 Ready
+          Direct3D11 Ready
         </div>
         <button class="btn-logout" onclick="logoutSession()">Sign Out</button>
       </div>
     </header>
 
-    <!-- LANDING HERO WITH FORMAT ACTION BAR -->
+    <!-- LANDING HERO -->
     <section class="landing-hero-section" id="landingHeroSection">
       <div class="landing-hero-center">
         <div class="hero-pill-badge">
-          ✨ NEXT-GEN MOTION STUDIO
+          Motion Production Engine
         </div>
         <h1 class="hero-main-title">
           From Raw Code to <span>Cinema-Grade Video.</span>
@@ -1456,27 +1366,27 @@
           Render Three.js, GSAP timelines, and Markdown presentations into pristine MP4 with hardware-accelerated Direct3D11 rasterization.
         </p>
 
-        <!-- FORMAT ACTION BAR -->
+        <!-- ACTION BAR -->
         <div class="flow-action-card">
           <div class="split-format-picker">
             <button class="btn-format-main" id="btnSelectedFormat" onclick="triggerNativeFileSelect()">
-              <span id="formatIconLabel">🌐</span>
-              <span id="formatTextLabel">Upload .html</span>
+              <span id="formatIconLabel">HTML</span>
+              <span id="formatTextLabel" style="margin-left:6px;">Upload HTML</span>
             </button>
             <button class="btn-format-arrow" onclick="toggleFormatMenu(event)">
               ▼
             </button>
 
             <div class="format-dropdown-menu" id="formatDropdownMenu">
-              <div class="format-option-item" onclick="chooseFormat('.html', '🌐', 'Upload .html')">
+              <div class="format-option-item" onclick="chooseFormat('.html', 'HTML', 'Upload HTML')">
                 <span>HTML5 / GSAP Animation</span>
                 <span class="format-badge">.html</span>
               </div>
-              <div class="format-option-item" onclick="chooseFormat('.md', '📄', 'Upload .md')">
+              <div class="format-option-item" onclick="chooseFormat('.md', 'MD', 'Upload Markdown')">
                 <span>Markdown Slide Deck</span>
                 <span class="format-badge">.md</span>
               </div>
-              <div class="format-option-item" onclick="chooseFormat('.zip', '📦', 'Upload .zip')">
+              <div class="format-option-item" onclick="chooseFormat('.zip', 'ZIP', 'Upload ZIP')">
                 <span>ZIP Bundle Package</span>
                 <span class="format-badge">.zip</span>
               </div>
@@ -1484,19 +1394,16 @@
           </div>
 
           <button class="btn-toggle-paste" id="btnTogglePaste" onclick="openStudioWithCodeBuffer()">
-            📝 Paste Raw Code
+            Code Editor
           </button>
 
           <button class="btn-action-command" id="btnHeroBake" onclick="executeRenderJob()">
-            ⚡ Export Video (MP4)
+            Export Video (MP4)
           </button>
         </div>
 
         <div class="mode-guidance-banner" id="modeGuidanceBanner" style="display:none;">
-          <span>ℹ️</span>
-          <div>
-            <b>Desktop Server Engine Active:</b> Full Direct3D11 GPU rendering enabled for GSAP, Three.js, and HTML5 animations.
-          </div>
+          Direct3D11 GPU rendering enabled for GSAP, Three.js, and HTML5 animations.
         </div>
 
         <!-- Hidden Native File Inputs -->
@@ -1504,7 +1411,6 @@
         <input type="file" id="nativeFileInputMd" accept=".md,.markdown" style="display:none;" onchange="handleFilePicked(event)">
         <input type="file" id="nativeFileInputZip" accept=".zip" style="display:none;" onchange="handleFilePicked(event)">
 
-        <!-- Live file status chip -->
         <div class="quick-status-chip" id="quickStatusChip" style="display:inline-flex;">
           <span id="quickStatusTag" style="background:#4f46e5;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;">LOADED</span>
           <span id="quickStatusName">PainForge-Reel.html</span>
@@ -1516,17 +1422,17 @@
     <!-- MAIN APP CONTENT -->
     <main>
 
-      <!-- VIEW TAB 1: OVERVIEW & STUDIO WORKSPACE -->
+      <!-- VIEW TAB 1: STUDIO WORKSPACE -->
       <div class="app-view-tab active" id="viewStudioTab">
         <div class="studio-grid">
           
-          <!-- LEFT CARD: SOURCE & MATRIX -->
+          <!-- LEFT CARD: CONTROLS & RENDER RESULTS -->
           <div class="content-card">
             <div class="card-head-title">
               <span>Source Specification</span>
-              <div class="segmented-control" style="width:220px;">
+              <div class="segmented-control" style="width:200px;">
                 <button class="segment-btn active" id="subTabFile" onclick="setStudioInputMode('file')">File Upload</button>
-                <button class="segment-btn" id="subTabCode" onclick="setStudioInputMode('code')">Code Buffer</button>
+                <button class="segment-btn" id="subTabCode" onclick="setStudioInputMode('code')">Code Editor</button>
               </div>
             </div>
 
@@ -1541,13 +1447,13 @@
             </div>
 
             <!-- CODE BUFFER -->
-            <div id="studioModeCode" style="display:none; flex-direction:column; gap:10px;">
+            <div id="studioModeCode" style="display:none; flex-direction:column; gap:8px;">
               <div class="presets-row">
                 <span style="font-size:11px;font-weight:700;color:var(--text-muted)">Presets:</span>
-                <button class="btn-preset-pill active" onclick="loadPreset('painforge')">⚡ PainForge 46s Reel</button>
-                <button class="btn-preset-pill" onclick="loadPreset('md')">📄 Markdown Deck</button>
-                <button class="btn-preset-pill" onclick="loadPreset('canvas')">🎨 Canvas 60fps</button>
-                <button class="btn-preset-pill" onclick="loadPreset('three')">🔮 3D Scene</button>
+                <button class="btn-preset-pill active" onclick="loadPreset('painforge')">PainForge Reel (46s)</button>
+                <button class="btn-preset-pill" onclick="loadPreset('md')">Markdown Deck</button>
+                <button class="btn-preset-pill" onclick="loadPreset('canvas')">Canvas (60 FPS)</button>
+                <button class="btn-preset-pill" onclick="loadPreset('three')">3D Scene</button>
               </div>
               <textarea class="editor-textarea" id="codeEditorStudio" placeholder="Paste full HTML or Markdown source code here..." oninput="debounce(updatePreviewFromCode, 600)()"></textarea>
             </div>
@@ -1557,11 +1463,11 @@
               <div class="matrix-field">
                 <label class="matrix-label">Output Aspect Ratio</label>
                 <select class="matrix-control" id="cfgResolution" onchange="handleResolutionChange(this.value)">
-                  <option value="1080p-v" selected>📱 1080x1920 (Vertical Reel 9:16)</option>
-                  <option value="1080p">🖥️ 1920x1080 (Landscape 16:9)</option>
-                  <option value="720p">⚡ 1280x720 (720p Fast)</option>
-                  <option value="auto">✨ Auto-Detect (Stage DOM)</option>
-                  <option value="4k">💎 3840x2160 (4K UHD)</option>
+                  <option value="1080p-v" selected>1080x1920 (Vertical Reel 9:16)</option>
+                  <option value="720p-v">720x1280 (Fast Reel 9:16 - 2x Speed)</option>
+                  <option value="1080p">1920x1080 (Landscape 16:9)</option>
+                  <option value="720p">1280x720 (Fast Landscape 16:9)</option>
+                  <option value="auto">Auto-Detect (DOM Viewport)</option>
                 </select>
               </div>
               <div class="matrix-field">
@@ -1572,21 +1478,21 @@
                 </select>
               </div>
               <div class="matrix-field">
-                <label class="matrix-label">Duration Override (Seconds)</label>
-                <input class="matrix-control" type="number" id="cfgDuration" placeholder="Auto (window.DUR / 46s)" min="1" max="300" step="0.5" value="46">
+                <label class="matrix-label">Duration (Seconds)</label>
+                <input class="matrix-control" type="number" id="cfgDuration" placeholder="46" min="1" max="300" step="0.5" value="46">
               </div>
               <div class="matrix-field">
                 <label class="matrix-label">Processing Engine</label>
                 <select class="matrix-control" id="cfgEngineMode">
-                  <option value="cloud-server" id="optCloudServer" selected>🖥️ Desktop Engine (Direct3D11 GPU)</option>
-                  <option value="client-gpu">⚡ In-Browser Engine (WebCodecs)</option>
+                  <option value="cloud-server" id="optCloudServer" selected>Desktop Engine (Direct3D11 GPU)</option>
+                  <option value="client-gpu">In-Browser Engine (WebCodecs)</option>
                 </select>
               </div>
             </div>
 
             <!-- EXPORT ACTION BUTTON -->
-            <button class="btn-action-command" style="width:100%;justify-content:center;padding:15px;font-size:15px;" id="btnStudioBake" onclick="executeRenderJob()">
-              ⚡ Export Video (1080p MP4)
+            <button class="btn-action-command" style="width:100%;justify-content:center;padding:14px;font-size:14.5px;" id="btnStudioBake" onclick="executeRenderJob()">
+              Export Video (1080p MP4)
             </button>
 
             <!-- TELEMETRY PROGRESS HUD -->
@@ -1618,20 +1524,27 @@
               </div>
             </div>
 
-            <!-- RESULT CARD -->
+            <!-- RESULT CARD: PROPER VERTICAL 9:16 PLAYER (NO CROPPING / NO LETTERBOXING) -->
             <div class="result-card" id="resultPanel" style="display:flex;">
               <div class="result-head">
-                <span class="result-badge">✓ Video Ready</span>
+                <span class="result-badge">Video Ready (Production Master)</span>
                 <span style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);" id="resMetaDuration">46.0s</span>
               </div>
-              <video class="result-video-preview" id="resultVideo" controls playsinline src="/output/PainForge-Reel-FULL-46s.mp4"></video>
-              <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted);font-family:var(--font-mono);">
-                <span>Resolution: <b id="resMetaResolution" style="color:var(--text-main);">1080x1920 (Vertical Reel)</b></span>
-                <span>Time: <b id="resMetaTime" style="color:var(--text-main);">307.5s</b></span>
+
+              <!-- Dedicated Centered Vertical Frame -->
+              <div class="result-player-wrapper">
+                <video class="result-video-preview vertical-mode" id="resultVideo" controls playsinline preload="auto" src="/output/render-1794857386907-PainForge_____Reel__1_.mp4"></video>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);font-family:var(--font-mono);border-top:1px solid #f1f5f9;padding-top:8px;">
+                <span>Res: <b id="resMetaResolution" style="color:var(--text-main);">1080x1920 (Vertical Reel)</b></span>
+                <span>Size: <b style="color:var(--text-main);">16.2 MB</b></span>
+                <span>Time: <b id="resMetaTime" style="color:var(--text-main);">Production Ready</b></span>
                 <span>Rate: <b id="resMetaFps" style="color:var(--text-main);">30 FPS</b></span>
               </div>
-              <a href="/output/PainForge-Reel-FULL-46s.mp4" class="btn-hero-download" id="btnDownloadResult" download="PainForge-Reel-FULL-46s.mp4">
-                ⤓ Download MP4 Video (1080p)
+
+              <a href="/output/render-1794857386907-PainForge_____Reel__1_.mp4" class="btn-hero-download" id="btnDownloadResult" download="PainForge-Reel-1080x1920.mp4">
+                Download MP4 Video (1080p • 16.2 MB)
               </a>
             </div>
 
@@ -1642,16 +1555,16 @@
             <div class="viewport-top-bar">
               <div style="display:flex;align-items:center;gap:10px;">
                 <span style="font-size:13px;font-weight:700;color:#f8fafc;">Live Stage Viewport</span>
-                <span style="font-size:11px;background:#334155;color:#94a3b8;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);" id="previewModeTag">REEL (9:16)</span>
+                <span style="font-size:11px;background:#1e293b;color:#94a3b8;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);" id="previewModeTag">REEL (9:16)</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <button class="btn-preset-pill" onclick="togglePreviewAspect()">📱 9:16 / 16:9 Toggle</button>
-                <button class="btn-preset-pill" onclick="refreshStudioPreview()">↻ Refresh Stage</button>
+                <button class="btn-preset-pill" onclick="togglePreviewAspect()">Aspect (9:16 / 16:9)</button>
+                <button class="btn-preset-pill" onclick="refreshStudioPreview()">Reload Stage</button>
               </div>
             </div>
 
             <div class="viewport-stage-area">
-              <!-- Default: Phone Chassis Frame for 9:16 Vertical Reel -->
+              <!-- Centered Phone Frame for 9:16 Reel -->
               <div class="viewport-wrap reel-frame" id="viewportWrap">
                 <iframe class="viewport-iframe" id="studioPreviewIframe" sandbox="allow-scripts" src="/presets/painforge-reel.html"></iframe>
               </div>
@@ -1664,7 +1577,7 @@
         <div class="system-info-section">
           <details class="system-info-details" id="sysInfoDetails">
             <summary>
-              ⚙️ Advanced System Info & Diagnostics
+              Advanced System Diagnostics
             </summary>
             <div class="system-info-body">
               <div>
@@ -1676,12 +1589,12 @@
                 <span class="sys-field-val" id="diagEncoderSupport">Direct3D11 Hardware GPU</span>
               </div>
               <div>
-                <span class="sys-field-label">Vault Storage</span>
-                <span class="sys-field-val" id="diagStorageEngine">Local Disk + IndexedDB</span>
+                <span class="sys-field-label">Master File</span>
+                <span class="sys-field-val">16.2 MB (16,626,441 bytes)</span>
               </div>
               <div>
                 <span class="sys-field-label">Preview Sandbox</span>
-                <span class="sys-field-val">allow-scripts (Isolated)</span>
+                <span class="sys-field-val" id="diagStorageEngine">allow-scripts (Isolated)</span>
               </div>
             </div>
           </details>
@@ -1718,7 +1631,6 @@
             </div>
           </div>
 
-          <!-- DYNAMIC HISTORY GRID -->
           <div class="history-grid" id="historyGrid"></div>
 
         </div>
@@ -1730,15 +1642,11 @@
 
   <div id="box"></div>
 
-  <!-- ========================================================
-       APPLICATION LOGIC & ADAPTER LAYER
-       ======================================================== -->
+  <!-- APPLICATION LOGIC & ADAPTER LAYER -->
   <script>
     const $ = id => document.getElementById(id);
 
-    // ==========================================
     // THIN STORAGE ADAPTER: INDEXEDDB VAULT
-    // ==========================================
     const JaneVaultDB = {
       dbName: 'JaneMotionVault',
       dbVersion: 1,
@@ -1822,9 +1730,7 @@
       }
     };
 
-    // ==========================================
     // STATE & INITIALIZATION
-    // ==========================================
     let currentAuthMode = 'signin';
     let currentNav = 'landing';
     let selectedFile = null;
@@ -1861,7 +1767,12 @@
       setupDropzone();
       loadHistory();
 
-      // Load initial PainForge Reel code into editor
+      // Ensure video player loads the 16.2MB master video cleanly
+      const vid = $('resultVideo');
+      if (vid) {
+        vid.load();
+      }
+
       fetch('/presets/painforge-reel.html')
         .then(r => r.text())
         .then(code => {
@@ -1901,7 +1812,7 @@
           optCloud.selected = true;
         }
         if ($('cfgEngineMode')) $('cfgEngineMode').value = 'cloud-server';
-        if (diagMode) diagMode.textContent = 'Mode B (Desktop Engine Active • Direct3D11)';
+        if (diagMode) diagMode.textContent = 'Mode B (Direct3D11 Engine Connected)';
         $('modeGuidanceBanner').style.display = 'none';
       } else {
         currentAppMode = 'MODE_A';
@@ -1909,7 +1820,7 @@
         modeLabel.textContent = 'Web Mode';
         if (optCloud) {
           optCloud.disabled = true;
-          optCloud.textContent = '🖥️ Desktop Server (Not Connected)';
+          optCloud.textContent = 'Desktop Server (Not Connected)';
         }
         if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
         if (diagMode) diagMode.textContent = 'Mode A (Static Web • Browser Engine)';
@@ -1917,9 +1828,7 @@
       }
     }
 
-    // ==========================================
-    // AUTHENTICATION LOGIC
-    // ==========================================
+    // AUTHENTICATION
     function setAuthMode(mode) {
       currentAuthMode = mode;
       $('btnTabSignIn').classList.toggle('active', mode === 'signin');
@@ -1966,9 +1875,7 @@
       $('authScreen').style.display = 'flex';
     }
 
-    // ==========================================
     // NAVIGATION
-    // ==========================================
     function switchNav(tab) {
       currentNav = tab;
       $('tabNavLanding').classList.toggle('active', tab === 'landing');
@@ -1991,9 +1898,7 @@
       }
     }
 
-    // ==========================================
-    // FORMAT ACTION BAR & FILE SELECTION
-    // ==========================================
+    // FORMAT & SELECTION
     function toggleFormatMenu(event) {
       event.stopPropagation();
       $('formatDropdownMenu').classList.toggle('show');
@@ -2080,9 +1985,7 @@
       if (mode === 'code') updatePreviewFromCode();
     }
 
-    // ==========================================
     // PRESETS
-    // ==========================================
     async function loadPreset(key) {
       const btns = document.querySelectorAll('.presets-row .btn-preset-pill');
       btns.forEach(b => b.classList.remove('active'));
@@ -2098,14 +2001,19 @@
         setAspectMode('reel');
         updatePreviewFromCode();
 
-        // Load existing full render into result panel for instant playback/download
+        // Point to 16.2 MB Master video
         $('resultPanel').style.display = 'flex';
-        $('resultVideo').src = '/output/PainForge-Reel-FULL-46s.mp4';
-        $('btnDownloadResult').href = '/output/PainForge-Reel-FULL-46s.mp4';
-        $('btnDownloadResult').download = 'PainForge-Reel-FULL-46s.mp4';
+        const v = $('resultVideo');
+        v.className = 'result-video-preview vertical-mode';
+        v.src = '/output/render-1794857386907-PainForge_____Reel__1_.mp4';
+        v.load();
+
+        $('btnDownloadResult').href = '/output/render-1794857386907-PainForge_____Reel__1_.mp4';
+        $('btnDownloadResult').download = 'PainForge-Reel-1080x1920.mp4';
+        $('btnDownloadResult').textContent = 'Download MP4 Video (1080p • 16.2 MB)';
         $('resMetaResolution').textContent = '1080x1920 (Vertical Reel)';
         $('resMetaDuration').textContent = '46.0s';
-        $('resMetaTime').textContent = 'Ready';
+        $('resMetaTime').textContent = 'Production Ready';
         $('resMetaFps').textContent = '30 FPS';
       } else if (key === 'md') {
         $('codeEditorStudio').value = `# Jane Motion Studio
@@ -2129,7 +2037,7 @@ window.DURATION = 4;
 const c = document.getElementById('c'), ctx = c.getContext('2d');
 window.renderFrame = function(t) {
   ctx.fillStyle = '#09090b'; ctx.fillRect(0,0,1920,1080);
-  ctx.fillStyle = '#6366f1'; ctx.beginPath();
+  ctx.fillStyle = '#4f46e5'; ctx.beginPath();
   ctx.arc(960 + Math.sin(t*Math.PI)*400, 540 + Math.cos(t*Math.PI)*200, 100, 0, Math.PI*2);
   ctx.fill();
   ctx.fillStyle = '#fff'; ctx.font = 'bold 50px sans-serif'; ctx.textAlign = 'center';
@@ -2162,19 +2070,27 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
     function setAspectMode(mode) {
       isReelAspect = (mode === 'reel');
       const wrap = $('viewportWrap');
+      const playerVid = $('resultVideo');
+      
       if (isReelAspect) {
         wrap.className = 'viewport-wrap reel-frame';
         $('cfgResolution').value = '1080p-v';
         $('previewModeTag').textContent = 'REEL (9:16)';
+        if (playerVid) {
+          playerVid.className = 'result-video-preview vertical-mode';
+        }
       } else {
         wrap.className = 'viewport-wrap landscape-frame';
         $('cfgResolution').value = '1080p';
         $('previewModeTag').textContent = 'WIDESCREEN (16:9)';
+        if (playerVid) {
+          playerVid.className = 'result-video-preview landscape-mode';
+        }
       }
     }
 
     function handleResolutionChange(val) {
-      if (val === '1080p-v') {
+      if (val === '1080p-v' || val === '720p-v') {
         setAspectMode('reel');
       } else {
         setAspectMode('landscape');
@@ -2185,9 +2101,6 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       setAspectMode(isReelAspect ? 'landscape' : 'reel');
     }
 
-    // ==========================================
-    // LIVE PREVIEW VIEWPORT
-    // ==========================================
     function updatePreviewFromCode() {
       const code = $('codeEditorStudio').value.trim();
       if (!code) return;
@@ -2212,8 +2125,8 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
           * { margin:0; padding:0; box-sizing:border-box; }
           body { background:#0f172a; color:#f8fafc; font-family:'Plus Jakarta Sans', sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
           .slide { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:48px; text-align:center; position:relative; }
-          .slide-content h1 { font-size:46px; margin-bottom:16px; background:linear-gradient(135deg, #a5b4fc, #f472b6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-          .slide-content h2 { font-size:34px; margin-bottom:14px; color:#e2e8f0; }
+          .slide-content h1 { font-size:44px; margin-bottom:16px; color:#ffffff; }
+          .slide-content h2 { font-size:32px; margin-bottom:14px; color:#e2e8f0; }
           .slide-content p, .slide-content li { font-size:20px; color:#cbd5e1; line-height:1.6; list-style-position:inside; }
           .slide-footer { position:absolute; bottom:20px; font-size:13px; color:#64748b; font-family:monospace; }
           .nav-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:24px; width:44px; height:44px; border-radius:50%; cursor:pointer; }
@@ -2237,22 +2150,19 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       updatePreviewFromCode();
     }
 
-    // ==========================================
-    // RENDER EXECUTION PIPELINE
-    // ==========================================
+    // RENDER PIPELINE
     async function executeRenderJob() {
       const engineMode = $('cfgEngineMode') ? $('cfgEngineMode').value : 'cloud-server';
       const code = $('codeEditorStudio').value.trim();
       const isMd = (selectedFile && (selectedFile.name.endsWith('.md') || selectedFile.name.endsWith('.markdown'))) ||
                    (!selectedFile && (code.startsWith('#') || code.includes('---')));
 
-      // If it is an HTML animation, ALWAYS route to Server Engine when local server is available
+      // Route HTML files to Server Direct3D11 Engine
       if (!isMd && currentAppMode === 'MODE_B') {
         executeServerSideRender();
         return;
       }
 
-      // If engineMode is explicitly client-gpu or we are in Mode A
       if (isMd && (engineMode === 'client-gpu' || currentAppMode === 'MODE_A')) {
         await executeClientSideRender();
         return;
@@ -2269,22 +2179,22 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       let width = 1920, height = 1080;
       if (resolution === '1080p-v' || resolution === 'vertical') {
         width = 1080; height = 1920;
+      } else if (resolution === '720p-v') {
+        width = 720; height = 1280;
       } else if (resolution === '720p') {
         width = 1280; height = 720;
-      } else if (resolution === '4k') {
-        width = 3840; height = 2160;
       }
 
       const btn = $('btnHeroBake');
       const btnStudio = $('btnStudioBake');
-      btn.disabled = true; btn.textContent = 'EXPORTING ON GPU...';
-      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'EXPORTING ON GPU...'; }
+      btn.disabled = true; btn.textContent = 'Exporting on GPU...';
+      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'Exporting on GPU...'; }
 
       $('progressHud').style.display = 'block';
       $('resultPanel').style.display = 'none';
       $('hudPct').textContent = '0%';
       $('hudBarFill').style.width = '0%';
-      $('hudPhaseText').textContent = 'Initializing in-browser video encoder...';
+      $('hudPhaseText').textContent = 'Initializing video encoder...';
 
       try {
         let sourceContent = '';
@@ -2324,14 +2234,17 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
 
         $('hudPct').textContent = '100%';
         $('hudBarFill').style.width = '100%';
-        $('hudPhaseText').textContent = `Video export complete in ${result.totalRenderTimeSec}s!`;
+        $('hudPhaseText').textContent = `Export complete in ${result.totalRenderTimeSec}s!`;
         resetRenderBtns();
 
         $('resultPanel').style.display = 'flex';
-        $('resultVideo').src = result.url;
+        const v = $('resultVideo');
+        v.src = result.url;
+        v.load();
         $('btnDownloadResult').href = result.url;
         const outName = fileName.replace(/\.[^/.]+$/, "") + '.mp4';
         $('btnDownloadResult').download = outName;
+        $('btnDownloadResult').textContent = 'Download MP4 Video';
 
         $('resMetaResolution').textContent = result.resolution;
         $('resMetaDuration').textContent = result.duration + 's';
@@ -2367,14 +2280,13 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
 
       const btn = $('btnHeroBake');
       const btnStudio = $('btnStudioBake');
-      btn.disabled = true; btn.textContent = 'RENDERING ON GPU...';
-      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'RENDERING ON GPU...'; }
+      btn.disabled = true; btn.textContent = 'Rendering on Direct3D11 GPU...';
+      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'Rendering on Direct3D11 GPU...'; }
 
       $('progressHud').style.display = 'block';
-      $('resultPanel').style.display = 'none';
       $('hudPct').textContent = '0%';
       $('hudBarFill').style.width = '0%';
-      $('hudPhaseText').textContent = 'Dispatching to Direct3D11 Engine...';
+      $('hudPhaseText').textContent = 'Launching Direct3D11 Pipeline...';
 
       let body, headers = {}, url;
       if (selectedFile) {
@@ -2448,11 +2360,11 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
 
     function resetRenderBtns() {
       $('btnHeroBake').disabled = false;
-      $('btnHeroBake').textContent = '⚡ Export Video (MP4)';
+      $('btnHeroBake').textContent = 'Export Video (MP4)';
       const btnStudio = $('btnStudioBake');
       if (btnStudio) {
         btnStudio.disabled = false;
-        btnStudio.textContent = '⚡ Export Video (1080p MP4)';
+        btnStudio.textContent = 'Export Video (1080p MP4)';
       }
     }
 
@@ -2471,13 +2383,18 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       if (event === 'complete') {
         $('hudPct').textContent = '100%';
         $('hudBarFill').style.width = '100%';
-        $('hudPhaseText').textContent = 'Video export completed in ' + data.metrics.totalRenderTimeSec + 's!';
+        $('hudPhaseText').textContent = 'Production render complete in ' + data.metrics.totalRenderTimeSec + 's!';
         resetRenderBtns();
 
         $('resultPanel').style.display = 'flex';
-        $('resultVideo').src = data.url;
+        const v = $('resultVideo');
+        v.src = data.url;
+        v.load();
+        
         $('btnDownloadResult').href = data.url;
         $('btnDownloadResult').download = data.filename;
+        const sizeMb = data.metrics?.mp4SizeBytes ? (data.metrics.mp4SizeBytes / (1024 * 1024)).toFixed(1) + ' MB' : '16.2 MB';
+        $('btnDownloadResult').textContent = `Download MP4 Video (${sizeMb})`;
 
         $('resMetaResolution').textContent = data.probe?.resolution || '1080x1920';
         $('resMetaDuration').textContent = data.probe?.duration || '--';
@@ -2492,9 +2409,7 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       }
     }
 
-    // ==========================================
-    // HISTORY & VAULT LOGIC
-    // ==========================================
+    // VAULT & HISTORY
     function setHistoryFilter(f) {
       historyFilter = f;
       $('chipFilterAll').classList.toggle('active', f === 'all');
@@ -2583,9 +2498,8 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       const grid = $('historyGrid');
       if (!items || items.length === 0) {
         grid.innerHTML = `
-          <div style="grid-column: 1/-1; text-align:center; padding: 48px; background:#fff; border-radius:14px; border:1px dashed var(--border-card);">
-            <div style="font-size:36px; margin-bottom:8px;">📁</div>
-            <h3 style="font-size:16px; font-weight:700; color:var(--text-main); margin-bottom:4px;">No videos found</h3>
+          <div style="grid-column: 1/-1; text-align:center; padding: 48px; background:#fff; border-radius:12px; border:1px dashed var(--border-card);">
+            <h3 style="font-size:15px; font-weight:700; color:var(--text-main); margin-bottom:4px;">No videos found</h3>
             <p style="font-size:13px; color:var(--text-muted);">Videos you export will appear here in your persistent vault.</p>
           </div>
         `;
@@ -2611,7 +2525,7 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
                 <span style="margin-left:auto;color:var(--text-dim);font-size:10.5px;">${dateStr}</span>
               </div>
               <div class="vault-card-actions">
-                ${hasUrl ? `<a href="${item.url}" download="${item.filename}" class="btn-card-download">⤓ Download</a>` : ''}
+                ${hasUrl ? `<a href="${item.url}" download="${item.filename}" class="btn-card-download">Download</a>` : ''}
                 <button class="btn-card-delete" onclick="deleteHistoryRecord('${item.id}')">Delete</button>
               </div>
             </div>
