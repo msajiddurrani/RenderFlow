@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="render-duration" content="1.5"></head>
+<body style="margin:0;background:#030712;display:flex;align-items:center;justify-content:center;width:1920px;height:1080px;">
+  <h1 id="title" style="color:#38bdf8;font-size:72px;font-family:sans-serif;">UPLOAD TEST ANIMATION</h1>
+  <script>
+    window.renderFrame = function(f) {
+      document.getElementById('title').style.transform = 'scale(' + (1 + Math.sin(f * 0.1) * 0.2) + ')';
+    };
+  </script>
+</body>
+</html>

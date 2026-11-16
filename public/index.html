@@ -1,0 +1,2140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jane Motion — HTML & Markdown to MP4 Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="/vendor/mp4-muxer.js"></script>
+  <script src="/vendor/marked.min.js"></script>
+  <script src="/client-engine.js"></script>
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-subtle: #f1f5f9;
+      --border-card: #e2e8f0;
+      --border-focus: #6366f1;
+      --text-main: #0f172a;
+      --text-body: #334155;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      
+      /* Vibrant Multi-stop Gradients */
+      --grad-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+      --grad-primary-hover: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #db2777 100%);
+      --grad-success: linear-gradient(135deg, #059669 0%, #10b981 50%, #06b6d4 100%);
+      --grad-success-hover: linear-gradient(135deg, #047857 0%, #059669 50%, #0891b2 100%);
+      --grad-brand: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+      --grad-accent: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      --grad-glow: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(236, 72, 153, 0.15));
+
+      /* Ambient Multi-Layer Shadows */
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+      --shadow-btn: 0 8px 24px -4px rgba(99, 102, 241, 0.4);
+      --shadow-btn-hover: 0 12px 28px -4px rgba(99, 102, 241, 0.55);
+      --shadow-btn-success: 0 8px 20px -4px rgba(16, 185, 129, 0.4);
+
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background-color: var(--bg-page);
+      background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========================================================
+       SCREEN 1: 60-40 SPLIT AUTHENTICATION EXPERIENCE
+       ======================================================== */
+    #authScreen {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      background: #ffffff;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      overflow-y: auto;
+    }
+
+    /* LEFT 60% PANE */
+    .auth-hero-pane {
+      flex: 60%;
+      background: linear-gradient(145deg, #090d16 0%, #111827 50%, #1e1b4b 100%);
+      color: #ffffff;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-hero-pane::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+      top: -150px;
+      right: -150px;
+      pointer-events: none;
+    }
+    .auth-hero-pane::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, transparent 70%);
+      bottom: -100px;
+      left: -100px;
+      pointer-events: none;
+    }
+
+    .auth-brand-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 10;
+    }
+    .swoosh-logo-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--grad-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    }
+    .swoosh-logo-icon svg {
+      width: 26px;
+      height: 26px;
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .auth-brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+    }
+    .auth-brand-tag {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3px 8px;
+      border-radius: 20px;
+      color: #cbd5e1;
+    }
+
+    .auth-hero-center {
+      max-width: 620px;
+      z-index: 10;
+      margin: 40px 0;
+    }
+    .auth-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(129, 140, 248, 0.3);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #a5b4fc;
+      margin-bottom: 22px;
+      font-family: var(--font-mono);
+    }
+    .auth-hero-heading {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+    .auth-hero-heading span {
+      background: linear-gradient(135deg, #a5b4fc 0%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .auth-dynamic-line {
+      font-size: 18px;
+      color: #94a3b8;
+      line-height: 1.5;
+      min-height: 54px;
+      font-weight: 500;
+      transition: opacity 0.3s ease;
+    }
+
+    /* CREATIVE SHOWCASE CARD IN 60% PANE */
+    .creative-showcase-box {
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .showcase-thumb-wrap {
+      width: 120px;
+      height: 72px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+    .showcase-thumb-wrap video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .showcase-details {
+      flex: 1;
+    }
+    .showcase-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .showcase-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .auth-hero-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #64748b;
+      z-index: 10;
+      font-family: var(--font-mono);
+    }
+
+    /* RIGHT 40% PANE */
+    .auth-form-pane {
+      flex: 40%;
+      background: #ffffff;
+      padding: 60px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    @media (max-width: 960px) {
+      #authScreen { flex-direction: column; }
+      .auth-hero-pane { flex: none; padding: 36px; min-height: 380px; }
+      .auth-form-pane { flex: none; width: 100%; max-width: 100%; padding: 36px 24px; }
+    }
+
+    .form-tabs {
+      display: flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-card);
+      margin-bottom: 28px;
+    }
+    .form-tab-btn {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.15s ease;
+    }
+    .form-tab-btn.active {
+      background: #ffffff;
+      color: var(--text-main);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    }
+
+    .auth-form-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .auth-form-sub {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 26px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .field-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-body);
+    }
+    .field-input {
+      width: 100%;
+      background: #f8fafc;
+      border: 1.5px solid var(--border-card);
+      color: var(--text-main);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .field-input:focus {
+      background: #ffffff;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    }
+
+    .btn-auth-submit {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: var(--grad-primary);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--shadow-btn);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: var(--font-sans);
+      margin-top: 8px;
+    }
+    .btn-auth-submit:hover {
+      background: var(--grad-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-btn-hover);
+    }
+
+    .btn-guest-bypass {
+      width: 100%;
+      padding: 13px;
+      border: 1.5px solid var(--border-card);
+      border-radius: 12px;
+      background: #f8fafc;
+      color: var(--text-body);
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      margin-top: 12px;
+      transition: all 0.15s ease;
+    }
+    .btn-guest-bypass:hover {
+      background: #f1f5f9;
+      color: var(--text-main);
+      border-color: #cbd5e1;
+    }
+
+    /* ========================================================
+       SCREEN 2: MAIN DASHBOARD & LANDING APPLICATION
+       ======================================================== */
+    #mainApp {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* TOP HEADER */
+    header {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-card);
+      padding: 14px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .header-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .header-logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--grad-brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .header-logo-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .header-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    .main-nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-card);
+    }
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+      transition: all 0.15s ease;
+    }
+    .nav-tab-btn:hover { color: var(--text-main); }
+    .nav-tab-btn.active {
+      background: #ffffff;
+      color: #4f46e5;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .telemetry-chip {
+      background: #f8fafc;
+      border: 1px solid var(--border-card);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #10b981;
+    }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border-card);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-logout:hover {
+      color: #ef4444;
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    /* HERO SECTION ON LANDING PAGE */
+    .landing-hero-section {
+      background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(248,250,252,0.4) 100%);
+      border-bottom: 1px solid var(--border-card);
+      padding: 56px 32px 48px;
+      text-align: center;
+      position: relative;
+    }
+    .landing-hero-center {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .hero-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #2563eb;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      margin-bottom: 18px;
+    }
+    .hero-main-title {
+      font-size: 44px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: var(--text-main);
+      margin-bottom: 14px;
+    }
+    .hero-main-title span {
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-main-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    /* ========================================================
+       THE INTERACTIVE FLOW ACTION BAR
+       Left: Format Selector with Arrow (Click opens native file picker directly)
+       Center: Paste Code Drawer
+       Right: Radiant Bake to MP4 Command
+       ======================================================== */
+    .flow-action-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-card);
+      border-radius: 18px;
+      padding: 14px 20px;
+      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08);
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    
+    /* Left split button: Format with Arrow */
+    .split-format-picker {
+      display: inline-flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .btn-format-main {
+      background: transparent;
+      border: none;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+    }
+    .btn-format-main:hover { background: #e2e8f0; }
+    .btn-format-arrow {
+      background: transparent;
+      border: none;
+      border-left: 1px solid #cbd5e1;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-format-arrow:hover { background: #e2e8f0; color: var(--text-main); }
+
+    /* Dropdown menu for formats */
+    .format-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 105%;
+      left: 0;
+      background: #ffffff;
+      border: 1.5px solid var(--border-card);
+      border-radius: 10px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+      width: 220px;
+      z-index: 100;
+      padding: 6px;
+      text-align: left;
+    }
+    .format-dropdown-menu.open { display: block; }
+    .format-option-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-body);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .format-option-item:hover {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+    .format-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    /* Paste code toggle */
+    .btn-toggle-paste {
+      background: #f8fafc;
+      border: 1px solid var(--border-card);
+      color: var(--text-body);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      font-family: var(--font-sans);
+    }
+    .btn-toggle-paste:hover {
+      background: #f1f5f9;
+      color: var(--text-main);
+    }
+
+    /* Right Command Button (Bake to MP4) */
+    .btn-action-command {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      background: var(--grad-primary);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-btn);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: var(--font-sans);
+    }
+    .btn-action-command:hover:not(:disabled) {
+      background: var(--grad-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-btn-hover);
+    }
+    .btn-action-command:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Quick status chip below bar */
+    .quick-status-chip {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 1px solid var(--border-card);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-main);
+    }
+
+    /* MAIN APP CONTAINER */
+    main {
+      flex: 1;
+      max-width: 1540px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 32px;
+    }
+
+    .app-view-tab { display: none; }
+    .app-view-tab.active { display: block; }
+
+    /* STUDIO LAYOUT */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 500px 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 1180px) {
+      .studio-grid { grid-template-columns: 1fr; }
+    }
+
+    .content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .card-head-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-card);
+      padding-bottom: 14px;
+    }
+
+    .editor-textarea {
+      width: 100%;
+      height: 220px;
+      background: #ffffff;
+      border: 1.5px solid var(--border-card);
+      border-radius: 10px;
+      color: #0f172a;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.6;
+      padding: 14px;
+      resize: vertical;
+      outline: none;
+    }
+    .editor-textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .opt-matrix-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .matrix-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .matrix-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .matrix-control {
+      background: #ffffff;
+      border: 1.5px solid var(--border-card);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      font-family: var(--font-sans);
+      font-weight: 500;
+    }
+
+    /* PROGRESS HUD */
+    .live-progress-hud {
+      display: none;
+      background: #f8fafc;
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 18px;
+      font-family: var(--font-mono);
+    }
+    .progress-hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .hud-phase-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #4f46e5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hud-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #cbd5e1;
+      border-top-color: #4f46e5;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hud-bar-track {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .hud-bar-glow {
+      height: 100%;
+      width: 0%;
+      background: var(--grad-primary);
+      border-radius: 999px;
+      transition: width 0.15s ease;
+    }
+
+    .hud-metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-card);
+      padding-top: 10px;
+    }
+    .hud-metric-item b {
+      font-size: 13.5px;
+      color: var(--text-main);
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* COMPLETED DOWNLOAD SHOWCASE */
+    .download-showcase-box {
+      display: none;
+      background: #ffffff;
+      border: 1.5px solid #10b981;
+      border-radius: 14px;
+      padding: 18px;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 8px 30px -4px rgba(16, 185, 129, 0.15);
+    }
+    .completed-video-player {
+      width: 100%;
+      max-height: 480px;
+      border-radius: 10px;
+      background: #000;
+    }
+    .video-tech-meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+    .btn-hero-download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--grad-success);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 14.5px;
+      padding: 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      box-shadow: var(--shadow-btn-success);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-hero-download:hover {
+      background: var(--grad-success-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px -3px rgba(16, 185, 129, 0.45);
+    }
+
+    /* RIGHT COLUMN: PREVIEW VIEWPORT */
+    .preview-viewport-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-card);
+      height: 100%;
+      min-height: 560px;
+    }
+    .viewport-top-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-card);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .viewport-container {
+      flex: 1;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .viewport-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000000;
+      border-radius: 8px;
+    }
+
+    /* ========================================================
+       HISTORY & VAULT VIEW
+       ======================================================== */
+    .vault-view-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .vault-action-bar {
+      background: #ffffff;
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      padding: 16px 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .vault-summary-stats {
+      display: flex;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .stat-badge-chip {
+      background: #f8fafc;
+      border: 1px solid var(--border-card);
+      padding: 6px 12px;
+      border-radius: 8px;
+      color: var(--text-muted);
+    }
+    .stat-badge-chip b { color: #4f46e5; }
+
+    .date-filter-chips {
+      display: flex;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 9px;
+      border: 1px solid var(--border-card);
+    }
+    .btn-date-chip {
+      background: transparent;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+    .btn-date-chip.active {
+      background: var(--grad-primary);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+    }
+
+    .vault-grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 20px;
+    }
+    .vault-item-card {
+      background: #ffffff;
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+    }
+    .vault-item-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.1);
+    }
+    .vault-video-box {
+      background: #000;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .vault-video-box.reel-aspect {
+      aspect-ratio: 9 / 13;
+      max-height: 380px;
+    }
+    .vault-video-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .vault-item-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+    .vault-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      word-break: break-all;
+    }
+    .btn-card-download {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--grad-accent);
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================
+       SCREEN 1: 60-40 SPLIT AUTHENTICATION PAGE
+       ======================================================== -->
+  <div id="authScreen">
+    
+    <!-- LEFT 60% PANE -->
+    <div class="auth-hero-pane">
+      <!-- HEADER LOGO -->
+      <div class="auth-brand-head">
+        <div class="swoosh-logo-icon">
+          <!-- Aerodynamic Swoosh Icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M8 12l4 4 4-4M12 4v12" />
+          </svg>
+        </div>
+        <div>
+          <span class="auth-brand-title">Jane Motion Studio</span>
+          <span class="auth-brand-tag">D3D11 Engine v2.5</span>
+        </div>
+      </div>
+
+      <!-- CENTER ROTATING COPY & HEADLINE -->
+      <div class="auth-hero-center">
+        <div class="auth-hero-badge">
+          ⚡ DIRECT3D11 ACCELERATED PIPELINE
+        </div>
+        <h1 class="auth-hero-heading">
+          Turn Code & Markup into <span>Pure Motion.</span>
+        </h1>
+        <div class="auth-dynamic-line" id="authDynamicLine">
+          Export GSAP timelines, Three.js 3D, and Markdown decks to pristine 1080p MP4s in seconds.
+        </div>
+      </div>
+
+      <!-- SHOWCASE VIDEO CARD -->
+      <div class="creative-showcase-box">
+        <div class="showcase-thumb-wrap">
+          <video autoplay loop muted playsinline src="/output/PainForge-Reel-FULL-46s.mp4"></video>
+        </div>
+        <div class="showcase-details">
+          <div class="showcase-title">
+            <span>PainForge Reel (Full 46s)</span>
+            <span style="font-size:10px;background:#4f46e5;color:#fff;padding:2px 6px;border-radius:4px;font-family:var(--font-mono)">1080x1920</span>
+          </div>
+          <div class="showcase-sub">
+            46.0s • 30 FPS • H.264 High • Offline PCM Audio
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="auth-hero-foot">
+        <span>© 2026 Jane Motion Systems. All rights reserved.</span>
+        <span>Hardware Engine: Online (Port 3333)</span>
+      </div>
+    </div>
+
+    <!-- RIGHT 40% PANE (AUTH / SIGN IN / SIGN UP) -->
+    <div class="auth-form-pane">
+      <div class="form-tabs">
+        <button class="form-tab-btn active" id="btnTabSignIn" onclick="setAuthMode('signin')">Sign In</button>
+        <button class="form-tab-btn" id="btnTabSignUp" onclick="setAuthMode('signup')">Create Account</button>
+      </div>
+
+      <h2 class="auth-form-title" id="authFormTitle">Welcome back</h2>
+      <p class="auth-form-sub" id="authFormSub">Enter your credentials to access the video studio</p>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)">
+        <div class="field-group">
+          <label class="field-label">Email Address</label>
+          <input class="field-input" type="email" id="authEmail" placeholder="developer@studio.io" required value="creator@janemotion.io">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Password</label>
+          <input class="field-input" type="password" id="authPassword" placeholder="••••••••••••" required value="developer2026">
+        </div>
+
+        <button type="submit" class="btn-auth-submit" id="btnAuthAction">
+          Continue to Studio →
+        </button>
+
+        <button type="button" class="btn-guest-bypass" onclick="enterStudioDirectly()">
+          ⚡ Quick Launch (Guest Mode)
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- ========================================================
+       SCREEN 2: MAIN DASHBOARD & STUDIO
+       ======================================================== -->
+  <div id="mainApp" style="display:none;">
+
+    <!-- TOP HEADER -->
+    <header>
+      <div class="header-left">
+        <div class="header-logo-group" onclick="switchNav('landing')">
+          <div class="header-logo-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M8 12l4 4 4-4M12 4v12" />
+            </svg>
+          </div>
+          <span class="header-title">Jane Motion Studio</span>
+        </div>
+
+        <nav class="main-nav-tabs">
+          <button class="nav-tab-btn active" id="tabNavLanding" onclick="switchNav('landing')">
+            🏠 Overview
+          </button>
+          <button class="nav-tab-btn" id="tabNavStudio" onclick="switchNav('studio')">
+            🎬 Studio Workspace
+          </button>
+          <button class="nav-tab-btn" id="tabNavHistory" onclick="switchNav('history')">
+            📁 History & Vault <span class="nav-badge" id="navHistoryCount" style="margin-left:4px;">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <div class="telemetry-chip">
+          <span class="status-dot"></span> D3D11 ACCEL
+        </div>
+        <div class="telemetry-chip">
+          ⚡ 2.5x SPEED
+        </div>
+        <button class="btn-logout" onclick="logoutSession()">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- LANDING HERO WITH NEW FLOW ACTION BAR -->
+    <section class="landing-hero-section" id="landingHeroSection">
+      <div class="landing-hero-center">
+        <div class="hero-pill-badge">
+          ✨ NEXT-GEN MARKUP TO MP4 ENGINE
+        </div>
+        <h1 class="hero-main-title">
+          From Raw Code to <span>Cinema-Grade Video.</span>
+        </h1>
+        <p class="hero-main-desc">
+          Render Three.js, GSAP timelines, and Markdown slide decks into pristine MP4 with hardware-accelerated Direct3D11 rasterization and sample-accurate Web Audio synchronization.
+        </p>
+
+        <!-- THE REQUESTED SPLIT FORMAT ACTION BAR -->
+        <div class="flow-action-card">
+          
+          <!-- LEFT: Format Selector with Arrow (Clicking opens native file selector directly) -->
+          <div class="split-format-picker">
+            <button class="btn-format-main" id="btnSelectedFormat" onclick="triggerNativeFileSelect()">
+              <span id="formatIconLabel">📄</span>
+              <span id="formatTextLabel">Upload .md</span>
+            </button>
+            <button class="btn-format-arrow" onclick="toggleFormatMenu(event)">
+              ▼
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="format-dropdown-menu" id="formatDropdownMenu">
+              <div class="format-option-item" onclick="chooseFormat('.md', '📄', 'Upload .md')">
+                <span>Markdown Slide Deck</span>
+                <span class="format-badge">.md</span>
+              </div>
+              <div class="format-option-item" onclick="chooseFormat('.html', '🌐', 'Upload .html')">
+                <span>HTML5 / GSAP Animation</span>
+                <span class="format-badge">.html</span>
+              </div>
+              <div class="format-option-item" onclick="chooseFormat('.zip', '📦', 'Upload .zip')">
+                <span>ZIP Bundle Package</span>
+                <span class="format-badge">.zip</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CENTER: Paste Code Toggle -->
+          <button class="btn-toggle-paste" onclick="openStudioWithCodeBuffer()">
+            📝 Paste Raw Code
+          </button>
+
+          <!-- RIGHT: Radiant Bake MP4 Command Button -->
+          <button class="btn-action-command" id="btnHeroBake" onclick="executeRenderJob()">
+            ⚡ BAKE TO MP4 STREAM
+          </button>
+        </div>
+
+        <!-- Hidden Native File Inputs -->
+        <input type="file" id="nativeFileInputMd" accept=".md,.markdown" style="display:none;" onchange="handleFilePicked(event)">
+        <input type="file" id="nativeFileInputHtml" accept=".html,.htm" style="display:none;" onchange="handleFilePicked(event)">
+        <input type="file" id="nativeFileInputZip" accept=".zip" style="display:none;" onchange="handleFilePicked(event)">
+
+        <!-- Live file status chip -->
+        <div class="quick-status-chip" id="quickStatusChip" style="display:none;">
+          <span id="quickStatusTag" style="background:#4f46e5;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;">READY</span>
+          <span id="quickStatusName">document.md</span>
+          <span id="quickStatusSize" style="color:var(--text-muted)">0 KB</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN APP CONTENT -->
+    <main>
+
+      <!-- VIEW TAB 1: OVERVIEW & STUDIO WORKSPACE -->
+      <div class="app-view-tab active" id="viewStudioTab">
+        <div class="studio-grid">
+          
+          <!-- LEFT CARD: SOURCE & MATRIX -->
+          <div class="content-card">
+            <div class="card-head-title">
+              <span>Source Specification</span>
+              <div class="segmented-control" style="width:220px;">
+                <button class="segment-btn active" id="subTabFile" onclick="setStudioInputMode('file')">File Upload</button>
+                <button class="segment-btn" id="subTabCode" onclick="setStudioInputMode('code')">Code Buffer</button>
+              </div>
+            </div>
+
+            <!-- FILE DROPZONE -->
+            <div id="studioModeFile">
+              <div class="dropzone-box" id="dzMain">
+                <input type="file" id="fileInputStudio" accept=".html,.htm,.md,.markdown,.zip" onchange="handleFilePicked(event)">
+                <div class="dz-icon-wrap">⤓</div>
+                <div class="dz-heading">Drop .html or .md file here</div>
+                <div class="dz-caption">Auto-detects GSAP timelines, Three.js canvases, and Markdown presentation slides</div>
+              </div>
+            </div>
+
+            <!-- CODE BUFFER -->
+            <div id="studioModeCode" style="display:none; flex-direction:column; gap:10px;">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <span style="font-size:11px;font-weight:700;color:var(--text-muted)">Presets:</span>
+                <button class="btn-preset-pill" onclick="loadPreset('gsap')">⚡ GSAP Reel</button>
+                <button class="btn-preset-pill" onclick="loadPreset('md')">📄 Markdown Deck</button>
+                <button class="btn-preset-pill" onclick="loadPreset('three')">🔮 Three.js 3D</button>
+              </div>
+              <textarea class="editor-textarea" id="codeEditorStudio" placeholder="Paste full HTML or Markdown source code here..."></textarea>
+            </div>
+
+            <!-- CONFIGURATION MATRIX -->
+            <div class="opt-matrix-2x2">
+              <div class="matrix-field">
+                <label class="matrix-label">Output Aspect Ratio</label>
+                <select class="matrix-control" id="cfgResolution">
+                  <option value="auto" selected>✨ Auto-Detect (Stage DOM)</option>
+                  <option value="1080p-v">📱 1080x1920 (Vertical Reel 9:16)</option>
+                  <option value="1080p">🖥️ 1920x1080 (HD Landscape 16:9)</option>
+                  <option value="720p">⚡ 1280x720 (720p Fast)</option>
+                  <option value="4k">💎 3840x2160 (4K UHD Cinema)</option>
+                </select>
+              </div>
+              <div class="matrix-field">
+                <label class="matrix-label">Frame Rate (FPS)</label>
+                <select class="matrix-control" id="cfgFps">
+                  <option value="30" selected>30 FPS (Standard H.264)</option>
+                  <option value="60">60 FPS (Cinematic 60)</option>
+                </select>
+              </div>
+              <div class="matrix-field">
+                <label class="matrix-label">Duration Override (Seconds)</label>
+                <input class="matrix-control" type="number" id="cfgDuration" placeholder="Auto (window.DUR / GSAP)" min="1" max="300" step="0.5">
+              </div>
+              <div class="matrix-field">
+                <label class="matrix-label">Processing Engine</label>
+                <select class="matrix-control" id="cfgEngineMode">
+                  <option value="client-gpu" selected>⚡ In-Browser GPU (WebCodecs - Free $0)</option>
+                  <option value="cloud-server">🖥️ Cloud Server Pipe (Node / D3D11)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- GRADIENT BAKE ACTION -->
+            <button class="btn-action-command" style="width:100%;justify-content:center;padding:15px;font-size:15px;" id="btnStudioBake" onclick="executeRenderJob()">
+              ⚡ BAKE TO MP4 STREAM (H.264 + AAC)
+            </button>
+
+            <!-- REAL-TIME PROGRESS HUD -->
+            <div class="live-progress-hud" id="progressHud">
+              <div class="progress-hud-top">
+                <div class="hud-phase-label">
+                  <div class="hud-spinner"></div>
+                  <span id="hudPhaseText">Launching accelerated raster engine...</span>
+                </div>
+                <span id="hudPct" style="color:var(--text-main);font-weight:800;font-size:14px;">0%</span>
+              </div>
+              <div class="hud-bar-track">
+                <div class="hud-bar-glow" id="hudBarFill"></div>
+              </div>
+              <div class="hud-metrics-row">
+                <div class="hud-metric-item">
+                  <span>FRAME</span>
+                  <b id="hudFrameVal">0 / 0</b>
+                </div>
+                <div class="hud-metric-item">
+                  <span>SPEED</span>
+                  <b id="hudFpsVal">0.0 FPS</b>
+                </div>
+                <div class="hud-metric-item">
+                  <span>FRAME TIME</span>
+                  <b id="hudMsVal">0 ms</b>
+                </div>
+                <div class="hud-metric-item">
+                  <span>ETA</span>
+                  <b id="hudEtaVal">--</b>
+                </div>
+              </div>
+            </div>
+
+            <!-- COMPLETED DOWNLOAD SHOWCASE -->
+            <div class="download-showcase-box" id="resultPanel">
+              <video class="completed-video-player" id="resultVideo" controls autoplay loop></video>
+              <div class="video-tech-meta">
+                <div>
+                  <div style="color:var(--text-dim);font-size:10px;">RESOLUTION</div>
+                  <b id="resMetaResolution" style="color:#0f172a;font-size:13px;">1080x1920</b>
+                </div>
+                <div>
+                  <div style="color:var(--text-dim);font-size:10px;">DURATION</div>
+                  <b id="resMetaDuration" style="color:#0f172a;font-size:13px;">46.0s</b>
+                </div>
+                <div>
+                  <div style="color:var(--text-dim);font-size:10px;">RENDER TIME</div>
+                  <b id="resMetaTime" style="color:#0f172a;font-size:13px;">12.2s</b>
+                </div>
+                <div>
+                  <div style="color:var(--text-dim);font-size:10px;">SPEED</div>
+                  <b id="resMetaFps" style="color:#0f172a;font-size:13px;">14.8 FPS</b>
+                </div>
+              </div>
+              <a class="btn-hero-download" id="btnDownloadResult" href="#" download>
+                ⬇ DOWNLOAD PRISTINE MP4
+              </a>
+            </div>
+
+          </div>
+
+          <!-- RIGHT CARD: LIVE PREVIEW VIEWPORT -->
+          <div class="preview-viewport-card">
+            <div class="viewport-top-bar">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;">
+                <span>DOCUMENT RUNTIME VIEWPORT</span>
+                <span class="preview-tag-indicator" id="previewModeTag">STANDBY</span>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-tool-pill" onclick="refreshStudioPreview()">↻ Refresh</button>
+                <button class="btn-tool-pill" onclick="togglePreviewAspect()">⤢ Aspect Ratio</button>
+              </div>
+            </div>
+            <div class="viewport-container" id="viewportWrap">
+              <iframe class="viewport-iframe" id="studioPreviewIframe" src="about:blank"></iframe>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- VIEW TAB 2: HISTORY & VAULT -->
+      <div class="app-view-tab" id="viewHistoryTab">
+        <div class="vault-view-wrap">
+          
+          <div class="vault-action-bar">
+            <div class="vault-summary-stats">
+              <div class="stat-badge-chip">Saved Videos: <b id="statTotalVideos">0</b></div>
+              <div class="stat-badge-chip">Storage: <b id="statTotalSize">0 MB</b></div>
+              <div class="stat-badge-chip">Total Time: <b id="statTotalDuration">0m 00s</b></div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <div class="date-filter-chips">
+                <button class="btn-date-chip active" id="chipFilterAll" onclick="setHistoryFilter('all')">All</button>
+                <button class="btn-date-chip" id="chipFilterToday" onclick="setHistoryFilter('today')">Today</button>
+                <button class="btn-date-chip" id="chipFilterWeek" onclick="setHistoryFilter('week')">This Week</button>
+                <button class="btn-date-chip" id="chipFilterMonth" onclick="setHistoryFilter('month')">This Month</button>
+              </div>
+
+              <input class="matrix-control" style="width:240px;" id="historySearch" placeholder="🔍 Search name, codec, resolution..." oninput="handleHistorySearch(this.value)">
+
+              <select class="matrix-control" id="historySort" onchange="handleHistorySort(this.value)">
+                <option value="newest">Sort: Newest First</option>
+                <option value="oldest">Sort: Oldest First</option>
+                <option value="size">Sort: File Size</option>
+                <option value="duration">Sort: Duration</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="vault-grid-cards" id="historyGrid">
+            <!-- Dynamically populated -->
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    // ==========================================
+    // SCREEN 1: 60-40 AUTH CONTROLLER
+    // ==========================================
+    let currentAuthMode = 'signin';
+    const rotatingLines = [
+      "Export GSAP timelines, Three.js 3D, and Markdown decks to pristine 1080p MP4s in seconds.",
+      "Hardware Direct3D11 acceleration operating at 15+ FPS with zero dropped frames.",
+      "Sample-accurate audio synthesis with synchronized chimes and master AAC tracks.",
+      "Instant live interactive preview in phone Reel (9:16) or cinematic widescreen (16:9)."
+    ];
+    let lineIdx = 0;
+    setInterval(() => {
+      const el = $('authDynamicLine');
+      if (el) {
+        el.style.opacity = '0';
+        setTimeout(() => {
+          lineIdx = (lineIdx + 1) % rotatingLines.length;
+          el.textContent = rotatingLines[lineIdx];
+          el.style.opacity = '1';
+        }, 300);
+      }
+    }, 4500);
+
+    function setAuthMode(mode) {
+      currentAuthMode = mode;
+      $('btnTabSignIn').classList.toggle('active', mode === 'signin');
+      $('btnTabSignUp').classList.toggle('active', mode === 'signup');
+      if (mode === 'signin') {
+        $('authFormTitle').textContent = 'Welcome back';
+        $('authFormSub').textContent = 'Enter your credentials to access the video studio';
+        $('btnAuthAction').textContent = 'Continue to Studio →';
+      } else {
+        $('authFormTitle').textContent = 'Create your account';
+        $('authFormSub').textContent = 'Join Jane Motion Studio for accelerated video creation';
+        $('btnAuthAction').textContent = 'Create Account & Enter →';
+      }
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = $('authEmail').value.trim();
+      localStorage.setItem('jane_auth_user', email || 'creator@janemotion.io');
+      enterStudioDirectly();
+    }
+
+    function enterStudioDirectly() {
+      $('authScreen').style.display = 'none';
+      $('mainApp').style.display = 'flex';
+      switchNav('landing');
+      loadHistory();
+    }
+
+    function logoutSession() {
+      localStorage.removeItem('jane_auth_user');
+      $('mainApp').style.display = 'none';
+      $('authScreen').style.display = 'flex';
+    }
+
+    // Check if user was previously authenticated
+    if (localStorage.getItem('jane_auth_user')) {
+      $('authScreen').style.display = 'none';
+      $('mainApp').style.display = 'flex';
+    }
+
+    // ==========================================
+    // SCREEN 2: MAIN DASHBOARD & ACTION BAR FLOW
+    // ==========================================
+    let currentChosenFormat = '.md';
+    let selectedFile = null;
+    let studioInputMode = 'file';
+    let activeNavTab = 'landing';
+    let historyFilter = 'all';
+    let historySearchQuery = '';
+    let historySortOrder = 'newest';
+
+    function toggleFormatMenu(e) {
+      e.stopPropagation();
+      $('formatDropdownMenu').classList.toggle('open');
+    }
+
+    document.addEventListener('click', () => {
+      $('formatDropdownMenu').classList.remove('open');
+    });
+
+    function chooseFormat(ext, icon, label) {
+      currentChosenFormat = ext;
+      $('formatIconLabel').textContent = icon;
+      $('formatTextLabel').textContent = label;
+      $('formatDropdownMenu').classList.remove('open');
+      triggerNativeFileSelect();
+    }
+
+    function triggerNativeFileSelect() {
+      if (currentChosenFormat === '.md') {
+        $('nativeFileInputMd').click();
+      } else if (currentChosenFormat === '.html') {
+        $('nativeFileInputHtml').click();
+      } else {
+        $('nativeFileInputZip').click();
+      }
+    }
+
+    async function handleFilePicked(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      selectedFile = file;
+
+      const isMd = file.name.endsWith('.md') || file.name.endsWith('.markdown');
+      $('quickStatusChip').style.display = 'inline-flex';
+      $('quickStatusTag').textContent = isMd ? 'MARKDOWN' : 'HTML5';
+      $('quickStatusName').textContent = file.name;
+      $('quickStatusSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+      // Automatically generate live preview in viewport
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        const res = await fetch('/api/preview-upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.previewUrl) {
+          $('studioPreviewIframe').src = data.previewUrl;
+          $('previewModeTag').textContent = isMd ? 'MARKDOWN SLIDES' : 'HTML5 STAGE';
+        }
+      } catch (err) {
+        console.error('Preview error:', err);
+      }
+    }
+
+    function openStudioWithCodeBuffer() {
+      switchNav('studio');
+      setStudioInputMode('code');
+      $('codeEditorStudio').focus();
+    }
+
+    function switchNav(tab) {
+      activeNavTab = tab;
+      $('tabNavLanding').classList.toggle('active', tab === 'landing');
+      $('tabNavStudio').classList.toggle('active', tab === 'studio');
+      $('tabNavHistory').classList.toggle('active', tab === 'history');
+
+      $('landingHeroSection').style.display = (tab === 'landing') ? 'block' : 'none';
+      $('viewStudioTab').classList.toggle('active', tab === 'landing' || tab === 'studio');
+      $('viewHistoryTab').classList.toggle('active', tab === 'history');
+
+      if (tab === 'history') loadHistory();
+    }
+
+    function setStudioInputMode(mode) {
+      studioInputMode = mode;
+      $('subTabFile').classList.toggle('active', mode === 'file');
+      $('subTabCode').classList.toggle('active', mode === 'code');
+      $('studioModeFile').style.display = mode === 'file' ? 'block' : 'none';
+      $('studioModeCode').style.display = mode === 'code' ? 'flex' : 'none';
+    }
+
+    // ==========================================
+    // PRESETS
+    // ==========================================
+    const PRESETS = {
+      gsap: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></scr` + `ipt>
+  <style>
+    body { margin:0; background:#0f172a; color:#fff; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; overflow:hidden; }
+    #box { width:220px; height:220px; background:linear-gradient(135deg,#6366f1,#ec4899); border-radius:28px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; box-shadow:0 20px 40px rgba(99,102,241,0.4); }
+  </style>
+</head>
+<body>
+  <div id="box">MOTION</div>
+  <script>
+    window.DUR = 5;
+    const tl = gsap.timeline({ paused: true });
+    tl.from('#box', { scale: 0, rotation: -180, duration: 2, ease: "elastic.out(1, 0.5)" })
+      .to('#box', { rotation: 360, duration: 3, ease: "power2.inOut" });
+    window.seek = t => tl.time(t);
+  </scr` + `ipt>
+</body>
+</html>`,
+      md: `# Precision Video Engine
+Universal HTML5 & Markdown Rendering Pipeline
+---
+# Hardware Direct3D11 Acceleration
+Zero-copy frame-stepping pipeline operating at 15+ FPS
+---
+# Sample-Accurate Audio Synthesis
+Automatic harmonic chimes & pristine AAC track muxing`,
+      three: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></scr` + `ipt>
+  <style>body { margin:0; overflow:hidden; background:#090d16; }</style>
+</head>
+<body>
+  <script>
+    window.DUR = 5;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    const geo = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const mat = new THREE.MeshNormalMaterial({ wireframe: true });
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    camera.position.z = 30;
+    window.seek = t => {
+      mesh.rotation.x = t * 1.5;
+      mesh.rotation.y = t * 2.0;
+      renderer.render(scene, camera);
+    };
+  </scr` + `ipt>
+</body>
+</html>`
+    };
+
+    function loadPreset(key) {
+      $('codeEditorStudio').value = PRESETS[key] || '';
+      updatePreviewFromCode();
+    }
+
+    $('codeEditorStudio').addEventListener('input', debounce(updatePreviewFromCode, 600));
+
+    async function updatePreviewFromCode() {
+      const code = $('codeEditorStudio').value.trim();
+      if (!code) return;
+
+      const isMd = code.startsWith('#') || code.includes('---');
+      if (isMd) {
+        const res = await fetch('/api/preview-markdown', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ markdown: code, aspect: 'horizontal' })
+        });
+        const data = await res.json();
+        if (data.previewUrl) {
+          $('studioPreviewIframe').src = data.previewUrl;
+          $('previewModeTag').textContent = 'MARKDOWN SLIDES';
+        }
+      } else {
+        const res = await fetch('/api/preview-html', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ htmlCode: code })
+        });
+        const data = await res.json();
+        if (data.previewUrl) {
+          $('studioPreviewIframe').src = data.previewUrl;
+          $('previewModeTag').textContent = 'HTML5 STAGE';
+        }
+      }
+    }
+
+    function refreshStudioPreview() {
+      if ($('studioPreviewIframe').src) {
+        $('studioPreviewIframe').src = $('studioPreviewIframe').src;
+      }
+    }
+
+    let isReelAspect = false;
+    function togglePreviewAspect() {
+      isReelAspect = !isReelAspect;
+      $('viewportWrap').style.aspectRatio = isReelAspect ? '9 / 16' : 'auto';
+      $('viewportWrap').style.maxWidth = isReelAspect ? '390px' : '100%';
+      $('viewportWrap').style.margin = isReelAspect ? '0 auto' : '0';
+    }
+
+    // ==========================================
+    // RENDER EXECUTION PIPELINE (CLIENT GPU & SERVER)
+    // ==========================================
+    async function executeRenderJob() {
+      const engineMode = $('cfgEngineMode') ? $('cfgEngineMode').value : 'client-gpu';
+      const isClientSupported = window.ClientRenderEngine && ClientRenderEngine.isSupported();
+
+      if (engineMode === 'client-gpu' && isClientSupported) {
+        await executeClientSideRender();
+        return;
+      }
+
+      // Fallback: Cloud Server Pipeline
+      executeServerSideRender();
+    }
+
+    async function executeClientSideRender() {
+      const resolution = $('cfgResolution').value;
+      const fps = parseInt($('cfgFps').value || '30', 10);
+      const durOverride = $('cfgDuration').value ? parseFloat($('cfgDuration').value) : null;
+
+      let width = 1920, height = 1080;
+      if (resolution === '1080p-v' || resolution === 'vertical') {
+        width = 1080; height = 1920;
+      } else if (resolution === '720p') {
+        width = 1280; height = 720;
+      } else if (resolution === '4k') {
+        width = 3840; height = 2160;
+      }
+
+      const btn = $('btnHeroBake');
+      const btnStudio = $('btnStudioBake');
+      btn.disabled = true;
+      btn.textContent = 'BAKING ON GPU...';
+      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'BAKING ON GPU...'; }
+
+      $('progressHud').style.display = 'block';
+      $('resultPanel').style.display = 'none';
+      $('hudPct').textContent = '0%';
+      $('hudBarFill').style.width = '0%';
+      $('hudPhaseText').textContent = 'Initializing in-browser hardware video encoder...';
+
+      try {
+        let sourceContent = '';
+        let fileName = 'presentation.md';
+
+        if (selectedFile) {
+          sourceContent = await selectedFile.text();
+          fileName = selectedFile.name;
+        } else {
+          sourceContent = $('codeEditorStudio').value.trim();
+          if (!sourceContent) {
+            alert('Please select a Markdown or HTML file, or choose a template preset.');
+            resetRenderBtns();
+            return;
+          }
+        }
+
+        const isMd = fileName.endsWith('.md') || fileName.endsWith('.markdown') || sourceContent.startsWith('#') || sourceContent.includes('---');
+
+        const clientEngine = new ClientRenderEngine({
+          fps,
+          width,
+          height,
+          onStatus: s => {
+            $('hudPhaseText').textContent = s.message;
+          },
+          onProgress: p => {
+            $('hudPct').textContent = p.percent + '%';
+            $('hudBarFill').style.width = p.percent + '%';
+            $('hudFrameVal').textContent = p.frame + ' / ' + p.totalFrames;
+            $('hudFpsVal').textContent = p.effectiveFps + ' FPS';
+            $('hudMsVal').textContent = p.avgFrameMs + ' ms';
+            $('hudEtaVal').textContent = p.etaSeconds + 's';
+          }
+        });
+
+        const slideCount = sourceContent.split(/\n\s*---\s*\n/).filter(s => s.trim()).length || 1;
+        const secondsPerSlide = durOverride ? (durOverride / slideCount) : 4;
+
+        const result = await clientEngine.renderMarkdownToMp4(sourceContent, {
+          fps,
+          width,
+          height,
+          secondsPerSlide
+        });
+
+        // Display finished result
+        $('hudPct').textContent = '100%';
+        $('hudBarFill').style.width = '100%';
+        $('hudPhaseText').textContent = `In-browser hardware encode complete in ${result.totalRenderTimeSec}s!`;
+        resetRenderBtns();
+
+        $('resultPanel').style.display = 'flex';
+        $('resultVideo').src = result.url;
+        $('btnDownloadResult').href = result.url;
+        const outName = fileName.replace(/\.[^/.]+$/, "") + '.mp4';
+        $('btnDownloadResult').download = outName;
+
+        $('resMetaResolution').textContent = result.resolution;
+        $('resMetaDuration').textContent = result.duration + 's';
+        $('resMetaTime').textContent = result.totalRenderTimeSec + 's';
+        $('resMetaFps').textContent = result.effectiveFps + ' FPS';
+
+        // Save into local history
+        const localRecs = JSON.parse(localStorage.getItem('jane_local_history') || '[]');
+        localRecs.unshift({
+          id: 'local_' + Date.now(),
+          filename: outName,
+          originalName: fileName,
+          fileType: isMd ? 'Markdown (Browser GPU)' : 'Video (Browser GPU)',
+          resolution: result.resolution,
+          duration: result.duration + 's',
+          durationSec: result.duration,
+          sizeKb: result.sizeKb,
+          url: result.url,
+          createdAt: Date.now()
+        });
+        localStorage.setItem('jane_local_history', JSON.stringify(localRecs));
+
+        loadHistory();
+
+      } catch (err) {
+        console.error('[In-Browser Render Error]:', err);
+        $('hudPhaseText').textContent = 'Hardware Encode Error: ' + err.message;
+        resetRenderBtns();
+      }
+    }
+
+    function executeServerSideRender() {
+      const resolution = $('cfgResolution').value;
+      const fps = $('cfgFps').value;
+      const duration = $('cfgDuration').value;
+      const btn = $('btnHeroBake');
+      const btnStudio = $('btnStudioBake');
+
+      btn.disabled = true;
+      btn.textContent = 'RENDERING ON SERVER...';
+      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'RENDERING ON SERVER...'; }
+
+      $('progressHud').style.display = 'block';
+      $('resultPanel').style.display = 'none';
+
+      $('hudPct').textContent = '0%';
+      $('hudBarFill').style.width = '0%';
+      $('hudPhaseText').textContent = 'Launching cloud raster engine...';
+
+      let url, body, isJson = false;
+      if (studioInputMode === 'file' && selectedFile) {
+        const fd = new FormData();
+        fd.append('htmlFile', selectedFile);
+        fd.append('resolution', resolution);
+        fd.append('fps', fps);
+        if (duration) fd.append('duration', duration);
+        url = '/api/upload-render';
+        body = fd;
+      } else {
+        const code = $('codeEditorStudio').value.trim();
+        if (!code && !selectedFile) {
+          alert('Please pick a file (.md or .html) or enter code first.');
+          resetRenderBtns();
+          return;
+        }
+        if (!code && selectedFile) {
+          const fd = new FormData();
+          fd.append('htmlFile', selectedFile);
+          fd.append('resolution', resolution);
+          fd.append('fps', fps);
+          if (duration) fd.append('duration', duration);
+          url = '/api/upload-render';
+          body = fd;
+        } else {
+          const isMd = code.startsWith('#') || code.includes('---');
+          url = '/api/render-code-sse';
+          body = JSON.stringify({
+            code,
+            format: isMd ? 'markdown' : 'html',
+            filename: isMd ? 'presentation.md' : 'stage.html',
+            resolution,
+            fps: parseInt(fps),
+            duration: duration ? parseFloat(duration) : null
+          });
+          isJson = true;
+        }
+      }
+
+      const headers = isJson ? { 'Content-Type': 'application/json' } : {};
+      fetch(url, { method: 'POST', body, headers })
+        .then(res => {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          function readStream() {
+            reader.read().then(({ done, value }) => {
+              if (done) return;
+              buffer += decoder.decode(value, { stream: true });
+              const chunks = buffer.split('\n\n');
+              buffer = chunks.pop();
+
+              for (const chunk of chunks) {
+                const lines = chunk.split('\n');
+                let event = 'message', data = '';
+                for (const line of lines) {
+                  if (line.startsWith('event: ')) event = line.slice(7);
+                  if (line.startsWith('data: ')) data = line.slice(6);
+                }
+                if (data) {
+                  try { handleServerEvent(event, JSON.parse(data)); } catch (e) {}
+                }
+              }
+              readStream();
+            }).catch(e => {
+              console.warn('Stream ended:', e);
+              resetRenderBtns();
+            });
+          }
+          readStream();
+        })
+        .catch(err => {
+          $('hudPhaseText').textContent = 'Server Unavailable — Try In-Browser GPU Mode!';
+          resetRenderBtns();
+        });
+    }
+
+    function resetRenderBtns() {
+      $('btnHeroBake').disabled = false;
+      $('btnHeroBake').textContent = '⚡ BAKE TO MP4 STREAM';
+      const btnStudio = $('btnStudioBake');
+      if (btnStudio) {
+        btnStudio.disabled = false;
+        btnStudio.textContent = '⚡ BAKE TO MP4 STREAM (H.264 + AAC)';
+      }
+    }
+
+    function handleServerEvent(event, data) {
+      if (event === 'status') {
+        $('hudPhaseText').textContent = data.message || data.phase;
+      }
+
+      if (event === 'progress') {
+        $('hudPct').textContent = data.percent + '%';
+        $('hudBarFill').style.width = data.percent + '%';
+        $('hudFrameVal').textContent = data.frame + ' / ' + data.totalFrames;
+        $('hudFpsVal').textContent = data.effectiveFps + ' FPS';
+        $('hudMsVal').textContent = data.avgFrameMs + ' ms';
+        $('hudEtaVal').textContent = data.etaSeconds + 's';
+      }
+
+      if (event === 'complete') {
+        $('hudPct').textContent = '100%';
+        $('hudBarFill').style.width = '100%';
+        $('hudPhaseText').textContent = 'Render completed in ' + data.metrics.totalRenderTimeSec + 's!';
+        resetRenderBtns();
+
+        // Show result panel
+        $('resultPanel').style.display = 'flex';
+        $('resultVideo').src = data.url;
+        $('btnDownloadResult').href = data.url;
+        $('btnDownloadResult').download = data.filename;
+
+        $('resMetaResolution').textContent = data.probe.resolution || '1080p';
+        $('resMetaDuration').textContent = data.probe.duration || '--';
+        $('resMetaTime').textContent = data.metrics.totalRenderTimeSec + 's';
+        $('resMetaFps').textContent = data.metrics.effectiveFps + ' FPS';
+
+        loadHistory();
+      }
+
+      if (event === 'error') {
+        $('hudPhaseText').textContent = 'Error: ' + data.error;
+        resetRenderBtns();
+      }
+    }
+
+    // ==========================================
+    // HISTORY & VAULT LOGIC
+    // ==========================================
+    function setHistoryFilter(f) {
+      historyFilter = f;
+      $('chipFilterAll').classList.toggle('active', f === 'all');
+      $('chipFilterToday').classList.toggle('active', f === 'today');
+      $('chipFilterWeek').classList.toggle('active', f === 'week');
+      $('chipFilterMonth').classList.toggle('active', f === 'month');
+      loadHistory();
+    }
+
+    function handleHistorySearch(q) {
+      historySearchQuery = q;
+      loadHistory();
+    }
+
+    function handleHistorySort(s) {
+      historySortOrder = s;
+      loadHistory();
+    }
+
+    async function loadHistory() {
+      let records = JSON.parse(localStorage.getItem('jane_local_history') || '[]');
+      try {
+        const query = new URLSearchParams({
+          filter: historyFilter,
+          search: historySearchQuery,
+          sort: historySortOrder
+        });
+        const res = await fetch('/api/history?' + query.toString());
+        if (res.ok) {
+          const data = await res.json();
+          if (data.records && Array.isArray(data.records)) {
+            // Deduplicate by filename
+            const seen = new Set(records.map(r => r.filename));
+            data.records.forEach(r => {
+              if (!seen.has(r.filename)) records.push(r);
+            });
+          }
+        }
+      } catch (err) {
+        // When deployed static on Vercel without backend, local history works 100%
+      }
+
+      // Filter and sort
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
+      const oneWeek = 7 * oneDay;
+      const oneMonth = 30 * oneDay;
+
+      let filtered = records.filter(r => {
+        if (historyFilter === 'today') {
+          if ((now - r.createdAt) > oneDay) return false;
+        } else if (historyFilter === 'week') {
+          if ((now - r.createdAt) > oneWeek) return false;
+        } else if (historyFilter === 'month') {
+          if ((now - r.createdAt) > oneMonth) return false;
+        }
+
+        if (historySearchQuery) {
+          const q = historySearchQuery.toLowerCase();
+          const matchName = (r.originalName || r.filename || '').toLowerCase().includes(q);
+          const matchRes = (r.resolution || '').toLowerCase().includes(q);
+          if (!matchName && !matchRes) return false;
+        }
+        return true;
+      });
+
+      // Sort
+      if (historySortOrder === 'newest') filtered.sort((a,b) => b.createdAt - a.createdAt);
+      else if (historySortOrder === 'oldest') filtered.sort((a,b) => a.createdAt - b.createdAt);
+      else if (historySortOrder === 'size') filtered.sort((a,b) => (parseFloat(b.sizeKb)||0) - (parseFloat(a.sizeKb)||0));
+      else if (historySortOrder === 'duration') filtered.sort((a,b) => (parseFloat(b.durationSec)||0) - (parseFloat(a.durationSec)||0));
+
+      const totalVideos = records.length;
+      const totalSizeMb = (records.reduce((sum, r) => sum + (parseFloat(r.sizeKb) || 0), 0) / 1024).toFixed(2);
+      const totalSec = records.reduce((sum, r) => sum + (parseFloat(r.durationSec) || 0), 0);
+      const m = Math.floor(totalSec / 60);
+      const s = Math.round(totalSec % 60);
+
+      $('statTotalVideos').textContent = totalVideos;
+      $('statTotalSize').textContent = totalSizeMb + ' MB';
+      $('statTotalDuration').textContent = `${m}m ${s < 10 ? '0' : ''}${s}s`;
+      $('navHistoryCount').textContent = totalVideos;
+
+      renderHistoryGrid(filtered);
+    }
+
+    async function deleteHistoryRecord(id) {
+      if (!confirm('Are you sure you want to delete this video file?')) return;
+      if (id.startsWith('local_')) {
+        let localRecs = JSON.parse(localStorage.getItem('jane_local_history') || '[]');
+        localRecs = localRecs.filter(r => r.id !== id);
+        localStorage.setItem('jane_local_history', JSON.stringify(localRecs));
+        loadHistory();
+        return;
+      }
+      try {
+        const res = await fetch('/api/history/' + id, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          loadHistory();
+        }
+      } catch (err) {
+        let localRecs = JSON.parse(localStorage.getItem('jane_local_history') || '[]');
+        localRecs = localRecs.filter(r => r.id !== id);
+        localStorage.setItem('jane_local_history', JSON.stringify(localRecs));
+        loadHistory();
+      }
+    }
+
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+  </script>
+</body>
+</html>

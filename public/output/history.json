@@ -1,0 +1,47 @@
+[
+  {
+    "id": "rec_1794857694716_srt9l",
+    "filename": "render-1794857386907-PainForge_____Reel__1_.mp4",
+    "originalName": "PainForge â Reel (1).html",
+    "fileType": "HTML5 Animation",
+    "resolution": "1080x1920",
+    "duration": "00:00:46.02",
+    "durationSec": 46.02,
+    "sizeKb": "16236.8",
+    "bytes": 16626441,
+    "videoCodec": "h264 (High) (avc1 / 0x31637661)",
+    "audioCodec": "aac (LC) (mp4a / 0x6134706D)",
+    "metrics": {
+      "fixture": "1794857386892-PainForge_____Reel__1_.html",
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "durationSec": 46,
+      "totalFrames": 1380,
+      "totalRenderTimeSec": "307.56",
+      "avgFrameTimeMs": "191.7",
+      "effectiveFps": "5.2",
+      "realTimeFactor": "6.69",
+      "mp4SizeBytes": 16626441,
+      "audioCaptured": "window-pcm",
+      "gpuMode": "Direct3D11 Hardware"
+    },
+    "createdAt": 1794857694717,
+    "url": "/output/render-1794857386907-PainForge_____Reel__1_.mp4"
+  },
+  {
+    "id": "rec_1794856938885_rg7dn",
+    "filename": "PainForge-Reel-FULL-46s.mp4",
+    "originalName": "PainForge-Reel-FULL-46s.mp4",
+    "fileType": "Reel 9:16",
+    "resolution": "1080x1920",
+    "duration": "00:00:46.02",
+    "durationSec": 46.02,
+    "sizeKb": "4687.9",
+    "bytes": 4800365,
+    "videoCodec": "h264 (High) (avc1 / 0x31637661)",
+    "audioCodec": "aac (LC) (mp4a / 0x6134706D)",
+    "createdAt": 1794835582144.2727,
+    "url": "/output/PainForge-Reel-FULL-46s.mp4"
+  }
+]

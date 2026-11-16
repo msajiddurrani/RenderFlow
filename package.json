@@ -1,0 +1,35 @@
+{
+  "name": "html-to-mp4-saas",
+  "version": "1.0.0",
+  "description": "High-performance HTML-to-MP4 SaaS engine and Chrome extension",
+  "main": "src/renderer-engine.js",
+  "bin": {
+    "html2mp4": "src/cli.js"
+  },
+  "scripts": {
+    "test:spike": "node src/run-sprint0-spike.js",
+    "render": "node src/cli.js",
+    "studio": "node src/preview-server.js"
+  },
+  "keywords": [
+    "html-to-mp4",
+    "webgl",
+    "threejs",
+    "web-audio",
+    "video-rendering",
+    "headless-chrome",
+    "ffmpeg"
+  ],
+  "author": "Antigravity Engineering Lead",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "express": "^4.22.3",
+    "marked": "^18.2.1",
+    "mp4-muxer": "^5.2.2",
+    "multer": "^2.5.0",
+    "puppeteer-core": "^24.43.1",
+    "three": "^0.170.0",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>body { margin:0; overflow:hidden; background:#090d16; }</style>
+</head>
+<body>
+  <script>
+    window.DUR = 5;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    const geo = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const mat = new THREE.MeshNormalMaterial({ wireframe: true });
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    camera.position.z = 30;
+    window.seek = t => {
+      mesh.rotation.x = t * 1.5;
+      mesh.rotation.y = t * 2.0;
+      renderer.render(scene, camera);
+    };
+  </script>
+</body>
+</html>
