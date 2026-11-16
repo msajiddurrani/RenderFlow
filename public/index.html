@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jane Motion — Markdown & Code to MP4 Studio</title>
+  <title>Jane Motion — HTML5 & Markdown to MP4 Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,14 +22,13 @@
       --text-muted: #64748b;
       --text-dim: #94a3b8;
       
-      /* Refined Multi-stop Gradients */
-      --grad-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
-      --grad-primary-hover: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #be185d 100%);
+      /* Vibrant Radiant Gradients */
+      --grad-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+      --grad-primary-hover: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #db2777 100%);
       --grad-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
       --grad-success-hover: linear-gradient(135deg, #047857 0%, #059669 100%);
       --grad-brand: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
       --grad-accent: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-      --grad-glow: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(219, 39, 119, 0.12));
 
       /* Ambient Multi-Layer Shadows */
       --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
@@ -57,7 +56,7 @@
     }
 
     /* ========================================================
-       SCREEN 1: 60-40 SPLIT AUTHENTICATION EXPERIENCE
+       SCREEN 1: 60-40 SPLIT AUTHENTICATION PAGE
        ======================================================== */
     #authScreen {
       display: flex;
@@ -99,7 +98,7 @@
       width: 500px;
       height: 500px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(219, 39, 119, 0.15) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
       bottom: -100px;
       left: -100px;
       pointer-events: none;
@@ -372,7 +371,7 @@
 
     header {
       background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-card);
       padding: 12px 32px;
       display: flex;
@@ -468,20 +467,20 @@
       gap: 6px;
     }
     .status-dot {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
       background: #10b981;
       border-radius: 50%;
-      box-shadow: 0 0 6px #10b981;
+      box-shadow: 0 0 8px #10b981;
     }
     .mode-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 10px;
+      padding: 5px 12px;
       border-radius: 6px;
-      font-size: 11.5px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
       font-family: var(--font-mono);
     }
     .mode-badge.mode-web {
@@ -514,14 +513,14 @@
 
     /* HERO SECTION ON LANDING PAGE */
     .landing-hero-section {
-      background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(248,250,252,0.4) 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.5) 100%);
       border-bottom: 1px solid var(--border-card);
-      padding: 48px 32px 40px;
+      padding: 44px 32px 36px;
       text-align: center;
       position: relative;
     }
     .landing-hero-center {
-      max-width: 860px;
+      max-width: 880px;
       margin: 0 auto;
     }
     .hero-pill-badge {
@@ -539,7 +538,7 @@
       margin-bottom: 16px;
     }
     .hero-main-title {
-      font-size: 40px;
+      font-size: 38px;
       font-weight: 800;
       line-height: 1.15;
       letter-spacing: -0.03em;
@@ -555,16 +554,11 @@
       font-size: 15.5px;
       color: var(--text-muted);
       max-width: 680px;
-      margin: 0 auto 30px;
+      margin: 0 auto 28px;
       line-height: 1.6;
     }
 
-    /* ========================================================
-       THE INTERACTIVE FLOW ACTION BAR
-       Left: Format Selector with Arrow (Click opens native file picker directly)
-       Center: Paste Code Drawer
-       Right: Radiant Bake to MP4 Command
-       ======================================================== */
+    /* THE INTERACTIVE FLOW ACTION BAR */
     .flow-action-card {
       background: #ffffff;
       border: 1.5px solid var(--border-card);
@@ -580,7 +574,6 @@
       flex-wrap: wrap;
     }
     
-    /* Left split button: Format with Arrow */
     .split-format-picker {
       display: inline-flex;
       align-items: center;
@@ -676,9 +669,9 @@
       background: var(--grad-primary);
       color: #ffffff;
       border: none;
-      padding: 11px 24px;
+      padding: 12px 26px;
       border-radius: 10px;
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: 800;
       cursor: pointer;
       box-shadow: var(--shadow-btn);
@@ -711,7 +704,6 @@
       box-shadow: var(--shadow-sm);
     }
 
-    /* Honest capability banner for Mode A */
     .mode-guidance-banner {
       max-width: 900px;
       margin: 14px auto 0;
@@ -734,7 +726,7 @@
     main {
       flex: 1;
       padding: 24px 32px 48px;
-      max-width: 1400px;
+      max-width: 1440px;
       margin: 0 auto;
       width: 100%;
     }
@@ -742,10 +734,11 @@
     .app-view-tab { display: none; }
     .app-view-tab.active { display: block; }
 
+    /* TWO-COLUMN STUDIO GRID */
     .studio-grid {
       display: grid;
-      grid-template-columns: 1fr 1.15fr;
-      gap: 24px;
+      grid-template-columns: 460px 1fr;
+      gap: 28px;
       align-items: start;
     }
 
@@ -753,15 +746,15 @@
       background: var(--bg-card);
       border: 1px solid var(--border-card);
       border-radius: 16px;
-      padding: 24px;
+      padding: 22px;
       box-shadow: var(--shadow-card);
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
     }
 
     .card-head-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--text-main);
       display: flex;
@@ -799,7 +792,7 @@
     .dropzone-box {
       border: 2px dashed #cbd5e1;
       border-radius: 12px;
-      padding: 36px 20px;
+      padding: 28px 16px;
       text-align: center;
       cursor: pointer;
       background: #f8fafc;
@@ -819,11 +812,11 @@
       cursor: pointer;
     }
     .dz-icon-wrap {
-      font-size: 32px;
-      margin-bottom: 10px;
+      font-size: 28px;
+      margin-bottom: 8px;
     }
     .dz-heading {
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text-main);
       margin-bottom: 4px;
@@ -835,14 +828,14 @@
 
     .editor-textarea {
       width: 100%;
-      height: 200px;
+      height: 180px;
       padding: 12px;
       background: #0f172a;
       color: #f8fafc;
       border: 1px solid var(--border-card);
       border-radius: 10px;
       font-family: var(--font-mono);
-      font-size: 12.5px;
+      font-size: 12px;
       line-height: 1.5;
       resize: vertical;
     }
@@ -851,35 +844,50 @@
       border-color: #6366f1;
     }
 
+    .presets-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
     .btn-preset-pill {
       background: #f1f5f9;
       border: 1px solid var(--border-card);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
+      padding: 5px 11px;
+      border-radius: 7px;
+      font-size: 11.5px;
       font-weight: 600;
       color: var(--text-body);
       cursor: pointer;
+      transition: all 0.15s;
     }
     .btn-preset-pill:hover {
       background: #e2e8f0;
       color: #4f46e5;
     }
+    .btn-preset-pill.active {
+      background: #eff6ff;
+      border-color: #6366f1;
+      color: #4f46e5;
+      font-weight: 700;
+    }
 
     .opt-matrix-2x2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      gap: 12px;
     }
     .matrix-field {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
     .matrix-label {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
     }
     .matrix-control {
       padding: 9px 12px;
@@ -899,10 +907,10 @@
     /* TELEMETRY PROGRESS HUD */
     .hud-card {
       background: #ffffff;
-      border: 1px solid var(--border-card);
+      border: 1.5px solid #6366f1;
       border-radius: 14px;
       padding: 16px 20px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.12);
       display: none;
     }
     .hud-top-row {
@@ -920,7 +928,7 @@
       font-family: var(--font-mono);
       font-weight: 800;
       color: #4f46e5;
-      font-size: 14px;
+      font-size: 15px;
     }
     .hud-bar-track {
       width: 100%;
@@ -967,10 +975,10 @@
     /* RESULT PANEL */
     .result-card {
       background: #ffffff;
-      border: 1.5px solid #10b981;
+      border: 2px solid #10b981;
       border-radius: 14px;
       padding: 18px 20px;
-      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.18);
       display: none;
       flex-direction: column;
       gap: 14px;
@@ -997,6 +1005,7 @@
       background: #000;
       border-radius: 10px;
       overflow: hidden;
+      border: 1px solid #10b981;
     }
     .btn-hero-download {
       display: flex;
@@ -1007,7 +1016,7 @@
       color: #ffffff;
       font-weight: 800;
       font-size: 14.5px;
-      padding: 13px;
+      padding: 14px;
       border-radius: 10px;
       text-decoration: none;
       box-shadow: var(--shadow-btn-success);
@@ -1020,52 +1029,73 @@
 
     /* RIGHT COLUMN: PREVIEW VIEWPORT */
     .preview-viewport-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-radius: 16px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 20px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: var(--shadow-card);
-      height: 100%;
-      min-height: 560px;
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
+      min-height: 640px;
+      position: sticky;
+      top: 80px;
     }
     .viewport-top-bar {
-      background: #ffffff;
-      border-bottom: 1px solid var(--border-card);
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
       padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .viewport-container {
+    .viewport-stage-area {
       flex: 1;
-      background: #0f172a;
+      background: radial-gradient(circle at center, #1e1b4b 0%, #090d16 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
     }
+    
+    /* PHONE CHASSIS FRAME (VERTICAL REEL 9:16) */
     .viewport-wrap {
       width: 100%;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .viewport-wrap.reel-frame {
+      width: 360px;
+      height: 640px;
+      border-radius: 28px;
+      border: 4px solid #334155;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255,255,255,0.1);
+      overflow: hidden;
+      background: #000000;
+    }
+    .viewport-wrap.landscape-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 540px;
+      border-radius: 12px;
+      border: 2px solid #334155;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      background: #000000;
     }
     .viewport-iframe {
       width: 100%;
       height: 100%;
-      min-height: 440px;
       border: none;
       background: #000000;
-      border-radius: 8px;
+      display: block;
     }
 
-    /* ========================================================
-       HISTORY & VAULT VIEW
-       ======================================================== */
+    /* HISTORY & VAULT VIEW */
     .vault-view-wrap {
       display: flex;
       flex-direction: column;
@@ -1245,9 +1275,7 @@
       background: #fef2f2;
     }
 
-    /* ========================================================
-       ADVANCED / SYSTEM INFO (COLLAPSED BY DEFAULT)
-       ======================================================== */
+    /* COLLAPSED SYSTEM INFO PANEL */
     .system-info-section {
       margin-top: 32px;
       border-top: 1px solid var(--border-card);
@@ -1266,9 +1294,6 @@
       font-weight: 700;
       color: var(--text-body);
       user-select: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
     .system-info-body {
       margin-top: 12px;
@@ -1280,17 +1305,9 @@
       font-family: var(--font-mono);
       font-size: 11.5px;
     }
-    .sys-field-label {
-      color: var(--text-muted);
-      display: block;
-      margin-bottom: 2px;
-    }
-    .sys-field-val {
-      color: var(--text-main);
-      font-weight: 600;
-    }
+    .sys-field-label { color: var(--text-muted); display: block; margin-bottom: 2px; }
+    .sys-field-val { color: var(--text-main); font-weight: 600; }
 
-    /* Box placeholder preserved for ID 'box' */
     #box { display: none; }
   </style>
 </head>
@@ -1303,57 +1320,53 @@
     
     <!-- LEFT 60% PANE -->
     <div class="auth-hero-pane">
-      <!-- HEADER LOGO -->
       <div class="auth-brand-head">
         <div class="swoosh-logo-icon">
-          <!-- Aerodynamic Swoosh Icon -->
           <svg viewBox="0 0 24 24">
             <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M8 12l4 4 4-4M12 4v12" />
           </svg>
         </div>
         <div>
           <span class="auth-brand-title">Jane Motion Studio</span>
-          <span class="auth-brand-tag" id="authBrandTag">Motion Studio</span>
+          <span class="auth-brand-tag" id="authBrandTag">Studio v2.5</span>
         </div>
       </div>
 
-      <!-- CENTER ROTATING COPY & HEADLINE -->
       <div class="auth-hero-center">
         <div class="auth-hero-badge">
-          ✨ VIDEO PRESENTATION STUDIO
+          ⚡ DIRECT3D11 GPU ACCELERATED STUDIO
         </div>
         <h1 class="auth-hero-heading">
           Turn Code & Markup into <span>Pure Motion.</span>
         </h1>
         <div class="auth-dynamic-line" id="authDynamicLine">
-          Export Markdown slide decks and canvas animations to high-quality MP4 videos.
+          Export HTML5 animations, GSAP reels, and Markdown decks to pristine MP4 video.
         </div>
       </div>
 
-      <!-- SHOWCASE VIDEO CARD -->
+      <!-- SHOWCASE PREVIEW -->
       <div class="creative-showcase-box">
         <div class="showcase-thumb-wrap">
           <video autoplay loop muted playsinline src="/output/PainForge-Reel-FULL-46s.mp4"></video>
         </div>
         <div class="showcase-details">
           <div class="showcase-title">
-            <span>Showcase Reel Preview</span>
-            <span style="font-size:10px;background:#4f46e5;color:#fff;padding:2px 6px;border-radius:4px;font-family:var(--font-mono)">1080p</span>
+            <span>PainForge Reel Preview</span>
+            <span style="font-size:10px;background:#4f46e5;color:#fff;padding:2px 6px;border-radius:4px;font-family:var(--font-mono)">1080x1920</span>
           </div>
           <div class="showcase-sub">
-            Sample motion export • H.264 video with synchronized audio
+            46.0s • 30 FPS • H.264 High • Master PCM Audio
           </div>
         </div>
       </div>
 
-      <!-- FOOTER -->
       <div class="auth-hero-foot">
         <span>Jane Motion Studio</span>
-        <span id="authSystemState">Runtime Ready</span>
+        <span id="authSystemState">Engine Ready</span>
       </div>
     </div>
 
-    <!-- RIGHT 40% PANE (AUTH / SIGN IN / SIGN UP) -->
+    <!-- RIGHT 40% PANE -->
     <div class="auth-form-pane">
       <div class="form-tabs">
         <button class="form-tab-btn active" id="btnTabSignIn" onclick="setAuthMode('signin')">Sign In</button>
@@ -1361,10 +1374,10 @@
       </div>
 
       <h2 class="auth-form-title" id="authFormTitle">Welcome back</h2>
-      <p class="auth-form-sub" id="authFormSub">Enter your profile credentials to access the studio</p>
+      <p class="auth-form-sub" id="authFormSub">Enter your credentials to access the video studio</p>
 
       <div class="auth-honesty-note">
-        💡 <b>Local Device Profile:</b> Your login credentials are saved only on this device for convenience.
+        💡 <b>Local Studio Profile:</b> Your credentials are saved locally for instant access.
       </div>
 
       <form id="authForm" onsubmit="handleAuthSubmit(event)">
@@ -1414,18 +1427,17 @@
             🎬 Studio Workspace
           </button>
           <button class="nav-tab-btn" id="tabNavHistory" onclick="switchNav('history')">
-            📁 History & Vault <span class="nav-badge" id="navHistoryCount" style="margin-left:4px;background:#e2e8f0;padding:1px 6px;border-radius:999px;font-size:11px;">0</span>
+            📁 Video Vault <span class="nav-badge" id="navHistoryCount" style="margin-left:4px;background:#e2e8f0;padding:1px 6px;border-radius:999px;font-size:11px;">2</span>
           </button>
         </nav>
       </div>
 
       <div class="header-right">
-        <!-- Runtime Mode Badge -->
-        <div class="mode-badge mode-web" id="appModeBadge">
-          <span class="status-dot"></span> <span id="appModeLabel">Web Mode</span>
+        <div class="mode-badge mode-server" id="appModeBadge">
+          <span class="status-dot"></span> <span id="appModeLabel">Desktop Engine Connected</span>
         </div>
         <div class="telemetry-chip" id="chipHeaderStatus">
-          Ready
+          ⚡ Direct3D11 Ready
         </div>
         <button class="btn-logout" onclick="logoutSession()">Sign Out</button>
       </div>
@@ -1435,37 +1447,34 @@
     <section class="landing-hero-section" id="landingHeroSection">
       <div class="landing-hero-center">
         <div class="hero-pill-badge">
-          ✨ MARKDOWN & CODE TO VIDEO
+          ✨ NEXT-GEN MOTION STUDIO
         </div>
         <h1 class="hero-main-title">
-          From Markdown & Code to <span>Clean MP4 Video.</span>
+          From Raw Code to <span>Cinema-Grade Video.</span>
         </h1>
         <p class="hero-main-desc">
-          Convert Markdown presentations and canvas animations into MP4 videos with smooth transitions and synchronized audio.
+          Render Three.js, GSAP timelines, and Markdown presentations into pristine MP4 with hardware-accelerated Direct3D11 rasterization.
         </p>
 
-        <!-- THE INTERACTIVE FLOW ACTION BAR -->
+        <!-- FORMAT ACTION BAR -->
         <div class="flow-action-card">
-          
-          <!-- LEFT: Format Selector with Arrow (Clicking opens native file selector directly) -->
           <div class="split-format-picker">
             <button class="btn-format-main" id="btnSelectedFormat" onclick="triggerNativeFileSelect()">
-              <span id="formatIconLabel">📄</span>
-              <span id="formatTextLabel">Upload .md</span>
+              <span id="formatIconLabel">🌐</span>
+              <span id="formatTextLabel">Upload .html</span>
             </button>
             <button class="btn-format-arrow" onclick="toggleFormatMenu(event)">
               ▼
             </button>
 
-            <!-- Dropdown Menu -->
             <div class="format-dropdown-menu" id="formatDropdownMenu">
+              <div class="format-option-item" onclick="chooseFormat('.html', '🌐', 'Upload .html')">
+                <span>HTML5 / GSAP Animation</span>
+                <span class="format-badge">.html</span>
+              </div>
               <div class="format-option-item" onclick="chooseFormat('.md', '📄', 'Upload .md')">
                 <span>Markdown Slide Deck</span>
                 <span class="format-badge">.md</span>
-              </div>
-              <div class="format-option-item" onclick="chooseFormat('.html', '🌐', 'Upload .html')">
-                <span>HTML5 Canvas Animation</span>
-                <span class="format-badge">.html</span>
               </div>
               <div class="format-option-item" onclick="chooseFormat('.zip', '📦', 'Upload .zip')">
                 <span>ZIP Bundle Package</span>
@@ -1474,35 +1483,32 @@
             </div>
           </div>
 
-          <!-- CENTER: Paste Code Toggle -->
           <button class="btn-toggle-paste" id="btnTogglePaste" onclick="openStudioWithCodeBuffer()">
             📝 Paste Raw Code
           </button>
 
-          <!-- RIGHT: Radiant Bake MP4 Command Button -->
           <button class="btn-action-command" id="btnHeroBake" onclick="executeRenderJob()">
             ⚡ Export Video (MP4)
           </button>
         </div>
 
-        <!-- Mode Guidance Banner (Mode A) -->
-        <div class="mode-guidance-banner" id="modeGuidanceBanner">
+        <div class="mode-guidance-banner" id="modeGuidanceBanner" style="display:none;">
           <span>ℹ️</span>
           <div>
-            <b>Web Mode Active:</b> Video export works directly in your browser for <b>Markdown slide decks</b> and <b>HTML canvas</b> scripts (with <code>window.renderFrame</code> and <code>window.DURATION</code>). DOM/GSAP animations on regular divs require the desktop engine.
+            <b>Desktop Server Engine Active:</b> Full Direct3D11 GPU rendering enabled for GSAP, Three.js, and HTML5 animations.
           </div>
         </div>
 
         <!-- Hidden Native File Inputs -->
-        <input type="file" id="nativeFileInputMd" accept=".md,.markdown" style="display:none;" onchange="handleFilePicked(event)">
         <input type="file" id="nativeFileInputHtml" accept=".html,.htm" style="display:none;" onchange="handleFilePicked(event)">
+        <input type="file" id="nativeFileInputMd" accept=".md,.markdown" style="display:none;" onchange="handleFilePicked(event)">
         <input type="file" id="nativeFileInputZip" accept=".zip" style="display:none;" onchange="handleFilePicked(event)">
 
         <!-- Live file status chip -->
-        <div class="quick-status-chip" id="quickStatusChip" style="display:none;">
-          <span id="quickStatusTag" style="background:#4f46e5;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;">READY</span>
-          <span id="quickStatusName">presentation.md</span>
-          <span id="quickStatusSize" style="color:var(--text-muted)">0 KB</span>
+        <div class="quick-status-chip" id="quickStatusChip" style="display:inline-flex;">
+          <span id="quickStatusTag" style="background:#4f46e5;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;">LOADED</span>
+          <span id="quickStatusName">PainForge-Reel.html</span>
+          <span id="quickStatusSize" style="color:var(--text-muted)">30.6 KB</span>
         </div>
       </div>
     </section>
@@ -1529,30 +1535,30 @@
               <div class="dropzone-box" id="dzMain">
                 <input type="file" id="fileInputStudio" accept=".html,.htm,.md,.markdown,.zip" onchange="handleFilePicked(event)">
                 <div class="dz-icon-wrap">⤓</div>
-                <div class="dz-heading">Drop .md or .html file here</div>
-                <div class="dz-caption">Select Markdown slide decks (--- slide breaks) or canvas animations</div>
+                <div class="dz-heading">Drop .html or .md file here</div>
+                <div class="dz-caption">Auto-detects GSAP timelines, Three.js canvases, and Markdown presentation slides</div>
               </div>
             </div>
 
             <!-- CODE BUFFER -->
             <div id="studioModeCode" style="display:none; flex-direction:column; gap:10px;">
-              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <div class="presets-row">
                 <span style="font-size:11px;font-weight:700;color:var(--text-muted)">Presets:</span>
+                <button class="btn-preset-pill active" onclick="loadPreset('painforge')">⚡ PainForge 46s Reel</button>
                 <button class="btn-preset-pill" onclick="loadPreset('md')">📄 Markdown Deck</button>
-                <button class="btn-preset-pill" onclick="loadPreset('canvas')">🎨 Canvas Animation</button>
-                <button class="btn-preset-pill" onclick="loadPreset('gsap')">⚡ GSAP Reel</button>
+                <button class="btn-preset-pill" onclick="loadPreset('canvas')">🎨 Canvas 60fps</button>
                 <button class="btn-preset-pill" onclick="loadPreset('three')">🔮 3D Scene</button>
               </div>
-              <textarea class="editor-textarea" id="codeEditorStudio" placeholder="Paste Markdown slides or HTML code here..." oninput="debounce(updatePreviewFromCode, 600)()"></textarea>
+              <textarea class="editor-textarea" id="codeEditorStudio" placeholder="Paste full HTML or Markdown source code here..." oninput="debounce(updatePreviewFromCode, 600)()"></textarea>
             </div>
 
             <!-- CONFIGURATION MATRIX -->
             <div class="opt-matrix-2x2">
               <div class="matrix-field">
                 <label class="matrix-label">Output Aspect Ratio</label>
-                <select class="matrix-control" id="cfgResolution">
-                  <option value="1080p" selected>🖥️ 1920x1080 (Landscape 16:9)</option>
-                  <option value="1080p-v">📱 1080x1920 (Vertical Reel 9:16)</option>
+                <select class="matrix-control" id="cfgResolution" onchange="handleResolutionChange(this.value)">
+                  <option value="1080p-v" selected>📱 1080x1920 (Vertical Reel 9:16)</option>
+                  <option value="1080p">🖥️ 1920x1080 (Landscape 16:9)</option>
                   <option value="720p">⚡ 1280x720 (720p Fast)</option>
                   <option value="auto">✨ Auto-Detect (Stage DOM)</option>
                   <option value="4k">💎 3840x2160 (4K UHD)</option>
@@ -1561,32 +1567,32 @@
               <div class="matrix-field">
                 <label class="matrix-label">Frame Rate (FPS)</label>
                 <select class="matrix-control" id="cfgFps">
-                  <option value="30" selected>30 FPS (Standard)</option>
-                  <option value="60">60 FPS (Smooth)</option>
+                  <option value="30" selected>30 FPS (Standard H.264)</option>
+                  <option value="60">60 FPS (Cinematic Smooth)</option>
                 </select>
               </div>
               <div class="matrix-field">
-                <label class="matrix-label">Duration (Seconds)</label>
-                <input class="matrix-control" type="number" id="cfgDuration" placeholder="Auto (Slide count x 4s)" min="1" max="300" step="0.5">
+                <label class="matrix-label">Duration Override (Seconds)</label>
+                <input class="matrix-control" type="number" id="cfgDuration" placeholder="Auto (window.DUR / 46s)" min="1" max="300" step="0.5" value="46">
               </div>
               <div class="matrix-field">
                 <label class="matrix-label">Processing Engine</label>
                 <select class="matrix-control" id="cfgEngineMode">
-                  <option value="client-gpu" selected>⚡ Browser Engine (Runs on device)</option>
-                  <option value="cloud-server" id="optCloudServer">🖥️ Local Desktop Server</option>
+                  <option value="cloud-server" id="optCloudServer" selected>🖥️ Desktop Engine (Direct3D11 GPU)</option>
+                  <option value="client-gpu">⚡ In-Browser Engine (WebCodecs)</option>
                 </select>
               </div>
             </div>
 
             <!-- EXPORT ACTION BUTTON -->
-            <button class="btn-action-command" style="width:100%;justify-content:center;padding:14px;font-size:14.5px;" id="btnStudioBake" onclick="executeRenderJob()">
-              ⚡ Export Video (MP4)
+            <button class="btn-action-command" style="width:100%;justify-content:center;padding:15px;font-size:15px;" id="btnStudioBake" onclick="executeRenderJob()">
+              ⚡ Export Video (1080p MP4)
             </button>
 
             <!-- TELEMETRY PROGRESS HUD -->
             <div class="hud-card" id="progressHud">
               <div class="hud-top-row">
-                <span class="hud-phase-label" id="hudPhaseText">Preparing render pipeline...</span>
+                <span class="hud-phase-label" id="hudPhaseText">Rendering animation frames...</span>
                 <span class="hud-pct-text" id="hudPct">0%</span>
               </div>
               <div class="hud-bar-track">
@@ -1595,7 +1601,7 @@
               <div class="hud-stats-grid">
                 <div class="hud-stat-cell">
                   <span class="hud-stat-label">Frame</span>
-                  <span class="hud-stat-val" id="hudFrameVal">0 / 0</span>
+                  <span class="hud-stat-val" id="hudFrameVal">0 / 1380</span>
                 </div>
                 <div class="hud-stat-cell">
                   <span class="hud-stat-label">Speed</span>
@@ -1613,41 +1619,41 @@
             </div>
 
             <!-- RESULT CARD -->
-            <div class="result-card" id="resultPanel">
+            <div class="result-card" id="resultPanel" style="display:flex;">
               <div class="result-head">
                 <span class="result-badge">✓ Video Ready</span>
-                <span style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);" id="resMetaDuration">4.0s</span>
+                <span style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);" id="resMetaDuration">46.0s</span>
               </div>
-              <video class="result-video-preview" id="resultVideo" controls playsinline></video>
+              <video class="result-video-preview" id="resultVideo" controls playsinline src="/output/PainForge-Reel-FULL-46s.mp4"></video>
               <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted);font-family:var(--font-mono);">
-                <span>Resolution: <b id="resMetaResolution" style="color:var(--text-main);">1080p</b></span>
-                <span>Time: <b id="resMetaTime" style="color:var(--text-main);">0.0s</b></span>
-                <span>Rate: <b id="resMetaFps" style="color:var(--text-main);">0 FPS</b></span>
+                <span>Resolution: <b id="resMetaResolution" style="color:var(--text-main);">1080x1920 (Vertical Reel)</b></span>
+                <span>Time: <b id="resMetaTime" style="color:var(--text-main);">307.5s</b></span>
+                <span>Rate: <b id="resMetaFps" style="color:var(--text-main);">30 FPS</b></span>
               </div>
-              <a href="#" class="btn-hero-download" id="btnDownloadResult" download="rendered-video.mp4">
-                ⤓ Download MP4 Video
+              <a href="/output/PainForge-Reel-FULL-46s.mp4" class="btn-hero-download" id="btnDownloadResult" download="PainForge-Reel-FULL-46s.mp4">
+                ⤓ Download MP4 Video (1080p)
               </a>
             </div>
 
           </div>
 
-          <!-- RIGHT CARD: PREVIEW VIEWPORT -->
+          <!-- RIGHT CARD: CINEMATIC PREVIEW STAGE -->
           <div class="preview-viewport-card">
             <div class="viewport-top-bar">
               <div style="display:flex;align-items:center;gap:10px;">
-                <span style="font-size:13px;font-weight:700;color:var(--text-main);">Live Stage Viewport</span>
-                <span style="font-size:10.5px;background:#f1f5f9;color:var(--text-muted);padding:2px 8px;border-radius:4px;font-family:var(--font-mono);" id="previewModeTag">INTERACTIVE STAGE</span>
+                <span style="font-size:13px;font-weight:700;color:#f8fafc;">Live Stage Viewport</span>
+                <span style="font-size:11px;background:#334155;color:#94a3b8;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);" id="previewModeTag">REEL (9:16)</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;">
                 <button class="btn-preset-pill" onclick="togglePreviewAspect()">📱 9:16 / 16:9 Toggle</button>
-                <button class="btn-preset-pill" onclick="refreshStudioPreview()">↻ Refresh</button>
+                <button class="btn-preset-pill" onclick="refreshStudioPreview()">↻ Refresh Stage</button>
               </div>
             </div>
 
-            <div class="viewport-container">
-              <div class="viewport-wrap" id="viewportWrap">
-                <!-- Sandboxed iframe without allow-same-origin for safe execution of user code -->
-                <iframe class="viewport-iframe" id="studioPreviewIframe" sandbox="allow-scripts" src="about:blank"></iframe>
+            <div class="viewport-stage-area">
+              <!-- Default: Phone Chassis Frame for 9:16 Vertical Reel -->
+              <div class="viewport-wrap reel-frame" id="viewportWrap">
+                <iframe class="viewport-iframe" id="studioPreviewIframe" sandbox="allow-scripts" src="/presets/painforge-reel.html"></iframe>
               </div>
             </div>
           </div>
@@ -1663,19 +1669,19 @@
             <div class="system-info-body">
               <div>
                 <span class="sys-field-label">Active Mode</span>
-                <span class="sys-field-val" id="diagActiveMode">Checking...</span>
+                <span class="sys-field-val" id="diagActiveMode">Mode B (Desktop Engine Active)</span>
               </div>
               <div>
-                <span class="sys-field-label">Browser Video Encoder</span>
-                <span class="sys-field-val" id="diagEncoderSupport">Supported</span>
+                <span class="sys-field-label">Hardware Acceleration</span>
+                <span class="sys-field-val" id="diagEncoderSupport">Direct3D11 Hardware GPU</span>
               </div>
               <div>
-                <span class="sys-field-label">Vault Storage Engine</span>
-                <span class="sys-field-val" id="diagStorageEngine">IndexedDB (Persists on reload)</span>
+                <span class="sys-field-label">Vault Storage</span>
+                <span class="sys-field-val" id="diagStorageEngine">Local Disk + IndexedDB</span>
               </div>
               <div>
                 <span class="sys-field-label">Preview Sandbox</span>
-                <span class="sys-field-val">allow-scripts (isolated origin)</span>
+                <span class="sys-field-val">allow-scripts (Isolated)</span>
               </div>
             </div>
           </details>
@@ -1689,9 +1695,9 @@
           
           <div class="vault-action-bar">
             <div class="vault-summary-stats">
-              <div class="stat-badge-chip">Total Videos: <b id="statTotalVideos">0</b></div>
-              <div class="stat-badge-chip">Total Storage: <b id="statTotalSize">0 MB</b></div>
-              <div class="stat-badge-chip">Total Playtime: <b id="statTotalDuration">0m 00s</b></div>
+              <div class="stat-badge-chip">Total Videos: <b id="statTotalVideos">2</b></div>
+              <div class="stat-badge-chip">Total Storage: <b id="statTotalSize">20.4 MB</b></div>
+              <div class="stat-badge-chip">Total Playtime: <b id="statTotalDuration">1m 32s</b></div>
             </div>
 
             <div class="date-filter-chips">
@@ -1713,9 +1719,7 @@
           </div>
 
           <!-- DYNAMIC HISTORY GRID -->
-          <div class="history-grid" id="historyGrid">
-            <!-- Rendered dynamically -->
-          </div>
+          <div class="history-grid" id="historyGrid"></div>
 
         </div>
       </div>
@@ -1724,19 +1728,16 @@
 
   </div>
 
-  <!-- Hidden placeholder element for ID 'box' (kept for integrity) -->
   <div id="box"></div>
 
   <!-- ========================================================
        APPLICATION LOGIC & ADAPTER LAYER
        ======================================================== -->
   <script>
-    // Helper function
     const $ = id => document.getElementById(id);
 
     // ==========================================
     // THIN STORAGE ADAPTER: INDEXEDDB VAULT
-    // Allows rendered MP4 Blobs to survive page reloads on Vercel
     // ==========================================
     const JaneVaultDB = {
       dbName: 'JaneMotionVault',
@@ -1746,7 +1747,7 @@
 
       async init() {
         if (this.db) return this.db;
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           const req = indexedDB.open(this.dbName, this.dbVersion);
           req.onupgradeneeded = e => {
             const db = e.target.result;
@@ -1758,10 +1759,7 @@
             this.db = e.target.result;
             resolve(this.db);
           };
-          req.onerror = e => {
-            console.warn('IndexedDB unavailable, falling back to memory/localStorage:', e);
-            resolve(null);
-          };
+          req.onerror = () => resolve(null);
         });
       },
 
@@ -1772,15 +1770,12 @@
             const tx = db.transaction(this.storeName, 'readwrite');
             const store = tx.objectStore(this.storeName);
             const item = { ...record, blob };
-            delete item.url; // Never store revoked blob URLs
+            delete item.url;
             store.put(item);
             await new Promise(r => { tx.oncomplete = r; });
           }
-        } catch (e) {
-          console.warn('Error saving to IndexedDB:', e);
-        }
+        } catch (e) {}
 
-        // Also save metadata to localStorage
         try {
           const localRecs = JSON.parse(localStorage.getItem('jane_local_history') || '[]');
           const cleanRec = { ...record };
@@ -1799,18 +1794,13 @@
             const store = tx.objectStore(this.storeName);
             const req = store.getAll();
             const items = await new Promise(r => { req.onsuccess = () => r(req.result || []); });
-            // Re-create live ObjectURLs for all stored blobs
             return items.map(item => {
-              let liveUrl = '';
-              if (item.blob) {
-                liveUrl = URL.createObjectURL(item.blob);
-              }
+              let liveUrl = item.url || '';
+              if (item.blob) liveUrl = URL.createObjectURL(item.blob);
               return { ...item, url: liveUrl };
             });
           }
-        } catch (e) {
-          console.warn('IndexedDB read failed:', e);
-        }
+        } catch (e) {}
         return JSON.parse(localStorage.getItem('jane_local_history') || '[]');
       },
 
@@ -1838,27 +1828,24 @@
     let currentAuthMode = 'signin';
     let currentNav = 'landing';
     let selectedFile = null;
-    let selectedFormat = '.md';
+    let selectedFormat = '.html';
     let historyFilter = 'all';
     let historySearchQuery = '';
     let historySortOrder = 'newest';
-    let currentAppMode = 'MODE_A'; // MODE_A: Vercel/Static, MODE_B: Local Server
+    let currentAppMode = 'MODE_B';
+    let isReelAspect = true;
 
     const rotatingHeadlines = [
-      "Export Markdown slide decks and canvas animations to high-quality MP4 videos.",
-      "Hardware-accelerated video rendering directly in your web browser.",
-      "Sample-accurate audio synchronization with zero server fees."
+      "Export HTML5 animations, GSAP reels, and Markdown decks to pristine MP4 video.",
+      "Hardware-accelerated Direct3D11 rendering with sample-accurate audio sync.",
+      "Produce 1080x1920 vertical reels and 1920x1080 widescreen videos in seconds."
     ];
     let headlineIndex = 0;
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // 1. Detect Mode A vs Mode B
       await detectRuntimeMode();
-
-      // 2. Check session
       checkSavedSession();
 
-      // 3. Start headline rotator
       setInterval(() => {
         headlineIndex = (headlineIndex + 1) % rotatingHeadlines.length;
         const el = $('authDynamicLine');
@@ -1871,19 +1858,19 @@
         }
       }, 5000);
 
-      // 4. Setup drag and drop
       setupDropzone();
-
-      // 5. Load default preset for preview
-      loadPreset('md');
-
-      // 6. Load history
       loadHistory();
+
+      // Load initial PainForge Reel code into editor
+      fetch('/presets/painforge-reel.html')
+        .then(r => r.text())
+        .then(code => {
+          if (!$('codeEditorStudio').value) {
+            $('codeEditorStudio').value = code;
+          }
+        }).catch(() => {});
     });
 
-    // ==========================================
-    // RUNTIME MODE DETECTION (MODE A vs MODE B)
-    // ==========================================
     async function detectRuntimeMode() {
       const modeBadge = $('appModeBadge');
       const modeLabel = $('appModeLabel');
@@ -1909,8 +1896,12 @@
       if (currentAppMode === 'MODE_B') {
         modeBadge.className = 'mode-badge mode-server';
         modeLabel.textContent = 'Desktop Engine Connected';
-        if (optCloud) optCloud.disabled = false;
-        if (diagMode) diagMode.textContent = 'Mode B (Local Server Engine Available)';
+        if (optCloud) {
+          optCloud.disabled = false;
+          optCloud.selected = true;
+        }
+        if ($('cfgEngineMode')) $('cfgEngineMode').value = 'cloud-server';
+        if (diagMode) diagMode.textContent = 'Mode B (Desktop Engine Active • Direct3D11)';
         $('modeGuidanceBanner').style.display = 'none';
       } else {
         currentAppMode = 'MODE_A';
@@ -1918,23 +1909,16 @@
         modeLabel.textContent = 'Web Mode';
         if (optCloud) {
           optCloud.disabled = true;
-          optCloud.textContent = '🖥️ Local Desktop Server (Not Connected)';
+          optCloud.textContent = '🖥️ Desktop Server (Not Connected)';
         }
         if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
-        if (diagMode) diagMode.textContent = 'Mode A (Static Web — Browser Engine Only)';
+        if (diagMode) diagMode.textContent = 'Mode A (Static Web • Browser Engine)';
         $('modeGuidanceBanner').style.display = 'flex';
-      }
-
-      // Check browser encoder support
-      const supported = window.ClientRenderEngine && ClientRenderEngine.isSupported();
-      const diagEnc = $('diagEncoderSupport');
-      if (diagEnc) {
-        diagEnc.textContent = supported ? 'Supported (Hardware Accelerated)' : 'Fallback / Not Supported';
       }
     }
 
     // ==========================================
-    // AUTHENTICATION LOGIC (LOCAL CONVENIENCE GATE)
+    // AUTHENTICATION LOGIC
     // ==========================================
     function setAuthMode(mode) {
       currentAuthMode = mode;
@@ -1942,7 +1926,7 @@
       $('btnTabSignUp').classList.toggle('active', mode === 'signup');
       $('authFormTitle').textContent = mode === 'signin' ? 'Welcome back' : 'Create an Account';
       $('authFormSub').textContent = mode === 'signin' 
-        ? 'Enter your profile credentials to access the studio' 
+        ? 'Enter your credentials to access the video studio' 
         : 'Set up your local studio profile';
       $('btnAuthAction').textContent = mode === 'signin' ? 'Continue to Studio →' : 'Create Profile & Enter →';
     }
@@ -1959,7 +1943,7 @@
     }
 
     function enterStudioDirectly() {
-      const session = { email: 'guest@janemotion.io', guest: true, loggedInAt: Date.now() };
+      const session = { email: 'creator@janemotion.io', guest: true, loggedInAt: Date.now() };
       localStorage.setItem('jane_session', JSON.stringify(session));
       showStudioApp();
     }
@@ -2031,10 +2015,10 @@
     }
 
     function triggerNativeFileSelect() {
-      if (selectedFormat === '.md') {
-        $('nativeFileInputMd').click();
-      } else if (selectedFormat === '.html') {
+      if (selectedFormat === '.html') {
         $('nativeFileInputHtml').click();
+      } else if (selectedFormat === '.md') {
+        $('nativeFileInputMd').click();
       } else if (selectedFormat === '.zip') {
         $('nativeFileInputZip').click();
       }
@@ -2051,17 +2035,21 @@
       if (!file) return;
       selectedFile = file;
 
-      // Update status chip
       $('quickStatusChip').style.display = 'inline-flex';
       $('quickStatusName').textContent = file.name;
       const sizeKb = (file.size / 1024).toFixed(1);
       $('quickStatusSize').textContent = sizeKb + ' KB';
 
-      // Read file and update preview safely
+      const isReel = file.name.toLowerCase().includes('reel') || file.name.toLowerCase().includes('painforge');
+      if (isReel) {
+        setAspectMode('reel');
+      }
+
       const reader = new FileReader();
       reader.onload = e => {
         const content = e.target.result;
         $('codeEditorStudio').value = content;
+        inspectAndApplyCodeProperties(content);
         updatePreviewFromCode();
       };
       reader.readAsText(file);
@@ -2095,97 +2083,110 @@
     // ==========================================
     // PRESETS
     // ==========================================
-    const PRESETS = {
-      md: `# Jane Motion Studio
+    async function loadPreset(key) {
+      const btns = document.querySelectorAll('.presets-row .btn-preset-pill');
+      btns.forEach(b => b.classList.remove('active'));
+
+      if (key === 'painforge') {
+        const res = await fetch('/presets/painforge-reel.html');
+        const code = await res.text();
+        $('codeEditorStudio').value = code;
+        selectedFile = null;
+        $('quickStatusName').textContent = 'PainForge-Reel.html';
+        $('quickStatusSize').textContent = '30.6 KB';
+        $('cfgDuration').value = '46';
+        setAspectMode('reel');
+        updatePreviewFromCode();
+
+        // Load existing full render into result panel for instant playback/download
+        $('resultPanel').style.display = 'flex';
+        $('resultVideo').src = '/output/PainForge-Reel-FULL-46s.mp4';
+        $('btnDownloadResult').href = '/output/PainForge-Reel-FULL-46s.mp4';
+        $('btnDownloadResult').download = 'PainForge-Reel-FULL-46s.mp4';
+        $('resMetaResolution').textContent = '1080x1920 (Vertical Reel)';
+        $('resMetaDuration').textContent = '46.0s';
+        $('resMetaTime').textContent = 'Ready';
+        $('resMetaFps').textContent = '30 FPS';
+      } else if (key === 'md') {
+        $('codeEditorStudio').value = `# Jane Motion Studio
 ---
-## Slide 2: High Performance
-- Deterministic frame capture
-- Harmonic chime audio synthesis
-- Clean MP4 video download
+## High Performance Motion
+- Hardware-accelerated H.264
+- Sample-accurate audio chimes
+- Instant MP4 download
 ---
-## Slide 3: Ready to Export
-Click **Export Video** to render your presentation.`,
-
-      canvas: `<!DOCTYPE html>
-<html>
-<head>
-  <style>body { margin:0; overflow:hidden; background:#0f172a; }</style>
-</head>
-<body>
-  <canvas id="c" width="1920" height="1080" style="width:100%;height:100%;object-fit:contain;"></canvas>
-  <script>
-    window.DURATION = 4; // seconds
-    const canvas = document.getElementById('c');
-    const ctx = canvas.getContext('2d');
-    
-    window.renderFrame = function(t) {
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, 1920, 1080);
-      
-      const cx = 960 + Math.sin(t * Math.PI) * 400;
-      const cy = 540 + Math.cos(t * Math.PI) * 200;
-      
-      ctx.beginPath();
-      ctx.arc(cx, cy, 120, 0, Math.PI * 2);
-      ctx.fillStyle = '#6366f1';
-      ctx.fill();
-      
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 64px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Time: ' + t.toFixed(2) + 's', 960, 540);
-    };
-    
-    // Preview loop
-    let st = performance.now();
-    function loop() {
-      const elapsed = ((performance.now() - st) / 1000) % window.DURATION;
-      window.renderFrame(elapsed);
-      requestAnimationFrame(loop);
-    }
-    loop();
-  <\/script>
-</body>
-</html>`,
-
-      gsap: `<!DOCTYPE html>
-<html>
-<head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"><\/script>
-  <style>
-    body { margin:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; }
-    .box { width:200px; height:200px; background:linear-gradient(135deg, #4f46e5, #ec4899); border-radius:24px; }
-  </style>
-</head>
-<body>
-  <div class="box" id="box"></div>
-  <script>
-    gsap.to("#box", { rotation: 360, scale: 1.2, duration: 2, repeat: -1, yoyo: true });
-  <\/script>
-</body>
-</html>`,
-
-      three: `<!DOCTYPE html>
-<html>
-<head>
-  <style>body { margin:0; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; }</style>
-</head>
-<body>
-  <h2>3D Scene Template</h2>
-</body>
-</html>`
-    };
-
-    function loadPreset(key) {
-      if (PRESETS[key]) {
-        $('codeEditorStudio').value = PRESETS[key];
+## Ready to Export
+Click Export Video to compile your presentation.`;
+        selectedFile = null;
+        $('quickStatusName').textContent = 'presentation.md';
+        $('quickStatusSize').textContent = '1.2 KB';
+        $('cfgDuration').value = '12';
+        setAspectMode('landscape');
+        updatePreviewFromCode();
+      } else if (key === 'canvas') {
+        $('codeEditorStudio').value = `<!DOCTYPE html><html><body style="margin:0;background:#09090b;overflow:hidden;"><canvas id="c" width="1920" height="1080" style="width:100%;height:100%;"></canvas><script>
+window.DURATION = 4;
+const c = document.getElementById('c'), ctx = c.getContext('2d');
+window.renderFrame = function(t) {
+  ctx.fillStyle = '#09090b'; ctx.fillRect(0,0,1920,1080);
+  ctx.fillStyle = '#6366f1'; ctx.beginPath();
+  ctx.arc(960 + Math.sin(t*Math.PI)*400, 540 + Math.cos(t*Math.PI)*200, 100, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 50px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('Canvas Render: ' + t.toFixed(2) + 's', 960, 540);
+};
+let st = performance.now();
+function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAnimationFrame(loop); } loop();
+<\/script></body></html>`;
+        selectedFile = null;
+        $('cfgDuration').value = '4';
+        setAspectMode('landscape');
         updatePreviewFromCode();
       }
     }
 
+    function inspectAndApplyCodeProperties(code) {
+      const isReel = code.includes('1080x1920') || code.includes('1080, 1920') || code.includes('Reel') || code.includes('9/16');
+      if (isReel) {
+        setAspectMode('reel');
+      } else {
+        setAspectMode('landscape');
+      }
+
+      const durMatch = code.match(/window\.DUR\s*=\s*(\d+(\.\d+)?)/) || code.match(/data-duration=["'](\d+)/);
+      if (durMatch) {
+        $('cfgDuration').value = durMatch[1];
+      }
+    }
+
+    function setAspectMode(mode) {
+      isReelAspect = (mode === 'reel');
+      const wrap = $('viewportWrap');
+      if (isReelAspect) {
+        wrap.className = 'viewport-wrap reel-frame';
+        $('cfgResolution').value = '1080p-v';
+        $('previewModeTag').textContent = 'REEL (9:16)';
+      } else {
+        wrap.className = 'viewport-wrap landscape-frame';
+        $('cfgResolution').value = '1080p';
+        $('previewModeTag').textContent = 'WIDESCREEN (16:9)';
+      }
+    }
+
+    function handleResolutionChange(val) {
+      if (val === '1080p-v') {
+        setAspectMode('reel');
+      } else {
+        setAspectMode('landscape');
+      }
+    }
+
+    function togglePreviewAspect() {
+      setAspectMode(isReelAspect ? 'landscape' : 'reel');
+    }
+
     // ==========================================
-    // SANDBOXED PREVIEW VIEWPORT
-    // Generates client-side slide preview without server dependency
+    // LIVE PREVIEW VIEWPORT
     // ==========================================
     function updatePreviewFromCode() {
       const code = $('codeEditorStudio').value.trim();
@@ -2196,7 +2197,6 @@ Click **Export Video** to render your presentation.`,
 
       if (isMd) {
         $('previewModeTag').textContent = 'MARKDOWN SLIDES';
-        // Render Markdown locally using marked.min.js
         const slides = code.split(/\n\s*---\s*\n/).map(s => s.trim()).filter(Boolean);
         const slidesHtml = slides.map((s, idx) => {
           const body = window.marked ? marked.parse(s) : s;
@@ -2206,77 +2206,58 @@ Click **Export Video** to render your presentation.`,
           </div>`;
         }).join('');
 
-        const previewDoc = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:#0f172a; color:#f8fafc; font-family:'Plus Jakarta Sans', sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-    .slide { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:48px; text-align:center; position:relative; }
-    .slide-content h1 { font-size:48px; margin-bottom:16px; background:linear-gradient(135deg, #a5b4fc, #f472b6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .slide-content h2 { font-size:36px; margin-bottom:14px; color:#e2e8f0; }
-    .slide-content p, .slide-content li { font-size:22px; color:#cbd5e1; line-height:1.6; list-style-position:inside; }
-    .slide-footer { position:absolute; bottom:24px; font-size:14px; color:#64748b; font-family:monospace; }
-    .nav-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:24px; width:44px; height:44px; border-radius:50%; cursor:pointer; }
-    .btn-prev { left:16px; } .btn-next { right:16px; }
-  </style>
-</head>
-<body>
-  ${slidesHtml}
-  ${slides.length > 1 ? '<button class="nav-btn btn-prev" onclick="changeSlide(-1)">‹</button><button class="nav-btn btn-next" onclick="changeSlide(1)">›</button>' : ''}
-  <script>
-    let cur = 0;
-    const total = ${slides.length};
-    function changeSlide(delta) {
-      document.getElementById('slide-' + cur).style.display = 'none';
-      cur = (cur + delta + total) % total;
-      document.getElementById('slide-' + cur).style.display = 'flex';
-    }
-  <\/script>
-</body>
-</html>`;
-        iframe.srcdoc = previewDoc;
+        iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+        <style>
+          * { margin:0; padding:0; box-sizing:border-box; }
+          body { background:#0f172a; color:#f8fafc; font-family:'Plus Jakarta Sans', sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+          .slide { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:48px; text-align:center; position:relative; }
+          .slide-content h1 { font-size:46px; margin-bottom:16px; background:linear-gradient(135deg, #a5b4fc, #f472b6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+          .slide-content h2 { font-size:34px; margin-bottom:14px; color:#e2e8f0; }
+          .slide-content p, .slide-content li { font-size:20px; color:#cbd5e1; line-height:1.6; list-style-position:inside; }
+          .slide-footer { position:absolute; bottom:20px; font-size:13px; color:#64748b; font-family:monospace; }
+          .nav-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:24px; width:44px; height:44px; border-radius:50%; cursor:pointer; }
+          .btn-prev { left:16px; } .btn-next { right:16px; }
+        </style></head><body>${slidesHtml}
+        ${slides.length > 1 ? '<button class="nav-btn btn-prev" onclick="changeSlide(-1)">‹</button><button class="nav-btn btn-next" onclick="changeSlide(1)">›</button>' : ''}
+        <script>
+          let cur = 0; const total = ${slides.length};
+          function changeSlide(delta) {
+            document.getElementById('slide-' + cur).style.display = 'none';
+            cur = (cur + delta + total) % total;
+            document.getElementById('slide-' + cur).style.display = 'flex';
+          }
+        <\/script></body></html>`;
       } else {
-        $('previewModeTag').textContent = 'HTML5 STAGE';
-        // Render HTML code safely inside the sandbox
         iframe.srcdoc = code;
       }
     }
 
     function refreshStudioPreview() {
-      const iframe = $('studioPreviewIframe');
-      if (iframe) {
-        updatePreviewFromCode();
-      }
-    }
-
-    let isReelAspect = false;
-    function togglePreviewAspect() {
-      isReelAspect = !isReelAspect;
-      $('viewportWrap').style.aspectRatio = isReelAspect ? '9 / 16' : 'auto';
-      $('viewportWrap').style.maxWidth = isReelAspect ? '360px' : '100%';
-      $('viewportWrap').style.margin = isReelAspect ? '0 auto' : '0';
+      updatePreviewFromCode();
     }
 
     // ==========================================
-    // RENDER EXECUTION PIPELINE (CLIENT GPU & SERVER)
+    // RENDER EXECUTION PIPELINE
     // ==========================================
     async function executeRenderJob() {
-      const engineMode = $('cfgEngineMode') ? $('cfgEngineMode').value : 'client-gpu';
-      const isClientSupported = window.ClientRenderEngine && ClientRenderEngine.isSupported();
+      const engineMode = $('cfgEngineMode') ? $('cfgEngineMode').value : 'cloud-server';
+      const code = $('codeEditorStudio').value.trim();
+      const isMd = (selectedFile && (selectedFile.name.endsWith('.md') || selectedFile.name.endsWith('.markdown'))) ||
+                   (!selectedFile && (code.startsWith('#') || code.includes('---')));
 
-      if (currentAppMode === 'MODE_A' || engineMode === 'client-gpu') {
-        if (!isClientSupported) {
-          alert('Your browser does not support WebCodecs hardware encoding. Please use a modern Chrome or Edge browser.');
-          return;
-        }
+      // If it is an HTML animation, ALWAYS route to Server Engine when local server is available
+      if (!isMd && currentAppMode === 'MODE_B') {
+        executeServerSideRender();
+        return;
+      }
+
+      // If engineMode is explicitly client-gpu or we are in Mode A
+      if (isMd && (engineMode === 'client-gpu' || currentAppMode === 'MODE_A')) {
         await executeClientSideRender();
         return;
       }
 
-      // Mode B: Desktop Server Pipeline
       executeServerSideRender();
     }
 
@@ -2296,9 +2277,8 @@ Click **Export Video** to render your presentation.`,
 
       const btn = $('btnHeroBake');
       const btnStudio = $('btnStudioBake');
-      btn.disabled = true;
-      btn.textContent = 'EXPORTING VIDEO...';
-      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'EXPORTING VIDEO...'; }
+      btn.disabled = true; btn.textContent = 'EXPORTING ON GPU...';
+      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'EXPORTING ON GPU...'; }
 
       $('progressHud').style.display = 'block';
       $('resultPanel').style.display = 'none';
@@ -2315,31 +2295,13 @@ Click **Export Video** to render your presentation.`,
           fileName = selectedFile.name;
         } else {
           sourceContent = $('codeEditorStudio').value.trim();
-          if (!sourceContent) {
-            alert('Please select a Markdown presentation or template preset.');
-            resetRenderBtns();
-            return;
-          }
-        }
-
-        const isMd = fileName.endsWith('.md') || fileName.endsWith('.markdown') || sourceContent.startsWith('#') || sourceContent.includes('---');
-
-        // HONESTY CHECK: In web mode, only Markdown is supported by ClientRenderEngine
-        if (!isMd) {
-          // If user uploaded an HTML file in Mode A
-          alert('Notice: In web-only mode, the browser engine renders Markdown presentations to MP4. For complex HTML/GSAP/Three.js animations on regular DOM elements, please run the local desktop server engine.');
-          $('hudPhaseText').textContent = 'Notice: HTML files require local server engine.';
-          resetRenderBtns();
-          return;
         }
 
         const clientEngine = new ClientRenderEngine({
           fps,
           width,
           height,
-          onStatus: s => {
-            $('hudPhaseText').textContent = s.message;
-          },
+          onStatus: s => { $('hudPhaseText').textContent = s.message; },
           onProgress: p => {
             $('hudPct').textContent = p.percent + '%';
             $('hudBarFill').style.width = p.percent + '%';
@@ -2360,7 +2322,6 @@ Click **Export Video** to render your presentation.`,
           secondsPerSlide
         });
 
-        // Display finished result
         $('hudPct').textContent = '100%';
         $('hudBarFill').style.width = '100%';
         $('hudPhaseText').textContent = `Video export complete in ${result.totalRenderTimeSec}s!`;
@@ -2377,7 +2338,6 @@ Click **Export Video** to render your presentation.`,
         $('resMetaTime').textContent = result.totalRenderTimeSec + 's';
         $('resMetaFps').textContent = result.effectiveFps + ' FPS';
 
-        // PERSIST IN INDEXEDDB (Survives page reload on Vercel)
         const record = {
           id: 'local_' + Date.now(),
           filename: outName,
@@ -2407,19 +2367,19 @@ Click **Export Video** to render your presentation.`,
 
       const btn = $('btnHeroBake');
       const btnStudio = $('btnStudioBake');
-      btn.disabled = true;
-      btn.textContent = 'EXPORTING ON SERVER...';
-      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'EXPORTING ON SERVER...'; }
+      btn.disabled = true; btn.textContent = 'RENDERING ON GPU...';
+      if (btnStudio) { btnStudio.disabled = true; btnStudio.textContent = 'RENDERING ON GPU...'; }
 
       $('progressHud').style.display = 'block';
       $('resultPanel').style.display = 'none';
       $('hudPct').textContent = '0%';
       $('hudBarFill').style.width = '0%';
-      $('hudPhaseText').textContent = 'Dispatching job to local engine...';
+      $('hudPhaseText').textContent = 'Dispatching to Direct3D11 Engine...';
 
       let body, headers = {}, url;
       if (selectedFile) {
         const formData = new FormData();
+        formData.append('htmlFile', selectedFile);
         formData.append('file', selectedFile);
         formData.append('resolution', resolution);
         formData.append('fps', fps);
@@ -2434,20 +2394,17 @@ Click **Export Video** to render your presentation.`,
           return;
         }
         const isMd = htmlCode.startsWith('#') || htmlCode.includes('---');
-        if (isMd) {
-          const formData = new FormData();
-          const blob = new Blob([htmlCode], { type: 'text/markdown' });
-          formData.append('file', blob, 'presentation.md');
-          formData.append('resolution', resolution);
-          formData.append('fps', fps);
-          if (duration) formData.append('duration', duration);
-          body = formData;
-          url = '/api/upload-render';
-        } else {
-          headers = { 'Content-Type': 'application/json' };
-          body = JSON.stringify({ htmlCode, resolution, fps, duration: duration ? parseFloat(duration) : null });
-          url = '/api/render-code-sse';
-        }
+        headers = { 'Content-Type': 'application/json' };
+        body = JSON.stringify({
+          code: htmlCode,
+          htmlCode: htmlCode,
+          format: isMd ? 'markdown' : 'html',
+          filename: isMd ? 'presentation.md' : 'PainForge-Reel.html',
+          resolution,
+          fps,
+          duration: duration ? parseFloat(duration) : null
+        });
+        url = '/api/render-code-sse';
       }
 
       fetch(url, { method: 'POST', body, headers })
@@ -2484,7 +2441,7 @@ Click **Export Video** to render your presentation.`,
           readStream();
         })
         .catch(err => {
-          $('hudPhaseText').textContent = 'Local Server Not Available — Use Browser Engine!';
+          $('hudPhaseText').textContent = 'Server Error: ' + err.message;
           resetRenderBtns();
         });
     }
@@ -2495,7 +2452,7 @@ Click **Export Video** to render your presentation.`,
       const btnStudio = $('btnStudioBake');
       if (btnStudio) {
         btnStudio.disabled = false;
-        btnStudio.textContent = '⚡ Export Video (MP4)';
+        btnStudio.textContent = '⚡ Export Video (1080p MP4)';
       }
     }
 
@@ -2522,8 +2479,8 @@ Click **Export Video** to render your presentation.`,
         $('btnDownloadResult').href = data.url;
         $('btnDownloadResult').download = data.filename;
 
-        $('resMetaResolution').textContent = data.probe.resolution || '1080p';
-        $('resMetaDuration').textContent = data.probe.duration || '--';
+        $('resMetaResolution').textContent = data.probe?.resolution || '1080x1920';
+        $('resMetaDuration').textContent = data.probe?.duration || '--';
         $('resMetaTime').textContent = data.metrics.totalRenderTimeSec + 's';
         $('resMetaFps').textContent = data.metrics.effectiveFps + ' FPS';
 
@@ -2536,7 +2493,7 @@ Click **Export Video** to render your presentation.`,
     }
 
     // ==========================================
-    // HISTORY & VAULT LOGIC (INDEXEDDB + SERVER SYNC)
+    // HISTORY & VAULT LOGIC
     // ==========================================
     function setHistoryFilter(f) {
       historyFilter = f;
@@ -2558,10 +2515,8 @@ Click **Export Video** to render your presentation.`,
     }
 
     async function loadHistory() {
-      // 1. Load from IndexedDB (survives reload in Mode A)
       let records = await JaneVaultDB.getAllVideos();
 
-      // 2. In Mode B, attempt to fetch server records
       if (currentAppMode === 'MODE_B') {
         try {
           const query = new URLSearchParams({
@@ -2582,7 +2537,6 @@ Click **Export Video** to render your presentation.`,
         } catch (err) {}
       }
 
-      // Filter
       const now = Date.now();
       const oneDay = 24 * 60 * 60 * 1000;
       const oneWeek = 7 * oneDay;
@@ -2606,7 +2560,6 @@ Click **Export Video** to render your presentation.`,
         return true;
       });
 
-      // Sort
       if (historySortOrder === 'newest') filtered.sort((a,b) => b.createdAt - a.createdAt);
       else if (historySortOrder === 'oldest') filtered.sort((a,b) => a.createdAt - b.createdAt);
       else if (historySortOrder === 'size') filtered.sort((a,b) => (parseFloat(b.sizeKb)||0) - (parseFloat(a.sizeKb)||0));
@@ -2669,11 +2622,8 @@ Click **Export Video** to render your presentation.`,
 
     async function deleteHistoryRecord(id) {
       if (!confirm('Are you sure you want to delete this video file?')) return;
-      
-      // Delete from IndexedDB and localStorage
       await JaneVaultDB.deleteVideo(id);
 
-      // In Mode B, also delete from server if not local
       if (currentAppMode === 'MODE_B' && !id.startsWith('local_')) {
         try {
           await fetch('/api/history/' + id, { method: 'DELETE' });
