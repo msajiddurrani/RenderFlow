@@ -1,27 +1,41 @@
 {
-  "name": "html-to-mp4-saas",
+  "name": "renderflow",
   "version": "1.0.0",
-  "description": "High-performance HTML-to-MP4 SaaS engine and Chrome extension",
+  "description": "RenderFlow — Turn HTML animations and Markdown slides into studio-grade 1080p 60 FPS MP4 videos with real-time canvas preview and hardware acceleration.",
   "main": "src/renderer-engine.js",
   "bin": {
-    "html2mp4": "src/cli.js"
+    "renderflow": "src/cli.js"
   },
   "scripts": {
-    "test:spike": "node src/run-sprint0-spike.js",
+    "start": "node src/preview-server.js",
+    "build": "node scripts/build-renderflow-ui.js",
+    "studio": "node src/preview-server.js",
     "render": "node src/cli.js",
-    "studio": "node src/preview-server.js"
+    "test:verify": "node scripts/inspect-index.js && node scripts/verify-syntax.js",
+    "test:spike": "node src/run-sprint0-spike.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msajiddurrani/RenderFlow.git"
   },
   "keywords": [
+    "renderflow",
     "html-to-mp4",
-    "webgl",
+    "markdown-to-video",
+    "webcodecs",
+    "canvas-recording",
+    "direct3d11",
     "threejs",
-    "web-audio",
-    "video-rendering",
-    "headless-chrome",
-    "ffmpeg"
+    "mp4-muxer",
+    "ffmpeg",
+    "video-synthesis"
   ],
-  "author": "Antigravity Engineering Lead",
+  "author": "Muhammad Sajid Durrani (https://github.com/msajiddurrani)",
   "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/msajiddurrani/RenderFlow/issues"
+  },
+  "homepage": "https://github.com/msajiddurrani/RenderFlow#readme",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "express": "^4.22.3",
