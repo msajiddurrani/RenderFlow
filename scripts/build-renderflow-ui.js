@@ -60,7 +60,7 @@ const htmlContent = `<!DOCTYPE html>
     
     /* TOP NAVBAR */
     .nav {
-      height: 92px;
+      height: 70px;
       background: rgba(255, 255, 255, 0.98);
       border-bottom: 1px solid #EBEEF2;
       position: sticky;
@@ -76,11 +76,11 @@ const htmlContent = `<!DOCTYPE html>
     }
     .brand {
       display: inline-flex;
-      gap: 15px;
+      gap: 12px;
       align-items: center;
       font-weight: 850;
-      font-size: 26px;
-      letter-spacing: -0.9px;
+      font-size: 24px;
+      letter-spacing: -0.8px;
       color: var(--ink);
       text-decoration: none;
       transition: transform 0.15s ease;
@@ -89,11 +89,11 @@ const htmlContent = `<!DOCTYPE html>
       transform: translateY(-1px);
     }
     .logo-mark {
-      width: 50px;
-      height: 50px;
+      width: 42px;
+      height: 42px;
       flex: none;
       object-fit: contain;
-      filter: drop-shadow(0 4px 10px rgba(67, 56, 202, 0.26));
+      filter: drop-shadow(0 4px 10px rgba(67, 56, 202, 0.22));
       transition: transform 0.2s ease;
     }
     .brand:hover .logo-mark {
@@ -139,7 +139,7 @@ const htmlContent = `<!DOCTYPE html>
       gap: 16px;
     }
     .mode-badge {
-      display: inline-flex;
+      display: none !important;
       align-items: center;
       gap: 7px;
       font-size: 12px;
@@ -276,22 +276,10 @@ const htmlContent = `<!DOCTYPE html>
       grid-template-columns: 1.05fr 1fr;
       gap: 56px;
       align-items: center;
-      padding: 72px 0 54px;
+      padding: 16px 0 38px;
     }
     .hero-left .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      font-weight: 800;
-      color: #4338CA;
-      margin-bottom: 20px;
-      background: #EEF2FF;
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid #E0E7FF;
+      display: none;
     }
     .hero-left h1 {
       font-size: 58px;
@@ -675,44 +663,491 @@ const htmlContent = `<!DOCTYPE html>
       100% { transform: translateX(-50%) rotateX(4deg) translateZ(52px) translateY(-7px); }
     }
 
-    .simple-steps {
-      padding: 36px 0 54px;
+    /* VISIONARY STEPS SECTION (HOW IT WORKS PIPELINE) */
+    .visionary-steps-section {
+      padding: 44px 0 68px;
       border-top: 1px solid #E9ECF1;
+      position: relative;
     }
-    .simple-steps h2 {
-      font-size: 28px;
-      letter-spacing: -1px;
-      font-weight: 750;
-      margin-bottom: 24px;
+    .steps-header {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 44px;
     }
-    .steps-list {
+    .steps-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--blue);
+      background: #EEF2FF;
+      border: 1px solid #E0E7FF;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .steps-main-heading {
+      font-size: 40px;
+      letter-spacing: -1.5px;
+      font-weight: 850;
+      line-height: 1.15;
+      color: #0F172A;
+      margin-bottom: 12px;
+    }
+    .steps-heading-gradient {
+      background: linear-gradient(120deg, #3D49DB 0%, #6366F1 50%, #8B5CF6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .steps-subheading {
+      font-size: 16px;
+      color: var(--body);
+      line-height: 1.6;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    /* PIPELINE GRID */
+    .steps-pipeline-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .step-mini {
-      display: flex;
-      align-items: flex-start;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
       gap: 16px;
-      padding: 24px;
-      background: #FFFFFF;
-      border: 1px solid var(--line);
-      border-radius: 16px;
+      position: relative;
     }
-    .step-mini .num {
-      width: 38px;
-      height: 38px;
+    .pipeline-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      color: #818CF8;
       flex: none;
-      background: #ECEDFF;
-      border-radius: 11px;
+      z-index: 2;
+    }
+    .pipeline-connector svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    /* STEP CARD */
+    .visionary-step-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.02),
+        0 8px 24px -4px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+    }
+    .visionary-step-card:hover {
+      transform: translateY(-6px);
+      border-color: #C7D2FE;
+      box-shadow: 
+        0 4px 12px rgba(67, 56, 202, 0.06),
+        0 20px 40px -12px rgba(67, 56, 202, 0.14);
+    }
+
+    /* CARD VISUAL STAGE */
+    .card-visual-stage {
+      height: 190px;
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* STAGE 1: INGESTION VISUAL */
+    .stage-1 {
+      background: radial-gradient(circle at 50% 20%, #EEF2FF 0%, #F8FAFC 80%);
+      border: 1px solid #E0E7FF;
+    }
+    .intake-drop-well {
+      width: 88%;
+      height: 84%;
+      border: 2px dashed #C7D2FE;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .floating-tokens-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .file-token {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-weight: 750;
+      font-size: 13px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+      transition: transform 0.25s ease;
+    }
+    .token-html {
+      background: linear-gradient(135deg, #FF6B4A 0%, #EA580C 100%);
+      color: #FFFFFF;
+      transform: rotate(-4deg);
+    }
+    .token-md {
+      background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+      color: #FFFFFF;
+      transform: rotate(4deg);
+    }
+    .file-token svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+    .visionary-step-card:hover .token-html {
+      transform: rotate(-7deg) translateY(-3px);
+    }
+    .visionary-step-card:hover .token-md {
+      transform: rotate(7deg) translateY(-3px);
+    }
+    .intake-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #4F46E5;
+      background: #EEF2FF;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #E0E7FF;
+    }
+    .intake-indicator svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+    }
+
+    /* STAGE 2: PREVIEW CANVAS VISUAL */
+    .stage-2 {
+      background: #0F172A;
+      border: 1px solid #1E293B;
+      padding: 12px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    .mini-studio-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      background: radial-gradient(circle at 50% 25%, #241B66 0%, #0F112E 90%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+    .screen-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    .fps-live-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34D399;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 12px;
+    }
+    .fps-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 6px #10B981;
+    }
+    .aspect-preview-badge {
+      font-size: 10px;
+      font-weight: 750;
+      color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .screen-center-play {
+      align-self: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(255, 255, 255, 0.4);
       display: grid;
       place-items: center;
+      color: #FFFFFF;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .screen-center-play svg {
+      width: 18px;
+      height: 18px;
+      fill: #FFFFFF;
+      margin-left: 2px;
+    }
+    .visionary-step-card:hover .screen-center-play {
+      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.28);
+    }
+    .screen-timeline-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 2;
+    }
+    .timeline-track-mini {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline-fill-mini {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 42%;
+      background: linear-gradient(90deg, #6366F1, #818CF8);
+      border-radius: 4px;
+      box-shadow: 0 0 8px rgba(99, 102, 241, 0.8);
+    }
+    .timeline-time-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .aspect-switchers-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+    .aspect-chip {
+      font-size: 9px;
+      font-weight: 750;
+      padding: 2px 7px;
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .aspect-chip.active {
+      color: #FFFFFF;
+      background: #4F46E5;
+      border-color: #6366F1;
+      box-shadow: 0 0 8px rgba(79, 70, 229, 0.5);
+    }
+
+    /* STAGE 3: SYNTHESIS & EXPORT VISUAL */
+    .stage-3 {
+      background: radial-gradient(circle at 50% 20%, #F5F3FF 0%, #F8FAFC 85%);
+      border: 1px solid #EDE9FE;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+    }
+    .export-master-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .export-top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .export-codec-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: #1E293B;
+      letter-spacing: 0.3px;
+    }
+    .export-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 750;
+      color: #059669;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+    .export-prog-bar {
+      height: 6px;
+      border-radius: 4px;
+      background: #F1F5F9;
+      position: relative;
+      overflow: hidden;
+    }
+    .export-prog-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      background: linear-gradient(90deg, #4F46E5 0%, #10B981 100%);
+      border-radius: 4px;
+    }
+    .export-btn-mock {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #3D49DB 0%, #252277 100%);
+      color: #FFFFFF;
+      font-weight: 750;
+      font-size: 12px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      box-shadow: 
+        inset 1px 1px 2px rgba(255, 255, 255, 0.35),
+        0 6px 14px rgba(61, 73, 219, 0.32);
+      transition: transform 0.2s ease;
+    }
+    .export-btn-mock svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+    }
+    .visionary-step-card:hover .export-btn-mock {
+      transform: translateY(-2px);
+      box-shadow: 
+        inset 1px 1px 2px rgba(255, 255, 255, 0.45),
+        0 8px 18px rgba(61, 73, 219, 0.42);
+    }
+    .export-btn-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748B;
+    }
+
+    /* CARD CONTENT */
+    .card-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .step-num-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    .num-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: #EEF2FF;
+      border: 1px solid #C7D2FE;
       color: var(--blue);
       font-weight: 800;
-      font-size: 14px;
+      font-size: 12px;
+      display: grid;
+      place-items: center;
     }
-    .step-mini h3 { font-size: 16px; font-weight: 700; margin-bottom: 5px; }
-    .step-mini p { font-size: 13px; color: var(--body); line-height: 1.6; }
+    .step-category-name {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #64748B;
+    }
+    .step-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: #0F172A;
+      margin-bottom: 8px;
+    }
+    .step-desc {
+      font-size: 14px;
+      color: var(--body);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+    .step-feature-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 14px;
+      border-top: 1px solid #F1F5F9;
+    }
+    .micro-chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 8px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      color: #475467;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .micro-chip svg {
+      width: 11px;
+      height: 11px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
 
     /* VIEW 2: CREATE / STUDIO WORKSPACE */
     .workspace {
@@ -1457,6 +1892,8 @@ const htmlContent = `<!DOCTYPE html>
       .home-hero { grid-template-columns: 1fr; gap: 40px; }
       .hero-left h1 { font-size: 52px; }
       .upload-grid, .preview-grid, .ready-layout { grid-template-columns: 1fr; }
+      .steps-pipeline-grid { grid-template-columns: 1fr; gap: 24px; }
+      .pipeline-connector { display: none; }
       .steps-list { grid-template-columns: 1fr; }
       .progress-bar-nav { display: none; }
       .clay-scene-wrapper { height: 350px; }
@@ -1493,7 +1930,7 @@ const htmlContent = `<!DOCTYPE html>
           </button>
         </nav>
         <div class="nav-actions">
-          <span id="appModeBadge" class="mode-badge" title="Rendering Mode">
+          <span id="appModeBadge" class="mode-badge" style="display: none;" title="Rendering Mode">
             <span class="mode-dot"></span>
             <span id="appModeLabel">Detecting mode...</span>
           </span>
@@ -1509,7 +1946,6 @@ const htmlContent = `<!DOCTYPE html>
     <section id="viewLandingTab" class="tab-view active page shell">
       <section class="home-hero">
         <div class="hero-left">
-          <div class="eyebrow">✦ INSTANT MOTION SYNTHESIS</div>
           <h1>
             Transform <span class="hero-magic-word html-word">HTML</span> &amp; <span class="hero-magic-word md-word">Markdown</span> into high-impact <span class="hero-magic-word video-word">videos.</span>
           </h1>
@@ -1640,28 +2076,163 @@ const htmlContent = `<!DOCTYPE html>
         </div>
       </section>
 
-      <section class="simple-steps">
-        <h2>Three steps. That's it.</h2>
-        <div class="steps-list">
-          <div class="step-mini">
-            <div class="num">01</div>
-            <div>
-              <h3>Add your content</h3>
-              <p>Choose a file or start with an example. We'll recognize the format automatically.</p>
+      <!-- VISIONARY STEPS SECTION (WORKFLOW PIPELINE) -->
+      <section class="visionary-steps-section">
+        <div class="steps-header">
+          <div class="steps-tag">✦ WORKFLOW PIPELINE</div>
+          <h2 class="steps-main-heading">
+            Three steps. <span class="steps-heading-gradient">From raw code to cinema.</span>
+          </h2>
+          <p class="steps-subheading">
+            Zero timeline editing. Just drop your file, preview the live kinetic canvas, and export studio-grade 1080p MP4.
+          </p>
+        </div>
+
+        <div class="steps-pipeline-grid">
+          <!-- STEP 1 -->
+          <div class="visionary-step-card" onclick="startNewVideo()">
+            <div class="card-visual-stage stage-1">
+              <div class="intake-drop-well">
+                <div class="floating-tokens-row">
+                  <div class="file-token token-html">
+                    <svg viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>
+                    <span>.html</span>
+                  </div>
+                  <div class="file-token token-md">
+                    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+                    <span>.md</span>
+                  </div>
+                </div>
+                <div class="intake-indicator">
+                  <svg viewBox="0 0 24 24"><path d="M12 5v14m-5-5 5 5 5-5"/></svg>
+                  <span>Drop &amp; Ingest File</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="step-num-pill">
+                <span class="num-circle">01</span>
+                <span class="step-category-name">SOURCE INGESTION</span>
+              </div>
+              <h3 class="step-title">Add your content</h3>
+              <p class="step-desc">
+                Choose your HTML animation or Markdown slides. RenderFlow automatically detects structure, dimensions, and playback timing.
+              </p>
+              <div class="step-feature-chips">
+                <span class="micro-chip">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  HTML5 &amp; Markdown
+                </span>
+                <span class="micro-chip">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Auto-Timing
+                </span>
+              </div>
             </div>
           </div>
-          <div class="step-mini">
-            <div class="num">02</div>
-            <div>
-              <h3>Check your video</h3>
-              <p>Preview it in real time and choose portrait, landscape, or square.</p>
+
+          <!-- CONNECTOR 1 -> 2 -->
+          <div class="pipeline-connector">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="visionary-step-card" onclick="startNewVideo()">
+            <div class="card-visual-stage stage-2">
+              <div class="mini-studio-screen">
+                <div class="screen-header-row">
+                  <span class="fps-live-chip">
+                    <span class="fps-dot"></span>
+                    60 FPS LIVE
+                  </span>
+                  <span class="aspect-preview-badge">Direct3D Canvas</span>
+                </div>
+                <div class="screen-center-play">
+                  <svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </div>
+                <div class="screen-timeline-bar">
+                  <div class="timeline-track-mini">
+                    <div class="timeline-fill-mini"></div>
+                  </div>
+                  <div class="timeline-time-info">
+                    <span>00:19</span>
+                    <span>00:46</span>
+                  </div>
+                  <div class="aspect-switchers-row">
+                    <span class="aspect-chip active">9:16 Reel</span>
+                    <span class="aspect-chip">16:9 Cinema</span>
+                    <span class="aspect-chip">1:1 Square</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="step-num-pill">
+                <span class="num-circle">02</span>
+                <span class="step-category-name">REAL-TIME STUDIO</span>
+              </div>
+              <h3 class="step-title">Check your video</h3>
+              <p class="step-desc">
+                Inspect your kinetic typography and animations at fluid 60 FPS. Switch instantly between portrait reel, landscape cinema, or square.
+              </p>
+              <div class="step-feature-chips">
+                <span class="micro-chip">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Live Playhead
+                </span>
+                <span class="micro-chip">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                  Multi-Aspect
+                </span>
+              </div>
             </div>
           </div>
-          <div class="step-mini">
-            <div class="num">03</div>
-            <div>
-              <h3>Download your MP4</h3>
-              <p>Render in one click and save your full-resolution 1080p MP4 master video.</p>
+
+          <!-- CONNECTOR 2 -> 3 -->
+          <div class="pipeline-connector">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="visionary-step-card" onclick="startNewVideo()">
+            <div class="card-visual-stage stage-3">
+              <div class="export-master-card">
+                <div class="export-top-meta">
+                  <span class="export-codec-badge">1080p Master • 60 FPS</span>
+                  <span class="export-status-pill">● Complete</span>
+                </div>
+                <div class="export-prog-bar">
+                  <div class="export-prog-fill"></div>
+                </div>
+                <div class="export-btn-meta">
+                  <span>1,440 / 1,440 frames</span>
+                  <span>17.8 MB</span>
+                </div>
+                <div class="export-btn-mock">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5 5 5-5m-5 5V3"/></svg>
+                  <span>Download Master MP4</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="step-num-pill">
+                <span class="num-circle">03</span>
+                <span class="step-category-name">MASTER SYNTHESIS</span>
+              </div>
+              <h3 class="step-title">Download your MP4</h3>
+              <p class="step-desc">
+                Trigger one-click GPU hardware rendering. RenderFlow synthesizes lossless 1080p video ready for social reels and broadcast.
+              </p>
+              <div class="step-feature-chips">
+                <span class="micro-chip">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Direct3D Lossless
+                </span>
+                <span class="micro-chip">
+                  <svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                  Ultra-Fast Export
+                </span>
+              </div>
             </div>
           </div>
         </div>
