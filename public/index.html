@@ -1455,7 +1455,7 @@
                 <button class="btn-preset-pill" onclick="loadPreset('canvas')">Canvas (60 FPS)</button>
                 <button class="btn-preset-pill" onclick="loadPreset('three')">3D Scene</button>
               </div>
-              <textarea class="editor-textarea" id="codeEditorStudio" placeholder="Paste full HTML or Markdown source code here..." oninput="debounce(updatePreviewFromCode, 600)()"></textarea>
+              <textarea class="editor-textarea" id="codeEditorStudio" placeholder="Paste full HTML or Markdown source code here..." oninput="selectedFile = null; debounce(updatePreviewFromCode, 600)()" onpaste="selectedFile = null; setTimeout(updatePreviewFromCode, 100);"></textarea>
             </div>
 
             <!-- CONFIGURATION MATRIX -->
@@ -1982,7 +1982,10 @@
       $('subTabCode').classList.toggle('active', mode === 'code');
       $('studioModeFile').style.display = mode === 'file' ? 'block' : 'none';
       $('studioModeCode').style.display = mode === 'code' ? 'flex' : 'none';
-      if (mode === 'code') updatePreviewFromCode();
+      if (mode === 'code') {
+        selectedFile = null;
+        updatePreviewFromCode();
+      }
     }
 
     // PRESETS
@@ -2105,6 +2108,7 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       const code = $('codeEditorStudio').value.trim();
       if (!code) return;
 
+      inspectAndApplyCodeProperties(code);
       const isMd = code.startsWith('#') || code.includes('---');
       const iframe = $('studioPreviewIframe');
 
@@ -2153,9 +2157,15 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
     // RENDER PIPELINE
     async function executeRenderJob() {
       const engineMode = $('cfgEngineMode') ? $('cfgEngineMode').value : 'cloud-server';
+      const isCodeInput = ($('studioModeCode') && $('studioModeCode').style.display !== 'none');
       const code = $('codeEditorStudio').value.trim();
-      const isMd = (selectedFile && (selectedFile.name.endsWith('.md') || selectedFile.name.endsWith('.markdown'))) ||
-                   (!selectedFile && (code.startsWith('#') || code.includes('---')));
+
+      let isMd = false;
+      if (isCodeInput || !selectedFile) {
+        isMd = code.startsWith('#') || code.includes('---');
+      } else if (selectedFile) {
+        isMd = selectedFile.name.endsWith('.md') || selectedFile.name.endsWith('.markdown');
+      }
 
       // Route HTML files to Server Direct3D11 Engine
       if (!isMd && currentAppMode === 'MODE_B') {
@@ -2288,11 +2298,12 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       $('hudBarFill').style.width = '0%';
       $('hudPhaseText').textContent = 'Launching Direct3D11 Pipeline...';
 
+      const isCodeInput = ($('studioModeCode') && $('studioModeCode').style.display !== 'none');
       let body, headers = {}, url;
-      if (selectedFile) {
+
+      if (!isCodeInput && selectedFile) {
         const formData = new FormData();
         formData.append('htmlFile', selectedFile);
-        formData.append('file', selectedFile);
         formData.append('resolution', resolution);
         formData.append('fps', fps);
         if (duration) formData.append('duration', duration);
@@ -2311,7 +2322,7 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
           code: htmlCode,
           htmlCode: htmlCode,
           format: isMd ? 'markdown' : 'html',
-          filename: isMd ? 'presentation.md' : 'PainForge-Reel.html',
+          filename: isMd ? 'presentation.md' : 'custom-animation.html',
           resolution,
           fps,
           duration: duration ? parseFloat(duration) : null
@@ -2320,8 +2331,17 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
       }
 
       fetch(url, { method: 'POST', body, headers })
-        .then(res => {
-          if (!res.ok) throw new Error('Local server engine unavailable');
+        .then(async res => {
+          if (!res.ok) {
+            let errorText = 'Local server engine error (' + res.status + ')';
+            try {
+              const errJson = await res.json();
+              if (errJson.error) errorText = errJson.error;
+            } catch (e) {
+              try { errorText = await res.text(); } catch (e) {}
+            }
+            throw new Error(errorText);
+          }
           const reader = res.body.getReader();
           const decoder = new TextDecoder();
           let buffer = '';
@@ -2389,6 +2409,10 @@ function loop() { window.renderFrame(((performance.now()-st)/1000)%4); requestAn
         $('resultPanel').style.display = 'flex';
         const v = $('resultVideo');
         v.src = data.url;
+        const isVertical = (data.probe?.resolution && (data.probe.resolution.includes('1080x1920') || data.probe.resolution.includes('720x1280'))) ||
+                           (data.metrics?.width === 1080 && data.metrics?.height === 1920) ||
+                           isReelAspect;
+        v.className = 'result-video-preview ' + (isVertical ? 'vertical-mode' : 'landscape-mode');
         v.load();
         
         $('btnDownloadResult').href = data.url;

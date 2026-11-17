@@ -122,40 +122,41 @@ app.post('/api/preview-html', (req, res) => {
 });
 
 // Upload File directly to Preview
-app.post('/api/preview-upload', upload.single('file'), (req, res) => {
+app.post('/api/preview-upload', upload.any(), (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const file = req.file || (req.files && req.files[0]);
+    if (!file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const ext = path.extname(req.file.originalname).toLowerCase();
+    const ext = path.extname(file.originalname).toLowerCase();
     if (ext === '.md' || ext === '.markdown') {
-      const content = fs.readFileSync(req.file.path, 'utf8');
+      const content = fs.readFileSync(file.path, 'utf8');
       const compiled = compileMarkdownToHtml(content, {
         secondsPerSlide: 4,
         width: 1920,
         height: 1080
       });
-      const previewFilename = `preview-${path.basename(req.file.filename, ext)}.html`;
+      const previewFilename = `preview-${path.basename(file.filename, ext)}.html`;
       fs.writeFileSync(path.join(previewsDir, previewFilename), compiled, 'utf8');
 
       return res.json({
         success: true,
         previewUrl: `/previews/${previewFilename}`,
-        originalName: req.file.originalname,
+        originalName: file.originalname,
         type: 'markdown',
-        filePath: req.file.path
+        filePath: file.path
       });
     }
 
     // HTML file
-    const previewFilename = `preview-${req.file.filename}`;
-    fs.copyFileSync(req.file.path, path.join(previewsDir, previewFilename));
+    const previewFilename = `preview-${file.filename}`;
+    fs.copyFileSync(file.path, path.join(previewsDir, previewFilename));
 
     res.json({
       success: true,
       previewUrl: `/previews/${previewFilename}`,
-      originalName: req.file.originalname,
+      originalName: file.originalname,
       type: 'html',
-      filePath: req.file.path
+      filePath: file.path
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -308,10 +309,11 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
   }
 }
 
-// Upload file & render
-app.post('/api/upload-render', upload.single('htmlFile'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded for rendering' });
-  handleRenderJob(req, res, req.file.path, req.file.originalname, req.body);
+// Upload file & render (accepts any field name: htmlFile or file)
+app.post('/api/upload-render', upload.any(), (req, res) => {
+  const file = req.file || (req.files && req.files[0]);
+  if (!file) return res.status(400).json({ error: 'No file uploaded for rendering' });
+  handleRenderJob(req, res, file.path, file.originalname, req.body);
 });
 
 // Render raw code string
