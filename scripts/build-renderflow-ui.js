@@ -312,11 +312,11 @@ const htmlContent = `<!DOCTYPE html>
       border-radius: 50%;
     }
 
-    /* 3D MORPHIC HERO SCENE (Image 1 Style) */
+    /* 3D MORPHIC HERO SCENE - PURE FLOATING LOGOS & VIDEO (NO BACKGROUND CARDS, ZERO OVERLAP) */
     .clay-scene-wrapper {
       position: relative;
       width: 100%;
-      height: 420px;
+      height: 480px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -324,95 +324,89 @@ const htmlContent = `<!DOCTYPE html>
     }
     .clay-ambient-glow {
       position: absolute;
-      width: 440px;
-      height: 360px;
-      background: radial-gradient(circle, rgba(129, 140, 248, 0.28) 0%, rgba(99, 102, 241, 0.12) 45%, transparent 70%);
-      filter: blur(50px);
+      width: 500px;
+      height: 420px;
+      background: radial-gradient(circle at 50% 38%, rgba(129, 140, 248, 0.3) 0%, rgba(99, 102, 241, 0.1) 50%, transparent 75%);
+      filter: blur(60px);
       pointer-events: none;
       z-index: 1;
     }
     .clay-stage-3d {
       position: relative;
-      width: 450px;
-      height: 360px;
+      width: 520px;
+      height: 460px;
       transform-style: preserve-3d;
       z-index: 2;
-      transition: transform 0.4s ease;
     }
-    .clay-floating-card {
+
+    /* 3D FLOATING LOGOS - PURE LOGO, ZERO BACKGROUND CARD */
+    .clay-logo-float {
       position: absolute;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(14px);
-      border: 2px solid rgba(255, 255, 255, 0.98);
-      box-shadow: 
-        inset 3px 3px 7px rgba(255, 255, 255, 1),
-        inset -3px -3px 8px rgba(79, 70, 229, 0.12),
-        0 20px 42px rgba(49, 46, 129, 0.16);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.3s ease;
-    }
-    .clay-card-code {
-      top: 12px;
-      left: 70px;
-      width: 124px;
-      height: 118px;
-      transform: rotate(-7deg) translateZ(42px);
-      z-index: 4;
-      animation: floatCode 4s ease-in-out infinite alternate;
-    }
-    .clay-card-inner {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      padding: 4px;
+      z-index: 10;
+      transition: transform 0.3s ease;
     }
-    .clay-card-label {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.4px;
+
+    /* HTML5 3D Floating Logo (Left) */
+    .clay-html-wrap {
+      top: 10px;
+      left: 55px;
+      transform: rotate(-6deg) rotateY(10deg) translateZ(45px);
+      animation: floatHtml 4s ease-in-out infinite alternate;
     }
-    .clay-card-md {
-      top: 36px;
-      right: 60px;
-      width: 124px;
-      height: 118px;
-      transform: rotate(6deg) translateZ(24px);
-      z-index: 3;
+    .clay-html-svg {
+      width: 88px;
+      height: 98px;
+      filter: 
+        drop-shadow(0 20px 30px rgba(228, 77, 38, 0.45))
+        drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
+    }
+
+    /* Markdown 3D Floating Logo (Right) */
+    .clay-md-wrap {
+      top: 20px;
+      right: 55px;
+      transform: rotate(6deg) rotateY(-10deg) translateZ(45px);
       animation: floatMd 4.5s ease-in-out infinite alternate;
     }
-    .clay-arrow-wrap {
-      position: absolute;
-      top: 85px;
-      left: 10px;
-      width: 100px;
-      height: 115px;
-      z-index: 5;
-      transform: translateZ(52px);
-      pointer-events: none;
+    .clay-md-svg {
+      width: 110px;
+      height: 70px;
+      filter: 
+        drop-shadow(0 20px 30px rgba(37, 99, 235, 0.45))
+        drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
     }
-    .clay-arrow-svg {
+
+    /* DUAL ARROWS CONTAINER (3D Z-plane) */
+    .clay-arrows-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
+      pointer-events: none;
       overflow: visible;
+      z-index: 20;
+      transform: translateZ(65px);
     }
+
+    /* 3D VIDEO PLAYER CARD (Properly spaced below, ZERO overlap) */
     .clay-video-card {
       position: absolute;
-      bottom: 10px;
+      top: 200px;
       left: 50%;
-      transform: translateX(-50%) rotateX(6deg) rotateY(-3deg) translateZ(68px);
-      width: 350px;
-      height: 215px;
+      transform: translateX(-50%) rotateX(5deg) translateZ(45px);
+      width: 390px;
+      height: 230px;
       border-radius: 28px;
-      background: linear-gradient(145deg, #18153F 0%, #271E69 45%, #4338CA 100%);
+      background: linear-gradient(145deg, #151238 0%, #241A61 45%, #4338CA 100%);
       border: 5px solid rgba(255, 255, 255, 0.96);
       box-shadow: 
         inset 3px 3px 10px rgba(255, 255, 255, 0.45),
         inset -4px -4px 12px rgba(10, 12, 38, 0.65),
-        0 30px 65px rgba(24, 21, 63, 0.42),
+        0 32px 70px rgba(21, 18, 56, 0.42),
         0 10px 25px rgba(67, 56, 202, 0.22);
       padding: 14px;
       display: flex;
@@ -427,13 +421,13 @@ const htmlContent = `<!DOCTYPE html>
       width: 100%;
       height: 100%;
       border-radius: 20px;
-      background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.25) 0%, rgba(15, 17, 46, 0.5) 80%);
+      background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.28) 0%, rgba(15, 17, 46, 0.5) 85%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
       padding: 16px 18px;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.45);
     }
     .clay-glass-sheen {
       position: absolute;
@@ -441,31 +435,59 @@ const htmlContent = `<!DOCTYPE html>
       left: 0;
       right: 0;
       height: 52%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.03) 85%, transparent 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.03) 85%, transparent 100%);
       border-radius: 20px 20px 0 0;
       pointer-events: none;
     }
+
+    .clay-vid-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    .clay-video-logo-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.5px;
+    }
+    .clay-video-logo-tag svg {
+      width: 14px;
+      height: 14px;
+      fill: #A5B4FC;
+    }
+
     .clay-play-well {
-      margin-top: 18px;
-      width: 66px;
-      height: 66px;
+      margin: auto;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 100%);
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.12) 100%);
       backdrop-filter: blur(10px);
-      border: 2px solid rgba(255, 255, 255, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.7);
       box-shadow: 
-        inset 2px 2px 6px rgba(255, 255, 255, 0.8),
+        inset 2px 2px 6px rgba(255, 255, 255, 0.85),
         inset -2px -2px 6px rgba(0, 0, 0, 0.35),
-        0 12px 28px rgba(0, 0, 0, 0.35),
-        0 0 20px rgba(129, 140, 248, 0.4);
+        0 14px 30px rgba(0, 0, 0, 0.38),
+        0 0 24px rgba(129, 140, 248, 0.45);
       display: grid;
       place-items: center;
     }
     .clay-play-btn {
       color: #FFFFFF;
-      font-size: 26px;
+      font-size: 28px;
       padding-left: 5px;
-      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
     }
     .clay-video-timeline {
       width: 100%;
@@ -473,6 +495,7 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       justify-content: space-between;
       gap: 14px;
+      z-index: 2;
     }
     .clay-timeline-track {
       position: relative;
@@ -487,7 +510,7 @@ const htmlContent = `<!DOCTYPE html>
       height: 100%;
       background: linear-gradient(90deg, #818CF8, #FFFFFF);
       border-radius: 6px;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.65);
     }
     .clay-timeline-thumb {
       position: absolute;
@@ -497,7 +520,7 @@ const htmlContent = `<!DOCTYPE html>
       height: 14px;
       border-radius: 50%;
       background: #FFFFFF;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 255, 255, 0.8);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.9);
     }
     .clay-time-tag {
       font-size: 11px;
@@ -505,24 +528,24 @@ const htmlContent = `<!DOCTYPE html>
       color: #FFFFFF;
       letter-spacing: 0.6px;
       text-transform: uppercase;
-      background: rgba(255, 255, 255, 0.16);
-      padding: 3px 8px;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 4px 10px;
       border-radius: 6px;
       backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.24);
     }
 
-    @keyframes floatCode {
-      0% { transform: rotate(-7deg) translateZ(42px) translateY(0px); }
-      100% { transform: rotate(-5deg) translateZ(46px) translateY(-8px); }
+    @keyframes floatHtml {
+      0% { transform: rotate(-6deg) rotateY(10deg) translateZ(45px) translateY(0px); }
+      100% { transform: rotate(-4deg) rotateY(12deg) translateZ(50px) translateY(-9px); }
     }
     @keyframes floatMd {
-      0% { transform: rotate(6deg) translateZ(24px) translateY(0px); }
-      100% { transform: rotate(8deg) translateZ(28px) translateY(-6px); }
+      0% { transform: rotate(6deg) rotateY(-10deg) translateZ(45px) translateY(0px); }
+      100% { transform: rotate(8deg) rotateY(-12deg) translateZ(50px) translateY(-9px); }
     }
     @keyframes floatVid {
-      0% { transform: translateX(-50%) rotateX(6deg) rotateY(-3deg) translateZ(68px) translateY(0px); }
-      100% { transform: translateX(-50%) rotateX(5deg) rotateY(-2deg) translateZ(74px) translateY(-7px); }
+      0% { transform: translateX(-50%) rotateX(5deg) translateZ(45px) translateY(0px); }
+      100% { transform: translateX(-50%) rotateX(4deg) translateZ(52px) translateY(-7px); }
     }
 
     .simple-steps {
@@ -1377,60 +1400,99 @@ const htmlContent = `<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- 3D MORPHIC SCENE (Image 1 Style, Real HTML5 & Markdown Logos, Claymorphism) -->
+        <!-- 3D MORPHIC SCENE (Pure Floating Logos, No Background Cards, Zero Overlap) -->
         <div class="clay-scene-wrapper">
           <div class="clay-ambient-glow"></div>
           <div class="clay-stage-3d">
-            <!-- 1. Floating 3D Code Card (Official W3C HTML5 Shield) -->
-            <div class="clay-floating-card clay-card-code">
-              <div class="clay-card-inner">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="46" height="46" class="clay-logo-svg" style="filter: drop-shadow(0 3px 6px rgba(228, 77, 38, 0.28));">
-                  <path fill="#E44D26" d="M107.644 470.877L74.633 100.57h362.734l-33.024 370.294L255.856 512z"/>
-                  <path fill="#F16529" d="M256 480.581l119.497-33.128 28.343-317.755H256z"/>
-                  <path fill="#EBEBEB" d="M256 208.636h66.705l-4.605 51.574H256v50.297h60.404l-5.748 64.385-54.656 14.757v52.684l98.547-27.307 14.288-160.093 3.993-46.297H256z"/>
-                  <path fill="#FFFFFF" d="M256 208.636V158.34H147.288l3.993 46.297 10.347 115.968H256v-50.297h-43.238l-4.605-51.574H256zM256 389.201l-54.656-14.757-3.504-39.278h-50.569l6.908 77.362 101.821 28.244z"/>
-                </svg>
-                <span class="clay-card-label" style="color: #E44D26;">HTML5</span>
-              </div>
-            </div>
 
-            <!-- 2. Floating 3D Markdown Card (Official MarkDown Mark) -->
-            <div class="clay-floating-card clay-card-md">
-              <div class="clay-card-inner">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 128" width="52" height="32" class="clay-logo-svg" style="filter: drop-shadow(0 3px 6px rgba(37, 99, 235, 0.28)); margin-bottom: 2px;">
-                  <rect x="5" y="5" width="198" height="118" rx="18" fill="none" stroke="#2563EB" stroke-width="12"/>
-                  <path fill="#2563EB" d="M30 98V30h20l20 25 20-25h20v68H90V59L70 84 50 59v39zm125 0l-30-33h20V30h20v35h20z"/>
-                </svg>
-                <span class="clay-card-label" style="color: #2563EB;">Markdown</span>
-              </div>
-            </div>
-
-            <!-- 3. Swooping 3D Purple Arrow -->
-            <div class="clay-arrow-wrap">
-              <svg viewBox="0 0 100 120" class="clay-arrow-svg">
+            <!-- 1. Floating 3D HTML5 Logo (NO Background Card) -->
+            <div class="clay-logo-float clay-html-wrap">
+              <svg class="clay-html-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                 <defs>
-                  <linearGradient id="arrowGrad3D" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#A5B4FC" />
-                    <stop offset="35%" stop-color="#818CF8" />
-                    <stop offset="70%" stop-color="#6366F1" />
-                    <stop offset="100%" stop-color="#4F46E5" />
+                  <linearGradient id="htmlShieldLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF5D38" />
+                    <stop offset="100%" stop-color="#E44D26" />
                   </linearGradient>
-                  <filter id="arrowShadow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="2" dy="5" stdDeviation="5" flood-color="#312E81" flood-opacity="0.38" />
-                  </filter>
+                  <linearGradient id="htmlShieldRight" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF7843" />
+                    <stop offset="100%" stop-color="#F16529" />
+                  </linearGradient>
                 </defs>
-                <path d="M 85 15 C 28 20, 15 65, 45 92" fill="none" stroke="url(#arrowGrad3D)" stroke-width="7.5" stroke-linecap="round" filter="url(#arrowShadow)" />
-                <polygon points="33 100, 57 95, 47 75" fill="#4F46E5" filter="url(#arrowShadow)" />
+                <!-- 3D Extrusion base shadow -->
+                <path fill="#9C2A12" d="M107.644 479L74.633 108.57h362.734l-33.024 370.294L255.856 520.1z"/>
+                <!-- Main Shield Facets -->
+                <path fill="url(#htmlShieldLeft)" d="M107.644 470.877L74.633 100.57h362.734l-33.024 370.294L255.856 512z"/>
+                <path fill="url(#htmlShieldRight)" d="M256 480.581l119.497-33.128 28.343-317.755H256z"/>
+                <!-- 3D Embossed "5" -->
+                <path fill="#D9DFE8" d="M256 211.636h66.705l-4.605 51.574H256v50.297h60.404l-5.748 64.385-54.656 14.757v52.684l98.547-27.307 14.288-160.093 3.993-46.297H256z"/>
+                <path fill="#FFFFFF" d="M256 208.636h66.705l-4.605 51.574H256v50.297h60.404l-5.748 64.385-54.656 14.757v52.684l98.547-27.307 14.288-160.093 3.993-46.297H256z"/>
+                <path fill="#FFFFFF" d="M256 208.636V158.34H147.288l3.993 46.297 10.347 115.968H256v-50.297h-43.238l-4.605-51.574H256zM256 389.201l-54.656-14.757-3.504-39.278h-50.569l6.908 77.362 101.821 28.244z"/>
               </svg>
             </div>
 
-            <!-- 4. Floating 3D Video Player Card -->
+            <!-- 2. Floating 3D Markdown Logo (NO Background Card) -->
+            <div class="clay-logo-float clay-md-wrap">
+              <svg class="clay-md-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 128">
+                <defs>
+                  <linearGradient id="mdClayBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#3B82F6" />
+                    <stop offset="50%" stop-color="#2563EB" />
+                    <stop offset="100%" stop-color="#1D4ED8" />
+                  </linearGradient>
+                </defs>
+                <!-- 3D Extrusion base -->
+                <rect x="4" y="11" width="200" height="120" rx="22" fill="#0F172A" />
+                <!-- Main Claymorphic Badge Body -->
+                <rect x="4" y="4" width="200" height="120" rx="22" fill="url(#mdClayBg)" stroke="#93C5FD" stroke-width="3" />
+                <!-- High-contrast glossy white official M and Arrow -->
+                <path fill="#FFFFFF" d="M30 96V32h20l20 25 20-25h20v64H90V60L70 85 50 60v36z"/>
+                <path fill="#FFFFFF" d="M155 96l-30-33h20V32h20v31h20z"/>
+              </svg>
+            </div>
+
+            <!-- 3. Sleek Dual Curved Arrows Swooping from BOTH Logos -->
+            <svg class="clay-arrows-svg" viewBox="0 0 520 460">
+              <defs>
+                <linearGradient id="arrowGrad3D" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FF5D38" />
+                  <stop offset="40%" stop-color="#818CF8" />
+                  <stop offset="100%" stop-color="#4F46E5" />
+                </linearGradient>
+                <linearGradient id="arrowGradR" x1="100%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#3B82F6" />
+                  <stop offset="40%" stop-color="#818CF8" />
+                  <stop offset="100%" stop-color="#4F46E5" />
+                </linearGradient>
+                <filter id="arrowShadow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#1E1B4B" flood-opacity="0.38"/>
+                </filter>
+              </defs>
+
+              <!-- Left Arrow: Starts below HTML, swoops around left flank, curves cleanly into video card mid-screen -->
+              <path d="M 75 115 C 32 150, 26 220, 75 250" fill="none" stroke="url(#arrowGrad3D)" stroke-width="6" stroke-linecap="round" filter="url(#arrowShadow)" />
+              <polygon points="68 238, 92 254, 71 262" fill="#4F46E5" filter="url(#arrowShadow)" />
+
+              <!-- Right Arrow: Starts below Markdown, swoops around right flank, curves cleanly into video card mid-screen -->
+              <path d="M 445 105 C 488 150, 494 220, 445 250" fill="none" stroke="url(#arrowGradR)" stroke-width="6" stroke-linecap="round" filter="url(#arrowShadow)" />
+              <polygon points="451 262, 430 254, 454 238" fill="#4F46E5" filter="url(#arrowShadow)" />
+            </svg>
+
+            <!-- 4. Floating 3D Video Player (Cleanly below, zero overlap) -->
             <div class="clay-video-card">
               <div class="clay-video-screen">
                 <div class="clay-glass-sheen"></div>
+                
+                <div class="clay-vid-header">
+                  <div class="clay-video-logo-tag">
+                    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>MOTION VIDEO</span>
+                  </div>
+                </div>
+
                 <div class="clay-play-well">
                   <div class="clay-play-btn">▶</div>
                 </div>
+
                 <div class="clay-video-timeline">
                   <div class="clay-timeline-track">
                     <div class="clay-timeline-fill"></div>
@@ -1440,6 +1502,9 @@ const htmlContent = `<!DOCTYPE html>
                 </div>
               </div>
             </div>
+
+          </div>
+        </div>
           </div>
         </div>
       </section>

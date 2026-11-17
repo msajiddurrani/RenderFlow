@@ -9,7 +9,7 @@ async function capture() {
   const browser = await puppeteer.launch({
     executablePath: CHROME_PATH,
     headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1440,900']
   });
 
   const page = await browser.newPage();
@@ -19,36 +19,28 @@ async function capture() {
   await page.goto('http://localhost:3333', { waitUntil: 'networkidle0' });
 
   // 1. Full Home Page Screenshot
-  const homePath = path.join(uploadsDir, 'enhanced-01-home.png');
+  const homePath = path.join(uploadsDir, 'recreated-01-home.png');
   await page.screenshot({ path: homePath });
   console.log('Saved:', homePath);
 
   // 2. Focused Hero Section Screenshot
   const heroElem = await page.$('.home-hero');
   if (heroElem) {
-    const heroPath = path.join(uploadsDir, 'enhanced-02-hero-focused.png');
+    const heroPath = path.join(uploadsDir, 'recreated-02-hero.png');
     await heroElem.screenshot({ path: heroPath });
     console.log('Saved:', heroPath);
   }
 
-  // 3. Focused Navbar Logo & Brand Screenshot
-  const brandElem = await page.$('.brand');
-  if (brandElem) {
-    const brandPath = path.join(uploadsDir, 'enhanced-03-navbar-brand.png');
-    await brandElem.screenshot({ path: brandPath });
-    console.log('Saved:', brandPath);
-  }
-
-  // 4. Focused 3D Morphic Scene Screenshot
+  // 3. Focused 3D Morphic Scene Screenshot
   const sceneElem = await page.$('.clay-scene-wrapper');
   if (sceneElem) {
-    const scenePath = path.join(uploadsDir, 'enhanced-04-3d-scene.png');
+    const scenePath = path.join(uploadsDir, 'recreated-03-3d-scene.png');
     await sceneElem.screenshot({ path: scenePath });
     console.log('Saved:', scenePath);
   }
 
   await browser.close();
-  console.log('All screenshots captured successfully!');
+  console.log('Screenshots captured successfully!');
 }
 
 capture().catch(err => {
