@@ -1,5 +1,35 @@
 [
   {
+    "id": "rec_1794919691759_mpkwv",
+    "filename": "render-1794919473780-PainForge_____Reel__2_.mp4",
+    "originalName": "PainForge â Reel (2).html",
+    "fileType": "Reel 9:16",
+    "resolution": "1080x1920",
+    "duration": "00:00:46.05",
+    "durationSec": 46.05,
+    "sizeKb": "17450.3",
+    "bytes": 17869078,
+    "videoCodec": "h264 (Constrained Baseline) (avc1 / 0x31637661)",
+    "audioCodec": "aac (LC) (mp4a / 0x6134706D)",
+    "metrics": {
+      "fixture": "1794919473774-PainForge_____Reel__2_.html",
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "durationSec": 46,
+      "totalFrames": 1380,
+      "totalRenderTimeSec": "217.77",
+      "avgFrameTimeMs": "121.9",
+      "effectiveFps": "8.2",
+      "realTimeFactor": "4.73",
+      "mp4SizeBytes": 17869078,
+      "audioCaptured": "window-pcm",
+      "gpuMode": "Direct3D11 Hardware"
+    },
+    "createdAt": 1794919691759,
+    "url": "/output/render-1794919473780-PainForge_____Reel__2_.mp4"
+  },
+  {
     "id": "rec_1794919319403_9s04h",
     "filename": "render-1794919313159-test-upload.mp4",
     "originalName": "test-upload.html",
