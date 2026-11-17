@@ -9,8 +9,13 @@ const htmlContent = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RenderFlow — Turn Animated Pages Into Videos</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128x128.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-32x32.png">
   <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/RenderFlow_Logo_Transparent.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -55,13 +60,13 @@ const htmlContent = `<!DOCTYPE html>
     
     /* TOP NAVBAR */
     .nav {
-      height: 84px;
+      height: 92px;
       background: rgba(255, 255, 255, 0.98);
       border-bottom: 1px solid #EBEEF2;
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
     }
     .nav-in {
       display: flex;
@@ -71,18 +76,28 @@ const htmlContent = `<!DOCTYPE html>
     }
     .brand {
       display: inline-flex;
-      gap: 12px;
+      gap: 15px;
       align-items: center;
-      font-weight: 800;
-      font-size: 22px;
-      letter-spacing: -0.8px;
+      font-weight: 850;
+      font-size: 26px;
+      letter-spacing: -0.9px;
       color: var(--ink);
+      text-decoration: none;
+      transition: transform 0.15s ease;
+    }
+    .brand:hover {
+      transform: translateY(-1px);
     }
     .logo-mark {
-      width: 38px;
-      height: 38px;
+      width: 50px;
+      height: 50px;
       flex: none;
       object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(67, 56, 202, 0.26));
+      transition: transform 0.2s ease;
+    }
+    .brand:hover .logo-mark {
+      transform: scale(1.04) rotate(-1.5deg);
     }
     .nav-links {
       display: flex;
@@ -301,50 +316,50 @@ const htmlContent = `<!DOCTYPE html>
     .clay-scene-wrapper {
       position: relative;
       width: 100%;
-      height: 410px;
+      height: 420px;
       display: flex;
       align-items: center;
       justify-content: center;
-      perspective: 1100px;
+      perspective: 1200px;
     }
     .clay-ambient-glow {
       position: absolute;
-      width: 420px;
-      height: 340px;
-      background: radial-gradient(circle, rgba(129, 140, 248, 0.25) 0%, rgba(99, 102, 241, 0.1) 45%, transparent 70%);
-      filter: blur(45px);
+      width: 440px;
+      height: 360px;
+      background: radial-gradient(circle, rgba(129, 140, 248, 0.28) 0%, rgba(99, 102, 241, 0.12) 45%, transparent 70%);
+      filter: blur(50px);
       pointer-events: none;
       z-index: 1;
     }
     .clay-stage-3d {
       position: relative;
-      width: 440px;
-      height: 350px;
+      width: 450px;
+      height: 360px;
       transform-style: preserve-3d;
       z-index: 2;
       transition: transform 0.4s ease;
     }
     .clay-floating-card {
       position: absolute;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(12px);
-      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(14px);
+      border: 2px solid rgba(255, 255, 255, 0.98);
       box-shadow: 
-        inset 2.5px 2.5px 6px rgba(255, 255, 255, 1),
+        inset 3px 3px 7px rgba(255, 255, 255, 1),
         inset -3px -3px 8px rgba(79, 70, 229, 0.12),
-        0 18px 40px rgba(49, 46, 129, 0.16);
+        0 20px 42px rgba(49, 46, 129, 0.16);
       display: flex;
       align-items: center;
       justify-content: center;
       transition: transform 0.3s ease;
     }
     .clay-card-code {
-      top: 15px;
-      left: 75px;
-      width: 115px;
-      height: 104px;
-      transform: rotate(-7deg) translateZ(40px);
+      top: 12px;
+      left: 70px;
+      width: 124px;
+      height: 118px;
+      transform: rotate(-7deg) translateZ(42px);
       z-index: 4;
       animation: floatCode 4s ease-in-out infinite alternate;
     }
@@ -352,39 +367,31 @@ const htmlContent = `<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-    }
-    .clay-card-icon {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 800;
-      font-size: 26px;
-      background: linear-gradient(135deg, #4338CA 0%, #6366F1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      gap: 6px;
+      padding: 4px;
     }
     .clay-card-label {
-      font-size: 11px;
-      font-weight: 750;
-      color: #6366F1;
-      letter-spacing: 0.5px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
     }
     .clay-card-md {
-      top: 38px;
-      right: 65px;
-      width: 110px;
-      height: 102px;
-      transform: rotate(6deg) translateZ(22px);
+      top: 36px;
+      right: 60px;
+      width: 124px;
+      height: 118px;
+      transform: rotate(6deg) translateZ(24px);
       z-index: 3;
       animation: floatMd 4.5s ease-in-out infinite alternate;
     }
     .clay-arrow-wrap {
       position: absolute;
       top: 85px;
-      left: 12px;
-      width: 95px;
-      height: 110px;
+      left: 10px;
+      width: 100px;
+      height: 115px;
       z-index: 5;
-      transform: translateZ(50px);
+      transform: translateZ(52px);
       pointer-events: none;
     }
     .clay-arrow-svg {
@@ -394,19 +401,20 @@ const htmlContent = `<!DOCTYPE html>
     }
     .clay-video-card {
       position: absolute;
-      bottom: 12px;
+      bottom: 10px;
       left: 50%;
-      transform: translateX(-50%) rotateX(6deg) rotateY(-3deg) translateZ(65px);
-      width: 330px;
-      height: 200px;
-      border-radius: 26px;
-      background: linear-gradient(145deg, #1E1B4B 0%, #2A246F 45%, #4338CA 100%);
-      border: 4.5px solid rgba(255, 255, 255, 0.96);
+      transform: translateX(-50%) rotateX(6deg) rotateY(-3deg) translateZ(68px);
+      width: 350px;
+      height: 215px;
+      border-radius: 28px;
+      background: linear-gradient(145deg, #18153F 0%, #271E69 45%, #4338CA 100%);
+      border: 5px solid rgba(255, 255, 255, 0.96);
       box-shadow: 
-        inset 2px 2px 8px rgba(255, 255, 255, 0.4),
-        inset -3px -3px 8px rgba(10, 12, 38, 0.55),
-        0 26px 56px rgba(30, 27, 75, 0.35);
-      padding: 12px;
+        inset 3px 3px 10px rgba(255, 255, 255, 0.45),
+        inset -4px -4px 12px rgba(10, 12, 38, 0.65),
+        0 30px 65px rgba(24, 21, 63, 0.42),
+        0 10px 25px rgba(67, 56, 202, 0.22);
+      padding: 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -418,93 +426,103 @@ const htmlContent = `<!DOCTYPE html>
       position: relative;
       width: 100%;
       height: 100%;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+      border-radius: 20px;
+      background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.25) 0%, rgba(15, 17, 46, 0.5) 80%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: 14px 16px;
+      padding: 16px 18px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
     }
     .clay-glass-sheen {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 48%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 100%);
-      border-radius: 18px 18px 0 0;
+      height: 52%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.03) 85%, transparent 100%);
+      border-radius: 20px 20px 0 0;
       pointer-events: none;
     }
     .clay-play-well {
-      margin-top: 16px;
-      width: 60px;
-      height: 60px;
+      margin-top: 18px;
+      width: 66px;
+      height: 66px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.22);
-      backdrop-filter: blur(8px);
-      border: 1.5px solid rgba(255, 255, 255, 0.5);
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 100%);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.65);
       box-shadow: 
-        inset 2px 2px 5px rgba(255, 255, 255, 0.65),
-        inset -2px -2px 5px rgba(0, 0, 0, 0.25),
-        0 10px 24px rgba(0, 0, 0, 0.28);
+        inset 2px 2px 6px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 6px rgba(0, 0, 0, 0.35),
+        0 12px 28px rgba(0, 0, 0, 0.35),
+        0 0 20px rgba(129, 140, 248, 0.4);
       display: grid;
       place-items: center;
     }
     .clay-play-btn {
       color: #FFFFFF;
-      font-size: 24px;
-      padding-left: 4px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+      font-size: 26px;
+      padding-left: 5px;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
     }
     .clay-video-timeline {
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
     }
     .clay-timeline-track {
       position: relative;
       flex: 1;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.28);
-      border-radius: 4px;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
     }
     .clay-timeline-fill {
-      width: 52%;
+      width: 55%;
       height: 100%;
-      background: #FFFFFF;
-      border-radius: 4px;
+      background: linear-gradient(90deg, #818CF8, #FFFFFF);
+      border-radius: 6px;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
     .clay-timeline-thumb {
       position: absolute;
-      left: 52%;
-      top: -3px;
-      width: 12px;
-      height: 12px;
+      left: 55%;
+      top: -3.5px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       background: #FFFFFF;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 255, 255, 0.8);
     }
     .clay-time-tag {
       font-size: 11px;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.9);
-      letter-spacing: 0.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.16);
+      padding: 3px 8px;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     @keyframes floatCode {
-      0% { transform: rotate(-7deg) translateZ(40px) translateY(0px); }
-      100% { transform: rotate(-5deg) translateZ(44px) translateY(-8px); }
+      0% { transform: rotate(-7deg) translateZ(42px) translateY(0px); }
+      100% { transform: rotate(-5deg) translateZ(46px) translateY(-8px); }
     }
     @keyframes floatMd {
-      0% { transform: rotate(6deg) translateZ(22px) translateY(0px); }
-      100% { transform: rotate(8deg) translateZ(26px) translateY(-6px); }
+      0% { transform: rotate(6deg) translateZ(24px) translateY(0px); }
+      100% { transform: rotate(8deg) translateZ(28px) translateY(-6px); }
     }
     @keyframes floatVid {
-      0% { transform: translateX(-50%) rotateX(6deg) rotateY(-3deg) translateZ(65px) translateY(0px); }
-      100% { transform: translateX(-50%) rotateX(5deg) rotateY(-2deg) translateZ(70px) translateY(-7px); }
+      0% { transform: translateX(-50%) rotateX(6deg) rotateY(-3deg) translateZ(68px) translateY(0px); }
+      100% { transform: translateX(-50%) rotateX(5deg) rotateY(-2deg) translateZ(74px) translateY(-7px); }
     }
 
     .simple-steps {
@@ -1359,26 +1377,31 @@ const htmlContent = `<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- 3D MORPHIC SCENE (Image 1 Style, No Outer Box, Claymorphism) -->
+        <!-- 3D MORPHIC SCENE (Image 1 Style, Real HTML5 & Markdown Logos, Claymorphism) -->
         <div class="clay-scene-wrapper">
           <div class="clay-ambient-glow"></div>
           <div class="clay-stage-3d">
-            <!-- 1. Floating 3D Code Card -->
+            <!-- 1. Floating 3D Code Card (Official W3C HTML5 Shield) -->
             <div class="clay-floating-card clay-card-code">
               <div class="clay-card-inner">
-                <span class="clay-card-icon">&lt;/&gt;</span>
-                <span class="clay-card-label">HTML5</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="46" height="46" class="clay-logo-svg" style="filter: drop-shadow(0 3px 6px rgba(228, 77, 38, 0.28));">
+                  <path fill="#E44D26" d="M107.644 470.877L74.633 100.57h362.734l-33.024 370.294L255.856 512z"/>
+                  <path fill="#F16529" d="M256 480.581l119.497-33.128 28.343-317.755H256z"/>
+                  <path fill="#EBEBEB" d="M256 208.636h66.705l-4.605 51.574H256v50.297h60.404l-5.748 64.385-54.656 14.757v52.684l98.547-27.307 14.288-160.093 3.993-46.297H256z"/>
+                  <path fill="#FFFFFF" d="M256 208.636V158.34H147.288l3.993 46.297 10.347 115.968H256v-50.297h-43.238l-4.605-51.574H256zM256 389.201l-54.656-14.757-3.504-39.278h-50.569l6.908 77.362 101.821 28.244z"/>
+                </svg>
+                <span class="clay-card-label" style="color: #E44D26;">HTML5</span>
               </div>
             </div>
 
-            <!-- 2. Floating 3D Markdown Card -->
+            <!-- 2. Floating 3D Markdown Card (Official MarkDown Mark) -->
             <div class="clay-floating-card clay-card-md">
               <div class="clay-card-inner">
-                <svg width="30" height="30" viewBox="0 0 32 32" style="margin-bottom:2px;">
-                  <rect x="2" y="2" width="28" height="28" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2.2" />
-                  <path d="M6 21V11l4 5 4-5v10M19 16l3 4 3-4M22 11v9" fill="none" stroke="#4F46E5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 128" width="52" height="32" class="clay-logo-svg" style="filter: drop-shadow(0 3px 6px rgba(37, 99, 235, 0.28)); margin-bottom: 2px;">
+                  <rect x="5" y="5" width="198" height="118" rx="18" fill="none" stroke="#2563EB" stroke-width="12"/>
+                  <path fill="#2563EB" d="M30 98V30h20l20 25 20-25h20v68H90V59L70 84 50 59v39zm125 0l-30-33h20V30h20v35h20z"/>
                 </svg>
-                <span class="clay-card-label">Markdown</span>
+                <span class="clay-card-label" style="color: #2563EB;">Markdown</span>
               </div>
             </div>
 
@@ -1387,16 +1410,17 @@ const htmlContent = `<!DOCTYPE html>
               <svg viewBox="0 0 100 120" class="clay-arrow-svg">
                 <defs>
                   <linearGradient id="arrowGrad3D" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#818CF8" />
-                    <stop offset="50%" stop-color="#6366F1" />
-                    <stop offset="100%" stop-color="#4338CA" />
+                    <stop offset="0%" stop-color="#A5B4FC" />
+                    <stop offset="35%" stop-color="#818CF8" />
+                    <stop offset="70%" stop-color="#6366F1" />
+                    <stop offset="100%" stop-color="#4F46E5" />
                   </linearGradient>
                   <filter id="arrowShadow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="2" dy="5" stdDeviation="5" flood-color="#312E81" flood-opacity="0.32" />
+                    <feDropShadow dx="2" dy="5" stdDeviation="5" flood-color="#312E81" flood-opacity="0.38" />
                   </filter>
                 </defs>
-                <path d="M 85 15 C 28 20, 15 65, 45 92" fill="none" stroke="url(#arrowGrad3D)" stroke-width="7" stroke-linecap="round" filter="url(#arrowShadow)" />
-                <polygon points="34 98, 56 94, 46 76" fill="#4338CA" filter="url(#arrowShadow)" />
+                <path d="M 85 15 C 28 20, 15 65, 45 92" fill="none" stroke="url(#arrowGrad3D)" stroke-width="7.5" stroke-linecap="round" filter="url(#arrowShadow)" />
+                <polygon points="33 100, 57 95, 47 75" fill="#4F46E5" filter="url(#arrowShadow)" />
               </svg>
             </div>
 
