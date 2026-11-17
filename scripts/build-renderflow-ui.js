@@ -278,18 +278,145 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       padding: 72px 0 54px;
     }
-    .hero-left .eyebrow { margin-bottom: 20px; }
-    .hero-left h1 {
-      font-size: 62px;
-      letter-spacing: -3px;
-      line-height: 1.08;
+    .hero-left .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
       font-weight: 800;
-      max-width: 600px;
+      color: #4338CA;
+      margin-bottom: 20px;
+      background: #EEF2FF;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid #E0E7FF;
     }
+    .hero-left h1 {
+      font-size: 58px;
+      letter-spacing: -2.6px;
+      line-height: 1.1;
+      font-weight: 850;
+      max-width: 600px;
+      color: #111827;
+    }
+
+    /* ANIMATED HERO KEYWORDS */
+    .hero-magic-word {
+      position: relative;
+      display: inline-block;
+      font-weight: 900;
+      white-space: nowrap;
+      transition: transform 0.2s ease;
+    }
+    .hero-magic-word:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+    .html-word {
+      background: linear-gradient(115deg, #DC2626 0%, #EA580C 25%, #F97316 45%, #FBBF24 55%, #EA580C 75%, #DC2626 100%);
+      background-size: 240% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: htmlShimmer 4s ease-in-out infinite;
+      filter: drop-shadow(0 2px 8px rgba(234, 88, 12, 0.25));
+    }
+    .html-word::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 0;
+      width: 100%;
+      height: 3.5px;
+      background: linear-gradient(90deg, transparent, #EA580C 30%, #F59E0B 70%, transparent);
+      border-radius: 2px;
+      animation: sweepUnderline 3s ease-in-out infinite;
+    }
+    .md-word {
+      background: linear-gradient(115deg, #1E40AF 0%, #2563EB 25%, #3B82F6 45%, #60A5FA 55%, #2563EB 75%, #1E40AF 100%);
+      background-size: 240% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: mdShimmer 4s ease-in-out infinite 0.8s;
+      filter: drop-shadow(0 2px 8px rgba(37, 99, 235, 0.25));
+    }
+    .md-word::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 0;
+      width: 100%;
+      height: 3.5px;
+      background: linear-gradient(90deg, transparent, #2563EB 30%, #60A5FA 70%, transparent);
+      border-radius: 2px;
+      animation: sweepUnderline 3s ease-in-out infinite 1.2s;
+    }
+    .video-word {
+      background: linear-gradient(115deg, #312E81 0%, #4338CA 25%, #6366F1 45%, #A855F7 60%, #4338CA 80%, #312E81 100%);
+      background-size: 260% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: videoShimmer 5s ease-in-out infinite;
+      filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.3));
+    }
+    .video-word::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 0;
+      width: 100%;
+      height: 3.5px;
+      background: linear-gradient(90deg, transparent, #6366F1 30%, #A855F7 70%, transparent);
+      border-radius: 2px;
+      animation: sweepUnderline 3s ease-in-out infinite 0.6s;
+    }
+
+    @keyframes htmlShimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes mdShimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes videoShimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes sweepUnderline {
+      0%, 100% { opacity: 0.35; transform: scaleX(0.7); }
+      50% { opacity: 1; transform: scaleX(1); }
+    }
+
     .hero-left .body {
       font-size: 18px;
-      max-width: 520px;
+      line-height: 1.55;
+      color: #5F6877;
+      max-width: 530px;
       margin-top: 22px;
+    }
+    .code-badge-inline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      vertical-align: baseline;
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+    .badge-html-inline {
+      background: #FFF5F2;
+      color: #EA580C;
+      border: 1px solid #FFD5C7;
+    }
+    .badge-md-inline {
+      background: #EFF6FF;
+      color: #2563EB;
+      border: 1px solid #BFDBFE;
     }
     .hero-actions {
       display: flex;
@@ -303,7 +430,7 @@ const htmlContent = `<!DOCTYPE html>
       margin-top: 24px;
       color: #7A8494;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 550;
     }
     .hero-proof span {
       height: 4px;
@@ -1382,21 +1509,25 @@ const htmlContent = `<!DOCTYPE html>
     <section id="viewLandingTab" class="tab-view active page shell">
       <section class="home-hero">
         <div class="hero-left">
-          <div class="eyebrow">From file to video, simply</div>
-          <h1>Turn animated pages into <span class="highlight">videos.</span></h1>
-          <p class="body">Upload your HTML or Markdown file, see how it looks, and download a high-quality MP4. No complicated video software needed.</p>
+          <div class="eyebrow">✦ INSTANT MOTION SYNTHESIS</div>
+          <h1>
+            Transform <span class="hero-magic-word html-word">HTML</span> &amp; <span class="hero-magic-word md-word">Markdown</span> into high-impact <span class="hero-magic-word video-word">videos.</span>
+          </h1>
+          <p class="body">
+            Drop in your <span class="code-badge-inline badge-html-inline">.html</span> animation or <span class="code-badge-inline badge-md-inline">.md</span> presentation. Preview in real time with hardware-accelerated playback and render master 1080p MP4s in seconds.
+          </p>
           <div class="hero-actions">
             <button class="btn primary large" onclick="startNewVideo()">
               Create a video
               <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
             </button>
-            <button class="btn secondary large" onclick="loadSampleAndPreview()">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="8 5 19 12 8 19 8 5"/></svg>
-              Try an example
+            <button class="btn secondary large" onclick="switchNav('history')">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              View History
             </button>
           </div>
           <div class="hero-proof">
-            HTML & Markdown <span></span> Portrait & landscape <span></span> MP4 downloads
+            HTML5 Animations <span></span> Markdown Slides <span></span> 1080p 60 FPS Export
           </div>
         </div>
 
