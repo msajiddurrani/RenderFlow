@@ -881,20 +881,20 @@ const htmlContent = `<!DOCTYPE html>
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(16, 185, 129, 0.16);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #34D399;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(129, 140, 248, 0.45);
+      color: #C7D2FE;
       font-size: 10px;
       font-weight: 800;
-      padding: 2px 7px;
+      padding: 2px 8px;
       border-radius: 12px;
     }
     .fps-dot {
       width: 5px;
       height: 5px;
       border-radius: 50%;
-      background: #10B981;
-      box-shadow: 0 0 6px #10B981;
+      background: #818CF8;
+      box-shadow: 0 0 6px #818CF8;
     }
     .aspect-preview-badge {
       font-size: 10px;
@@ -1018,10 +1018,10 @@ const htmlContent = `<!DOCTYPE html>
       gap: 5px;
       font-size: 10px;
       font-weight: 750;
-      color: #059669;
-      background: #ECFDF5;
-      border: 1px solid #A7F3D0;
-      padding: 2px 7px;
+      color: #4F46E5;
+      background: #EEF2FF;
+      border: 1px solid #C7D2FE;
+      padding: 2px 8px;
       border-radius: 10px;
     }
     .export-prog-bar {
@@ -1037,7 +1037,7 @@ const htmlContent = `<!DOCTYPE html>
       top: 0;
       bottom: 0;
       width: 100%;
-      background: linear-gradient(90deg, #4F46E5 0%, #10B981 100%);
+      background: linear-gradient(90deg, #4F46E5 0%, #8B5CF6 100%);
       border-radius: 4px;
     }
     .export-btn-mock {
@@ -1122,31 +1122,27 @@ const htmlContent = `<!DOCTYPE html>
       margin-bottom: 16px;
       flex: 1;
     }
-    .step-feature-chips {
+    .step-meta-line {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 16px;
       padding-top: 14px;
       border-top: 1px solid #F1F5F9;
-    }
-    .micro-chip {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 8px;
-      background: #F8FAFC;
-      border: 1px solid #E2E8F0;
+      font-size: 13px;
+      font-weight: 600;
       color: #475467;
+    }
+    .meta-item {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
-    .micro-chip svg {
-      width: 11px;
-      height: 11px;
-      stroke: currentColor;
-      stroke-width: 2.2;
-      fill: none;
+    .meta-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--blue);
+      flex-shrink: 0;
     }
 
     /* VIEW 2: CREATE / STUDIO WORKSPACE */
@@ -1210,9 +1206,9 @@ const htmlContent = `<!DOCTYPE html>
       color: white;
     }
     .progress-segment.passed b {
-      background: #E4F4EF;
-      border-color: #D1E9E1;
-      color: #177B63;
+      background: #EEF2FF;
+      border-color: #C7D2FE;
+      color: #3D49DB;
     }
     .progress-bar-nav .dash {
       height: 1px;
@@ -1337,10 +1333,10 @@ const htmlContent = `<!DOCTYPE html>
       display: none;
       padding: 14px 18px;
       margin-top: 16px;
-      background: #F0FAF6;
-      border: 1px solid #C7EADA;
+      background: #EEF2FF;
+      border: 1px solid #C7D2FE;
       border-radius: 12px;
-      color: #177960;
+      color: #3D49DB;
       font-weight: 650;
       font-size: 13px;
       align-items: center;
@@ -1646,10 +1642,11 @@ const htmlContent = `<!DOCTYPE html>
       width: 54px;
       height: 54px;
       border-radius: 15px;
-      background: #E1F6EC;
+      background: #EEF2FF;
+      border: 1px solid #C7D2FE;
       display: grid;
       place-items: center;
-      color: #148361;
+      color: #3D49DB;
       font-size: 24px;
       flex: none;
     }
@@ -1856,17 +1853,172 @@ const htmlContent = `<!DOCTYPE html>
       font-weight: 700;
     }
 
-    /* FOOTER */
-    .footer {
-      border-top: 1px solid #E7EBF1;
-      padding: 24px 0 28px;
+    /* DROPZONE FORMAT PILLS */
+    .drop-formats-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 6px 14px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 20px;
       font-size: 12px;
-      color: #9AA3AE;
+    }
+    .drop-format-label {
+      color: #64748B;
+      font-weight: 600;
+    }
+    .drop-format-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #3D49DB;
+      background: #EEF2FF;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    /* GUIDELINES SIDEBAR */
+    .guidelines-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .guideline-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #FFFFFF;
+      border: 1px solid #E3E7F0;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .gl-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      background: #EEF2FF;
+      color: var(--blue);
+      border: 1px solid #C7D2FE;
+      padding: 3px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .guideline-row strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0F172A;
+      margin-bottom: 2px;
+    }
+    .guideline-row p {
+      font-size: 12px;
+      color: #64748B;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* CREATIVE VISIONARY FOOTER */
+    .creative-footer {
+      margin-top: 50px;
+      padding: 40px 0 32px;
+      border-top: 1px solid #E5E9F0;
+    }
+    .footer-top-grid {
       display: flex;
       justify-content: space-between;
-      margin-top: 40px;
+      align-items: flex-start;
+      gap: 40px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid #F1F4F9;
     }
-    .footer strong { color: #6E7684; }
+    .footer-brand-col {
+      max-width: 480px;
+    }
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 850;
+      letter-spacing: -0.7px;
+      color: #0F172A;
+      margin-bottom: 10px;
+    }
+    .footer-logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+    .footer-tagline {
+      font-size: 13px;
+      color: #64748B;
+      line-height: 1.6;
+    }
+    .footer-nav-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-link {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      color: #475467;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 10px;
+      transition: all 0.15s ease;
+    }
+    .footer-link:hover {
+      background: #EEF2FF;
+      color: var(--blue);
+      border-color: #C7D2FE;
+      transform: translateY(-1px);
+    }
+    .footer-link.back-top {
+      background: #FFFFFF;
+      color: var(--blue);
+      border-color: #C7D2FE;
+    }
+    .footer-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+      font-size: 12px;
+      color: #94A3B8;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .footer-tech-specs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 650;
+      color: #64748B;
+    }
+    .tech-badge {
+      background: #F1F5F9;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid #E2E8F0;
+    }
+    .tech-sep {
+      color: #CBD5E1;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: #64748B;
+      font-weight: 500;
+    }
+    @media (max-width: 768px) {
+      .footer-top-grid { flex-direction: column; gap: 20px; }
+      .footer-bottom-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
 
     /* TOAST */
     .toast {
@@ -2072,11 +2224,9 @@ const htmlContent = `<!DOCTYPE html>
 
           </div>
         </div>
-          </div>
-        </div>
       </section>
 
-      <!-- VISIONARY STEPS SECTION (WORKFLOW PIPELINE) -->
+      <!-- VISIONARY STEPS SECTION (WORKFLOW PIPELINE - STRICTLY HOME TAB ONLY) -->
       <section class="visionary-steps-section">
         <div class="steps-header">
           <div class="steps-tag">✦ WORKFLOW PIPELINE</div>
@@ -2118,15 +2268,9 @@ const htmlContent = `<!DOCTYPE html>
               <p class="step-desc">
                 Choose your HTML animation or Markdown slides. RenderFlow automatically detects structure, dimensions, and playback timing.
               </p>
-              <div class="step-feature-chips">
-                <span class="micro-chip">
-                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                  HTML5 &amp; Markdown
-                </span>
-                <span class="micro-chip">
-                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  Auto-Timing
-                </span>
+              <div class="step-meta-line">
+                <span class="meta-item"><span class="meta-dot"></span>HTML5 &amp; Markdown Ingest</span>
+                <span class="meta-item"><span class="meta-dot"></span>Sub-second Auto-Timing</span>
               </div>
             </div>
           </div>
@@ -2175,15 +2319,9 @@ const htmlContent = `<!DOCTYPE html>
               <p class="step-desc">
                 Inspect your kinetic typography and animations at fluid 60 FPS. Switch instantly between portrait reel, landscape cinema, or square.
               </p>
-              <div class="step-feature-chips">
-                <span class="micro-chip">
-                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                  Live Playhead
-                </span>
-                <span class="micro-chip">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                  Multi-Aspect
-                </span>
+              <div class="step-meta-line">
+                <span class="meta-item"><span class="meta-dot"></span>60 FPS Live Playhead</span>
+                <span class="meta-item"><span class="meta-dot"></span>Instant Multi-Aspect</span>
               </div>
             </div>
           </div>
@@ -2223,15 +2361,9 @@ const htmlContent = `<!DOCTYPE html>
               <p class="step-desc">
                 Trigger one-click GPU hardware rendering. RenderFlow synthesizes lossless 1080p video ready for social reels and broadcast.
               </p>
-              <div class="step-feature-chips">
-                <span class="micro-chip">
-                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                  Direct3D Lossless
-                </span>
-                <span class="micro-chip">
-                  <svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                  Ultra-Fast Export
-                </span>
+              <div class="step-meta-line">
+                <span class="meta-item"><span class="meta-dot"></span>Direct3D Lossless Encoding</span>
+                <span class="meta-item"><span class="meta-dot"></span>1-Click Master 1080p MP4</span>
               </div>
             </div>
           </div>
@@ -2284,7 +2416,12 @@ const htmlContent = `<!DOCTYPE html>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
                 Choose a file
               </button>
-              <p style="font-size:12px;color:#9BA5B3">Supported formats: .html, .htm, .md</p>
+              <div class="drop-formats-bar">
+                <span class="drop-format-label">Supported formats:</span>
+                <span class="drop-format-pill">.html</span>
+                <span class="drop-format-pill">.htm</span>
+                <span class="drop-format-pill">.md</span>
+              </div>
             </div>
 
             <div id="filePickedStatus" class="selectedfile">
@@ -2309,21 +2446,27 @@ const htmlContent = `<!DOCTYPE html>
           </section>
 
           <aside class="surface info-panel">
-            <h3>Want to try it first?</h3>
-            <p>See what RenderFlow can do with a ready-made example.</p>
-            <button class="example" onclick="loadSampleAndPreview()">
-              <div class="e-icon">
-                <svg class="icon" viewBox="0 0 24 24"><polygon points="8 5 19 12 8 19 8 5"/></svg>
+            <h3>Format Guidelines</h3>
+            <p>RenderFlow turns web animations and markdown presentations into pristine 1080p MP4.</p>
+            <div class="guidelines-list">
+              <div class="guideline-row">
+                <span class="gl-tag">HTML5</span>
+                <div>
+                  <strong>Kinetic Web Animation</strong>
+                  <p>CSS keyframes, Canvas, SVG, or interactive HTML motion.</p>
+                </div>
               </div>
-              <div>
-                <b>Try a sample animation</b>
-                <small>RenderFlow Motion Graphics template</small>
+              <div class="guideline-row">
+                <span class="gl-tag">Markdown</span>
+                <div>
+                  <strong>Presentation Slides</strong>
+                  <p>Slide decks with automatic cinematic transitions and layouts.</p>
+                </div>
               </div>
-              <div class="arr">→</div>
-            </button>
+            </div>
             <div class="tip">
-              <b>Not sure what HTML or Markdown means?</b>
-              They’re file formats for web pages and written slides. If you have one, you can simply upload it here.
+              <b>Hardware Accelerated</b>
+              Timing, duration, and frame rate are detected automatically upon upload.
             </div>
           </aside>
         </div>
@@ -2474,7 +2617,7 @@ const htmlContent = `<!DOCTYPE html>
           <section class="surface preview-surface">
             <div class="preview-toolbar">
               <h3>Your finished video</h3>
-              <span class="tag" style="background:#E1F6EC;color:#148361;">Ready to download</span>
+              <span class="tag" style="background:#EEF2FF;color:#4338CA;border:1px solid #E0E7FF;">Ready to download</span>
             </div>
 
             <div class="preview-stage">
@@ -2561,10 +2704,43 @@ const htmlContent = `<!DOCTYPE html>
       </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="shell footer">
-      <div><strong>RenderFlow</strong> · Turn animated pages into videos.</div>
-      <div>Designed for clarity. Built for creators.</div>
+    <!-- CREATIVE VISIONARY FOOTER -->
+    <footer class="shell creative-footer">
+      <div class="footer-top-grid">
+        <div class="footer-brand-col">
+          <div class="footer-brand">
+            <img src="/RenderFlow_Logo_Transparent.png" alt="RenderFlow" class="footer-logo">
+            <span>RenderFlow</span>
+          </div>
+          <p class="footer-tagline">
+            Hardware-accelerated kinetic video synthesis. Transform raw HTML5 animations and Markdown slides into studio-grade 1080p MP4 master videos.
+          </p>
+        </div>
+
+        <div class="footer-actions-col">
+          <div class="footer-nav-links">
+            <button onclick="switchNav('landing')" class="footer-link">Home</button>
+            <button onclick="startNewVideo()" class="footer-link">Create Video</button>
+            <button onclick="switchNav('history')" class="footer-link">Archives</button>
+            <button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="footer-link back-top">
+              Back to Top ↑
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom-row">
+        <div class="footer-tech-specs">
+          <span class="tech-badge">Direct3D11 Engine</span>
+          <span class="tech-sep">•</span>
+          <span class="tech-badge">1080p 60 FPS Export</span>
+          <span class="tech-sep">•</span>
+          <span class="tech-badge">Lossless H.264</span>
+        </div>
+        <div class="footer-copy">
+          © 2026 RenderFlow Studio. Designed for clarity, built for creators.
+        </div>
+      </div>
     </footer>
   </div>
 
@@ -2746,6 +2922,13 @@ const htmlContent = `<!DOCTYPE html>
     function startNewVideo() {
       switchNav('studio');
       setCreateStep(1);
+      const fi = $('fileInputStudio');
+      if (fi) fi.value = '';
+      const fps = $('filePickedStatus');
+      if (fps) fps.classList.remove('show');
+      const b1 = $('btnStep1Next');
+      if (b1) b1.disabled = true;
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
     // GUIDED STEP WORKFLOW (1: ADD CONTENT, 2: PREVIEW, 3: DOWNLOAD)
