@@ -215,10 +215,16 @@ class RendererEngine extends EventEmitter {
     await page.evaluate(() => {
       const st = document.getElementById('st') || document.getElementById('stage');
       if (st) {
-        st.style.left = '0';
-        st.style.top = '0';
-        st.style.transform = 'none';
-        st.style.margin = '0';
+        st.style.setProperty('left', '0px', 'important');
+        st.style.setProperty('top', '0px', 'important');
+        st.style.setProperty('margin', '0px', 'important');
+        st.style.setProperty('transform', 'none', 'important');
+        try {
+          Object.defineProperty(st.style, 'transform', {
+            set: () => {},
+            get: () => 'none'
+          });
+        } catch(e) {}
       }
       const go = document.getElementById('go');
       if (go) go.style.display = 'none';
