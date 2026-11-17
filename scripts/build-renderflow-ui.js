@@ -1935,9 +1935,9 @@ const htmlContent = `<!DOCTYPE html>
       z-index: 2;
     }
     .footer-main-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: space-between;
       gap: 32px;
     }
     .footer-left {
@@ -1945,7 +1945,8 @@ const htmlContent = `<!DOCTYPE html>
       flex-direction: column;
       align-items: flex-start;
       gap: 6px;
-      max-width: 360px;
+      max-width: 380px;
+      justify-self: start;
     }
     .footer-brand-header {
       display: inline-flex;
@@ -1973,7 +1974,10 @@ const htmlContent = `<!DOCTYPE html>
     .footer-nav-wrap {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 24px;
+      justify-self: center;
+      text-align: center;
     }
     .footer-nav-divider {
       color: #CBD5E1;
@@ -1998,6 +2002,7 @@ const htmlContent = `<!DOCTYPE html>
       display: inline-flex;
       align-items: center;
       gap: 12px;
+      justify-self: end;
     }
     .footer-social-card {
       width: 44px;
@@ -2026,14 +2031,19 @@ const htmlContent = `<!DOCTYPE html>
       display: block;
     }
     .footer-copyright-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       text-align: center;
       margin: 28px 0 20px;
+      width: 100%;
     }
     .footer-copyright-row p {
       color: #64748B;
       font-size: 13px;
       font-weight: 500;
       margin: 0;
+      text-align: center;
     }
     .footer-wave-banner {
       position: relative;
