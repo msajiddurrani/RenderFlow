@@ -3713,7 +3713,7 @@ const htmlContent = `<!DOCTYPE html>
           }
         });
 
-        const result = await engine.renderAnimation(code);
+        const result = await engine.renderAnimation(code, { width, height, fps, duration });
         const blobUrl = URL.createObjectURL(result.blob);
         const sizeFormatted = (result.blob.size / (1024 * 1024)).toFixed(1) + ' MB';
 

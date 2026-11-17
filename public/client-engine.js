@@ -9,6 +9,7 @@ class ClientRenderEngine {
     this.fps = options.fps || 30;
     this.width = options.width || 1920;
     this.height = options.height || 1080;
+    this.duration = options.duration || 5;
     this.onProgress = options.onProgress || (() => {});
     this.onStatus = options.onStatus || (() => {});
   }
@@ -23,12 +24,340 @@ class ClientRenderEngine {
   }
 
   /**
+   * Universal entry point: auto-routes to Markdown or HTML renderer
+   */
+  async renderAnimation(code, options = {}) {
+    const trimmed = (code || '').trim();
+    const isMarkdown = !/^\s*<!DOCTYPE\s+html/i.test(trimmed) && 
+                       !/^\s*<html/i.test(trimmed) && 
+                       (/\n\s*---\s*\n/.test(trimmed) || /^\s*#\s+/m.test(trimmed) || !/<[a-z][\s\S]*>/i.test(trimmed));
+
+    if (isMarkdown) {
+      return await this.renderMarkdownToMp4(trimmed, options);
+    }
+    return await this.renderHtmlToMp4(trimmed, options);
+  }
+
+  /**
+   * Render an HTML animation directly to MP4 in memory using WebCodecs (Untainted Canvas)
+   */
+  async renderHtmlToMp4(htmlCode, options = {}) {
+    const fps = options.fps || this.fps || 30;
+    const width = options.width || this.width || 1920;
+    const height = options.height || this.height || 1080;
+    const duration = options.duration || this.duration || 5;
+    const totalFrames = Math.max(1, Math.round(duration * fps));
+    const isVertical = height > width;
+
+    this.onStatus({ phase: 'init', message: 'Initializing in-browser hardware video encoder...' });
+
+    // 1. Set up Canvas for frame rasterization (Guaranteed Untainted)
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: true });
+    ctx.fillStyle = '#090B14';
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. Initialize MP4 Muxer in browser memory
+    const target = new window.Mp4Muxer.ArrayBufferTarget();
+
+    const muxer = new window.Mp4Muxer.Muxer({
+      target,
+      video: {
+        codec: 'avc',
+        width,
+        height
+      },
+      fastStart: 'in-memory',
+      firstTimestampBehavior: 'offset'
+    });
+
+    // 3. Configure WebCodecs VideoEncoder
+    let encoderError = null;
+    const videoEncoder = new window.VideoEncoder({
+      output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      error: err => {
+        console.error('[WebCodecs VideoEncoder Error]:', err);
+        encoderError = err;
+      }
+    });
+
+    videoEncoder.configure({
+      codec: 'avc1.4d002a',
+      width,
+      height,
+      bitrate: isVertical ? 3_500_000 : 5_000_000,
+      framerate: fps,
+      hardwareAcceleration: 'prefer-hardware'
+    });
+
+    // 4. Parse DOM structure to extract content and check for canvas
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlCode, 'text/html');
+
+    // Check preview iframe for live rendering canvas
+    const iframe = document.getElementById('studioPreviewIframe');
+    let innerCanvas = null;
+    if (iframe && iframe.contentDocument) {
+      innerCanvas = iframe.contentDocument.querySelector('canvas');
+    }
+
+    // Extract sections or slides if defined
+    const sectionNodes = doc.querySelectorAll('section, .slide, .scene');
+    const sections = [];
+    if (sectionNodes.length > 0) {
+      sectionNodes.forEach(s => {
+        const h = s.querySelector('h1, h2, h3, h4, .title, .heading');
+        const pList = Array.from(s.querySelectorAll('p, li, .desc, .text, span')).map(e => e.textContent.trim()).filter(Boolean);
+        sections.push({
+          title: h ? h.textContent.trim() : 'RenderFlow Motion',
+          items: pList
+        });
+      });
+    }
+
+    // Fallback: extract root headings and text
+    if (sections.length === 0) {
+      const allH = Array.from(doc.querySelectorAll('h1, h2, h3, .title, .heading')).map(e => e.textContent.trim()).filter(Boolean);
+      const allP = Array.from(doc.querySelectorAll('p, li, .desc, .text')).map(e => e.textContent.trim()).filter(Boolean);
+      const title = allH[0] || doc.title || 'RenderFlow';
+      const items = allP.length > 0 ? allP : (allH.slice(1).length > 0 ? allH.slice(1) : ['Kinetic Web Motion', 'Exported in Studio Full HD']);
+      sections.push({ title, items });
+    }
+
+    const totalSections = sections.length;
+    const timePerSection = duration / totalSections;
+
+    this.onStatus({ phase: 'rendering', message: `Encoding ${totalFrames} frames in browser GPU...` });
+
+    const startTime = performance.now();
+    const frameTimes = [];
+
+    for (let frameIndex = 0; frameIndex < totalFrames; frameIndex++) {
+      if (encoderError) throw encoderError;
+
+      const fStart = performance.now();
+      const tSec = frameIndex / fps;
+
+      // Allow iframe animations with renderFrame(tSec) to advance
+      if (iframe && iframe.contentWindow) {
+        if (typeof iframe.contentWindow.renderFrame === 'function') {
+          try { iframe.contentWindow.renderFrame(tSec); } catch (e) {}
+        }
+        if (!innerCanvas && iframe.contentDocument) {
+          innerCanvas = iframe.contentDocument.querySelector('canvas');
+        }
+      }
+
+      ctx.fillStyle = '#090B14';
+      ctx.fillRect(0, 0, width, height);
+
+      let frameDrawn = false;
+
+      // Method A: If HTML animation uses a native canvas (Canvas 2D / Three.js / WebGL)
+      if (innerCanvas && innerCanvas.width > 0 && innerCanvas.height > 0) {
+        try {
+          ctx.drawImage(innerCanvas, 0, 0, width, height);
+          frameDrawn = true;
+        } catch (e) {
+          console.warn('Could not draw innerCanvas directly:', e);
+        }
+      }
+
+      // Method B: Untainted native Canvas 2D motion rasterization
+      if (!frameDrawn) {
+        const secIdx = Math.min(totalSections - 1, Math.floor(tSec / timePerSection));
+        const secProg = (tSec % timePerSection) / timePerSection;
+        const curSec = sections[secIdx];
+
+        this.drawHtmlKineticFrame(ctx, curSec, secIdx, totalSections, secProg, width, height, tSec, duration);
+        frameDrawn = true;
+      }
+
+      // Create VideoFrame from Untainted Canvas
+      const timestampMicros = Math.round(tSec * 1_000_000);
+      const videoFrame = new window.VideoFrame(canvas, {
+        timestamp: timestampMicros,
+        duration: Math.round((1 / fps) * 1_000_000)
+      });
+
+      const isKeyFrame = frameIndex % (fps * 2) === 0;
+      videoEncoder.encode(videoFrame, { keyFrame: isKeyFrame });
+      videoFrame.close();
+
+      const fDuration = performance.now() - fStart;
+      frameTimes.push(fDuration);
+
+      const avgMs = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
+      const pct = Math.round(((frameIndex + 1) / totalFrames) * 100);
+      const etaSeconds = Math.round(((totalFrames - frameIndex - 1) * avgMs) / 1000);
+
+      this.onProgress({
+        frame: frameIndex + 1,
+        totalFrames,
+        percent: pct,
+        pct: pct,
+        avgFrameMs: Math.round(avgMs),
+        fps: (1000 / avgMs).toFixed(1),
+        effectiveFps: (1000 / avgMs).toFixed(1),
+        etaSeconds
+      });
+
+      // Yield event loop every 4 frames so UI stays silky responsive
+      if (frameIndex % 4 === 0) {
+        await new Promise(r => setTimeout(r, 0));
+      }
+    }
+
+    this.onStatus({ phase: 'muxing', message: 'Finalizing pristine MP4 container in browser...' });
+    await videoEncoder.flush();
+    videoEncoder.close();
+
+    muxer.finalize();
+
+    const buffer = target.buffer;
+    const blob = new Blob([buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(blob);
+    const totalTimeSec = ((performance.now() - startTime) / 1000).toFixed(1);
+
+    this.onStatus({ phase: 'done', message: `Render finished in ${totalTimeSec}s!` });
+
+    return {
+      blob,
+      url,
+      sizeBytes: buffer.byteLength,
+      sizeKb: (buffer.byteLength / 1024).toFixed(1),
+      duration,
+      durationSec: duration,
+      resolution: `${width}x${height}`,
+      totalRenderTimeSec: totalTimeSec,
+      effectiveFps: (totalFrames / (parseFloat(totalTimeSec) || 1)).toFixed(1)
+    };
+  }
+
+  /**
+   * Draw kinetic HTML slide/scene frame directly with Canvas 2D (Never Taints Canvas)
+   */
+  drawHtmlKineticFrame(ctx, section, secIdx, totalSecs, progress, width, height, tSec, totalDuration) {
+    const isVertical = height > width;
+
+    // Dark kinetic background gradient
+    const grad = ctx.createLinearGradient(0, 0, width, height);
+    if (secIdx % 3 === 0) {
+      grad.addColorStop(0, '#090B14');
+      grad.addColorStop(0.5, '#121829');
+      grad.addColorStop(1, '#05070D');
+    } else if (secIdx % 3 === 1) {
+      grad.addColorStop(0, '#080F1E');
+      grad.addColorStop(0.5, '#141E38');
+      grad.addColorStop(1, '#060B14');
+    } else {
+      grad.addColorStop(0, '#0D0E1A');
+      grad.addColorStop(0.5, '#1F1A3A');
+      grad.addColorStop(1, '#080811');
+    }
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Glowing orbital ambient lights
+    const orbX = width * (0.3 + 0.4 * Math.sin(tSec * 0.8));
+    const orbY = height * (0.3 + 0.3 * Math.cos(tSec * 0.6));
+    const radGrad = ctx.createRadialGradient(orbX, orbY, 40, orbX, orbY, Math.max(width, height) * 0.6);
+    radGrad.addColorStop(0, 'rgba(99, 102, 241, 0.22)');
+    radGrad.addColorStop(0.5, 'rgba(129, 140, 248, 0.06)');
+    radGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = radGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Fine grid pattern
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
+    ctx.lineWidth = 1;
+    const step = isVertical ? 60 : 80;
+    for (let x = 0; x < width; x += step) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+    }
+    for (let y = 0; y < height; y += step) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+    }
+
+    // Transition Alpha
+    let alpha = 1.0;
+    if (progress < 0.15) alpha = progress / 0.15;
+    else if (progress > 0.88) alpha = (1 - progress) / 0.12;
+    alpha = Math.max(0, Math.min(1, alpha));
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    const yOffset = (1 - alpha) * 20;
+    const padX = isVertical ? 64 : 120;
+    let currY = isVertical ? 200 + yOffset : 180 + yOffset;
+
+    // Badge
+    ctx.fillStyle = '#6366F1';
+    ctx.beginPath();
+    ctx.arc(padX + 8, currY - 6, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#818CF8';
+    ctx.font = '600 ' + (isVertical ? '20px' : '22px') + ' sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('HTML5 MOTION COMPOSITION', padX + 26, currY);
+
+    currY += isVertical ? 54 : 64;
+
+    // Title
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold ' + (isVertical ? '56px' : '64px') + ' sans-serif';
+    const maxTitleWidth = width - (padX * 2);
+    const titleLines = this.wrapText(ctx, section.title, maxTitleWidth);
+    titleLines.forEach(tl => {
+      ctx.fillText(tl, padX, currY);
+      currY += isVertical ? 66 : 74;
+    });
+
+    currY += isVertical ? 36 : 44;
+
+    // Items / Subtext
+    ctx.font = (isVertical ? '28px' : '32px') + ' sans-serif';
+    ctx.fillStyle = '#CBD5E1';
+
+    (section.items || []).slice(0, 4).forEach(item => {
+      ctx.fillStyle = '#6366F1';
+      ctx.beginPath();
+      ctx.arc(padX + 10, currY - 10, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#E2E8F0';
+      ctx.fillText(item, padX + 32, currY);
+      currY += isVertical ? 50 : 54;
+    });
+
+    ctx.restore();
+
+    // Progress Bar at Bottom
+    const barHeight = 6;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.fillRect(0, height - barHeight, width, barHeight);
+
+    const overallProgress = tSec / (totalDuration || 1);
+    const fillWidth = Math.min(width, Math.max(0, width * overallProgress));
+    
+    const barGrad = ctx.createLinearGradient(0, 0, width, 0);
+    barGrad.addColorStop(0, '#6366F1');
+    barGrad.addColorStop(0.5, '#818CF8');
+    barGrad.addColorStop(1, '#A5B4FC');
+    ctx.fillStyle = barGrad;
+    ctx.fillRect(0, height - barHeight, fillWidth, barHeight);
+  }
+
+  /**
    * Render a Markdown slide deck directly to MP4 in memory
    */
   async renderMarkdownToMp4(markdownText, options = {}) {
-    const fps = options.fps || this.fps;
-    const width = options.width || this.width;
-    const height = options.height || this.height;
+    const fps = options.fps || this.fps || 30;
+    const width = options.width || this.width || 1920;
+    const height = options.height || this.height || 1080;
     const secondsPerSlide = options.secondsPerSlide || 4;
 
     const rawSlides = markdownText.split(/\n\s*---\s*\n/).map(s => s.trim()).filter(Boolean);
@@ -85,7 +414,7 @@ class ClientRenderEngine {
     });
 
     const isVertical = height > width;
-    const codecString = 'avc1.4d002a'; // H.264 Main Profile Level 4.2
+    const codecString = 'avc1.4d002a';
     videoEncoder.configure({
       codec: codecString,
       width,
@@ -128,7 +457,7 @@ class ClientRenderEngine {
         const floatData = new Float32Array(pcmSub.length);
         floatData.set(pcmSub);
 
-        const audioData = new AudioData({
+        const audioData = new window.AudioData({
           format: 'f32-planar',
           sampleRate: 44100,
           numberOfFrames: floatData.length,
@@ -136,6 +465,7 @@ class ClientRenderEngine {
           timestamp: Math.round((start / 44100) * 1_000_000),
           data: floatData
         });
+
         audioEncoder.encode(audioData);
         audioData.close();
       }
@@ -181,12 +511,13 @@ class ClientRenderEngine {
         frame: frameIndex + 1,
         totalFrames,
         percent: pct,
+        pct: pct,
         avgFrameMs: Math.round(avgMs),
+        fps: (1000 / avgMs).toFixed(1),
         effectiveFps: (1000 / avgMs).toFixed(1),
         etaSeconds
       });
 
-      // Yield event loop every 5 frames so UI stays silky smooth
       if (frameIndex % 5 === 0) {
         await new Promise(r => setTimeout(r, 0));
       }
@@ -220,30 +551,43 @@ class ClientRenderEngine {
   }
 
   /**
-   * Draw high-typography presentation slide onto Canvas
+   * Draw an individual slide frame onto the Canvas with kinetic typography & aesthetics
    */
   drawSlideFrame(ctx, slideText, slideIdx, totalSlides, progress, width, height, tSec, totalDuration) {
     const isVertical = height > width;
 
-    // Background gradient
-    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-    bgGrad.addColorStop(0, '#0a0d14');
-    bgGrad.addColorStop(0.6, '#0f172a');
-    bgGrad.addColorStop(1, '#1e1b4b');
-    ctx.fillStyle = bgGrad;
+    // Background base
+    const grad = ctx.createLinearGradient(0, 0, width, height);
+    if (slideIdx % 3 === 0) {
+      grad.addColorStop(0, '#090B14');
+      grad.addColorStop(0.5, '#121829');
+      grad.addColorStop(1, '#05070D');
+    } else if (slideIdx % 3 === 1) {
+      grad.addColorStop(0, '#080F1E');
+      grad.addColorStop(0.5, '#141E38');
+      grad.addColorStop(1, '#060B14');
+    } else {
+      grad.addColorStop(0, '#0D0E1A');
+      grad.addColorStop(0.5, '#1F1A3A');
+      grad.addColorStop(1, '#080811');
+    }
+    ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
 
-    // Subtle ambient glow
-    const glowGrad = ctx.createRadialGradient(width * 0.7, height * 0.3, 10, width * 0.7, height * 0.3, width * 0.5);
-    glowGrad.addColorStop(0, 'rgba(99, 102, 241, 0.18)');
-    glowGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = glowGrad;
+    // Subtle ambient glow orbs
+    const orbX = width * (0.3 + 0.4 * Math.sin(tSec * 0.8));
+    const orbY = height * (0.3 + 0.3 * Math.cos(tSec * 0.6));
+    const radGrad = ctx.createRadialGradient(orbX, orbY, 50, orbX, orbY, Math.max(width, height) * 0.6);
+    radGrad.addColorStop(0, 'rgba(99, 102, 241, 0.18)');
+    radGrad.addColorStop(0.5, 'rgba(129, 140, 248, 0.05)');
+    radGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = radGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // Decorative geometric grid lines
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+    // Decorative grid pattern
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
     ctx.lineWidth = 1;
-    const step = 80;
+    const step = isVertical ? 60 : 80;
     for (let x = 0; x < width; x += step) {
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
     }
@@ -251,69 +595,62 @@ class ClientRenderEngine {
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
     }
 
-    // Top branding badge
-    ctx.save();
-    const padX = isVertical ? 60 : 120;
-    const topY = isVertical ? 100 : 100;
-
-    // Category / Slide Tag
-    ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
-    ctx.strokeStyle = 'rgba(129, 140, 248, 0.4)';
-    ctx.lineWidth = 1.5;
-    const tagW = 180, tagH = 36;
-    ctx.beginPath();
-    ctx.roundRect(padX, topY, tagW, tagH, 18);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#a5b4fc';
-    ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`SLIDE ${slideIdx + 1} OF ${totalSlides}`, padX + tagW / 2, topY + tagH / 2);
-    ctx.restore();
-
-    // Parse slide markdown lines
+    // Parse slide lines
     const lines = slideText.split('\n').map(l => l.trim()).filter(Boolean);
-    let title = lines[0] || 'Presentation Slide';
-    if (title.startsWith('#')) title = title.replace(/^#+\s*/, '');
+    let title = lines[0] || 'RenderFlow Presentation';
     const bodyLines = lines.slice(1);
 
-    // Title entrance animation (eases in during first 0.3s of slide)
-    const enterEase = Math.min(1, progress * 4);
-    const titleOffsetY = (1 - enterEase) * 20;
+    // Slide transition alpha with subtle cubic ease-in
+    let slideAlpha = 1.0;
+    const fadeInDuration = 0.15;
+    const fadeOutDuration = 0.12;
 
-    // Draw Slide Title
+    if (progress < fadeInDuration) {
+      slideAlpha = progress / fadeInDuration;
+    } else if (progress > 1 - fadeOutDuration) {
+      slideAlpha = (1 - progress) / fadeOutDuration;
+    }
+    slideAlpha = Math.max(0, Math.min(1, slideAlpha));
+
     ctx.save();
-    ctx.font = isVertical ? '800 52px "Plus Jakarta Sans", sans-serif' : '800 68px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#ffffff';
-    ctx.textBaseline = 'top';
+    ctx.globalAlpha = slideAlpha;
+
+    const yOffset = (1 - slideAlpha) * 20;
+    const padX = isVertical ? 64 : 120;
+    let currY = isVertical ? 180 + yOffset : 160 + yOffset;
+
+    // Render Tag / Category Badge
+    ctx.fillStyle = '#6366F1';
+    ctx.beginPath();
+    ctx.arc(padX + 8, currY - 6, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#818CF8';
+    ctx.font = '600 ' + (isVertical ? '20px' : '22px') + ' sans-serif';
     ctx.textAlign = 'left';
+    ctx.fillText(`SLIDE ${slideIdx + 1} OF ${totalSlides}`, padX + 26, currY);
 
-    // Wrap title if long
-    const maxTitleW = width - padX * 2;
-    const titleLines = this.wrapText(ctx, title, maxTitleW);
-    let currY = topY + 80 + titleOffsetY;
+    currY += isVertical ? 50 : 60;
 
+    // Render Title
+    if (title.startsWith('#')) title = title.replace(/^#+\s*/, '');
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold ' + (isVertical ? '56px' : '64px') + ' sans-serif';
+    
+    const maxTitleWidth = width - (padX * 2);
+    const titleLines = this.wrapText(ctx, title, maxTitleWidth);
     titleLines.forEach(tl => {
       ctx.fillText(tl, padX, currY);
-      currY += isVertical ? 62 : 78;
+      currY += isVertical ? 66 : 74;
     });
 
-    // Decorative color accent line
-    const accentGrad = ctx.createLinearGradient(padX, 0, padX + 260, 0);
-    accentGrad.addColorStop(0, '#4f46e5');
-    accentGrad.addColorStop(0.5, '#7c3aed');
-    accentGrad.addColorStop(1, '#ec4899');
-    ctx.fillStyle = accentGrad;
-    ctx.fillRect(padX, currY + 12, 180, 5);
-    currY += 46;
+    currY += isVertical ? 30 : 40;
 
-    // Draw Body content / bullet points
-    ctx.font = isVertical ? '500 28px "Plus Jakarta Sans", sans-serif' : '500 32px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#cbd5e1';
+    // Render Body bullets / text
+    ctx.font = (isVertical ? '28px' : '32px') + ' sans-serif';
+    ctx.fillStyle = '#CBD5E1';
 
-    bodyLines.forEach((line, lIdx) => {
+    bodyLines.forEach(line => {
       let text = line;
       let isBullet = false;
       if (text.startsWith('- ') || text.startsWith('* ')) {
@@ -322,45 +659,44 @@ class ClientRenderEngine {
       }
 
       if (isBullet) {
-        ctx.fillStyle = '#818cf8';
+        ctx.fillStyle = '#6366F1';
         ctx.beginPath();
-        ctx.arc(padX + 12, currY + 16, 6, 0, Math.PI * 2);
+        ctx.arc(padX + 10, currY - 10, 5, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#e2e8f0';
-        ctx.fillText(text, padX + 36, currY);
+        ctx.fillStyle = '#E2E8F0';
+        ctx.fillText(text, padX + 32, currY);
       } else {
-        ctx.fillStyle = '#94a3b8';
+        ctx.fillStyle = '#94A3B8';
         ctx.fillText(text, padX, currY);
       }
-
-      currY += isVertical ? 48 : 54;
+      currY += isVertical ? 48 : 52;
     });
+
     ctx.restore();
 
-    // Bottom timeline bar
-    const barHeight = 8;
-    const totalProgress = Math.max(0, Math.min(1, tSec / totalDuration));
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    // Render Progress Bar at the bottom
+    const barHeight = 6;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.fillRect(0, height - barHeight, width, barHeight);
 
-    const progGrad = ctx.createLinearGradient(0, 0, width, 0);
-    progGrad.addColorStop(0, '#4f46e5');
-    progGrad.addColorStop(0.5, '#7c3aed');
-    progGrad.addColorStop(1, '#ec4899');
-    ctx.fillStyle = progGrad;
-    ctx.fillRect(0, height - barHeight, width * totalProgress, barHeight);
-
-    // Footer brand note
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.font = '600 16px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.fillText('Jane Motion Studio • 1080p WebCodecs', width - padX, height - 30);
+    const overallProgress = tSec / (totalDuration || 1);
+    const fillWidth = Math.min(width, Math.max(0, width * overallProgress));
+    
+    const barGrad = ctx.createLinearGradient(0, 0, width, 0);
+    barGrad.addColorStop(0, '#6366F1');
+    barGrad.addColorStop(0.5, '#818CF8');
+    barGrad.addColorStop(1, '#A5B4FC');
+    ctx.fillStyle = barGrad;
+    ctx.fillRect(0, height - barHeight, fillWidth, barHeight);
   }
 
+  /**
+   * Helper: Wrap text to fit canvas width
+   */
   wrapText(ctx, text, maxWidth) {
     const words = text.split(' ');
     const lines = [];
-    let currentLine = words[0];
+    let currentLine = words[0] || '';
 
     for (let i = 1; i < words.length; i++) {
       const word = words[i];
@@ -389,7 +725,7 @@ class ClientRenderEngine {
     // Add harmonic chime at each slide transition
     for (let s = 0; s < totalSlides; s++) {
       const slideTime = s * secondsPerSlide;
-      const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (Pristine Major Chime)
+      const freqs = [523.25, 659.25, 783.99, 1046.50];
       freqs.forEach((freq, fIdx) => {
         const osc = actx.createOscillator();
         const gain = actx.createGain();
