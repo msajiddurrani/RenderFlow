@@ -247,6 +247,61 @@ function formatDuration(sec) {
   return `${m}m ${s < 10 ? '0' : ''}${s}s`;
 }
 
+// Active in-memory jobs registry for mobile background polling
+const activeRenderJobs = new Map();
+
+// Endpoint for instant engine warm-up & health check
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'RenderFlow Cloud Acceleration Engine',
+    hardware: 'GPU Hardware Direct3D11 / NVENC Pipeline',
+    uptime: process.uptime(),
+    activeJobsCount: activeRenderJobs.size,
+    timestamp: Date.now()
+  });
+});
+
+// Endpoint for live mobile background job progress query
+app.get(['/api/render-status/:filename', '/api/render-status'], (req, res) => {
+  const filename = req.params.filename || req.query.filename;
+  if (!filename) {
+    return res.status(400).json({ error: 'Filename parameter required' });
+  }
+
+  // 1. Check active memory jobs
+  const liveJob = activeRenderJobs.get(filename);
+  if (liveJob) {
+    return res.json({
+      success: true,
+      job: liveJob
+    });
+  }
+
+  // 2. Fall back to completed history store
+  const records = historyStore.readRecords();
+  const completed = records.find(r => r.filename === filename && r.resolution !== 'Unknown' && r.videoCodec !== 'None');
+  if (completed) {
+    return res.json({
+      success: true,
+      job: {
+        filename: completed.filename,
+        status: 'completed',
+        url: completed.url || (`/output/${completed.filename}`),
+        record: completed,
+        metrics: completed.metrics,
+        probe: completed.probe
+      }
+    });
+  }
+
+  return res.json({
+    success: false,
+    status: 'pending_or_unknown',
+    filename
+  });
+});
+
 // ==========================================
 // CORE RENDER SSE PIPELINE
 // ==========================================
@@ -273,6 +328,21 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
   const baseCleanName = path.basename(originalFilename, path.extname(originalFilename)).replace(/[^a-zA-Z0-9_-]/g, '_');
   const outputName = `render-${Date.now()}-${baseCleanName}.mp4`;
   const outputPath = path.join(outputDir, outputName);
+
+  const jobState = {
+    filename: outputName,
+    originalFilename,
+    status: 'rendering',
+    phase: 'Initializing hardware synthesis...',
+    startTime: Date.now(),
+    frame: 0,
+    totalFrames: 0,
+    percent: 0,
+    effectiveFps: '--',
+    avgFrameMs: '--',
+    etaSeconds: '--'
+  };
+  activeRenderJobs.set(outputName, jobState);
 
   try {
     if (req.socket) req.socket.setTimeout(0);
@@ -324,8 +394,12 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
     });
 
     let lastProgressTime = 0;
-    engine.on('status', data => sendSSE('status', data));
+    engine.on('status', data => {
+      jobState.phase = data.message || data.phase;
+      sendSSE('status', data);
+    });
     engine.on('progress', data => {
+      Object.assign(jobState, data, { status: 'rendering' });
       const now = Date.now();
       if (data.percent === 100 || (now - lastProgressTime) >= 120) {
         lastProgressTime = now;
@@ -352,6 +426,14 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
       metrics
     });
 
+    jobState.status = 'completed';
+    jobState.percent = 100;
+    jobState.record = record;
+    jobState.url = `/output/${outputName}`;
+    jobState.metrics = metrics;
+    jobState.probe = probe;
+    setTimeout(() => activeRenderJobs.delete(outputName), 600000);
+
     sendSSE('complete', {
       success: true,
       filename: outputName,
@@ -362,6 +444,9 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
     });
   } catch (err) {
     console.error('[Render Job Exception]:', err);
+    jobState.status = 'error';
+    jobState.error = err.message;
+    setTimeout(() => activeRenderJobs.delete(outputName), 60000);
     sendSSE('error', { error: err.message });
   } finally {
     clearInterval(heartbeat);

@@ -3667,6 +3667,10 @@ const htmlContent = `<!DOCTYPE html>
         sub.textContent = 'Everything looks good. Your MP4 is ready to download.';
         back.textContent = 'Create another video';
       }
+
+      if (step === 1 || step === 2) {
+        if (typeof prewarmCloudEngine === 'function') prewarmCloudEngine();
+      }
     }
 
     function handleWsBack() {
@@ -3937,6 +3941,12 @@ const htmlContent = `<!DOCTYPE html>
     let bgPollInterval = null;
     let coldStartTimer = null;
 
+    function prewarmCloudEngine() {
+      try {
+        fetch(apiUrl('/api/status')).catch(() => {});
+      } catch (e) {}
+    }
+
     async function requestRenderWakeLock() {
       try {
         if ('wakeLock' in navigator && !renderWakeLock) {
@@ -3955,6 +3965,22 @@ const htmlContent = `<!DOCTYPE html>
 
     function startBgAudioKeepAlive() {
       try {
+        let el = document.getElementById('rfBgAudio');
+        if (!el) {
+          el = document.createElement('audio');
+          el.id = 'rfBgAudio';
+          el.loop = true;
+          el.setAttribute('playsinline', '');
+          el.style.display = 'none';
+          document.body.appendChild(el);
+        }
+        if (!el.src || !el.src.startsWith('data:audio/wav')) {
+          el.src = 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        }
+        el.play().catch(() => {});
+      } catch (e) {}
+
+      try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
         const ctx = new AudioCtx();
@@ -3972,6 +3998,13 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     function stopBgAudioKeepAlive() {
+      try {
+        const el = document.getElementById('rfBgAudio');
+        if (el) {
+          el.pause();
+          el.currentTime = 0;
+        }
+      } catch (e) {}
       if (bgAudioKeepAlive) {
         try {
           bgAudioKeepAlive.source.stop();
@@ -4050,25 +4083,55 @@ const htmlContent = `<!DOCTYPE html>
     function startBackgroundPollRecovery(targetFilename, startTime) {
       if (bgPollInterval) clearInterval(bgPollInterval);
       let pollCount = 0;
-      const maxPolls = 100;
+      const maxPolls = 150;
 
       bgPollInterval = setInterval(async () => {
         pollCount++;
         try {
+          // 1. Direct active render-status endpoint
+          if (targetFilename) {
+            const statusRes = await fetch(apiUrl('/api/render-status/' + encodeURIComponent(targetFilename)));
+            if (statusRes.ok) {
+              const statusData = await statusRes.json();
+              if (statusData.success && statusData.job) {
+                const job = statusData.job;
+                if (job.status === 'completed') {
+                  stopBackgroundPollRecovery();
+                  handleServerEvent('complete', {
+                    success: true,
+                    filename: job.filename,
+                    url: job.url || ('/output/' + job.filename),
+                    record: job.record,
+                    metrics: job.metrics,
+                    probe: job.probe
+                  });
+                  return;
+                } else if (job.status === 'rendering') {
+                  handleServerEvent('progress', job);
+                  return;
+                } else if (job.status === 'error') {
+                  stopBackgroundPollRecovery();
+                  handleServerEvent('error', { error: job.error || 'Server render failed' });
+                  return;
+                }
+              }
+            }
+          }
+
+          // 2. Fall back to completed history records
           const res = await fetch(apiUrl('/api/history?limit=10'));
           if (res.ok) {
             const data = await res.json();
             const records = data.records || [];
             const found = records.find(r => 
-              (targetFilename && r.filename === targetFilename) ||
-              (startTime && r.timestamp && r.timestamp >= startTime - 5000)
+              r.resolution !== 'Unknown' &&
+              r.videoCodec !== 'None' &&
+              ((targetFilename && r.filename === targetFilename) ||
+               (startTime && r.createdAt && r.createdAt >= startTime - 5000))
             );
 
             if (found) {
-              clearInterval(bgPollInterval);
-              bgPollInterval = null;
-              activeRenderFilename = null;
-              activeRenderStartTime = 0;
+              stopBackgroundPollRecovery();
               handleServerEvent('complete', {
                 success: true,
                 filename: found.filename,
@@ -4083,16 +4146,13 @@ const htmlContent = `<!DOCTYPE html>
         } catch (e) {}
 
         if (pollCount >= maxPolls) {
-          clearInterval(bgPollInterval);
-          bgPollInterval = null;
-          activeRenderFilename = null;
-          activeRenderStartTime = 0;
+          stopBackgroundPollRecovery();
           releaseRenderWakeLock();
           stopBgAudioKeepAlive();
           $('hudPhaseText').textContent = 'Render completed or timed out. Check History tab.';
           resetRenderBtns();
         }
-      }, 3000);
+      }, 2000);
     }
 
     function stopBackgroundPollRecovery() {
@@ -4102,6 +4162,30 @@ const htmlContent = `<!DOCTYPE html>
       }
       activeRenderFilename = null;
       activeRenderStartTime = 0;
+      try { localStorage.removeItem('rf_active_render_job'); } catch (e) {}
+    }
+
+    function checkActiveJobRecovery() {
+      try {
+        const saved = localStorage.getItem('rf_active_render_job');
+        if (!saved) return;
+        const job = JSON.parse(saved);
+        if (!job || !job.startTime) return;
+        if (Date.now() - job.startTime < 15 * 60 * 1000) {
+          $('progressHud').style.display = 'block';
+          $('hudPhaseText').textContent = 'Syncing cloud render progress...';
+          const btn = $('btnStudioBake');
+          if (btn) {
+            btn.textContent = 'Rendering...';
+            btn.disabled = true;
+          }
+          activeRenderFilename = job.filename;
+          activeRenderStartTime = job.startTime;
+          startBackgroundPollRecovery(job.filename, job.startTime);
+        } else {
+          localStorage.removeItem('rf_active_render_job');
+        }
+      } catch (e) {}
     }
 
     // SERVER RENDER VIA SSE
@@ -4125,7 +4209,7 @@ const htmlContent = `<!DOCTYPE html>
       $('progressHud').style.display = 'block';
       $('hudPct').textContent = '0%';
       $('hudBarFill').style.width = '0%';
-      $('hudPhaseText').textContent = 'Connecting to Hardware GPU Engine...';
+      $('hudPhaseText').textContent = 'Connecting to Hardware GPU Pipeline...';
 
       await requestNotificationPermission();
       await requestRenderWakeLock();
@@ -4133,10 +4217,21 @@ const htmlContent = `<!DOCTYPE html>
       activeRenderStartTime = Date.now();
       activeRenderFilename = null;
 
+      try {
+        localStorage.setItem('rf_active_render_job', JSON.stringify({
+          filename: null,
+          startTime: activeRenderStartTime,
+          fps,
+          resMode,
+          duration,
+          status: 'rendering'
+        }));
+      } catch (e) {}
+
       if (coldStartTimer) clearTimeout(coldStartTimer);
       coldStartTimer = setTimeout(() => {
         if ($('hudPct') && $('hudPct').textContent === '0%') {
-          $('hudPhaseText').textContent = 'Allocating Cloud ZeroGPU replica (Cold start 15–30s)...';
+          $('hudPhaseText').textContent = 'Allocating Cloud GPU Acceleration Node (Cold boot 10–20s)...';
         }
       }, 4000);
 
@@ -4213,7 +4308,14 @@ const htmlContent = `<!DOCTYPE html>
         coldStartTimer = null;
       }
       if (event === 'init') {
-        if (data && data.filename) activeRenderFilename = data.filename;
+        if (data && data.filename) {
+          activeRenderFilename = data.filename;
+          try {
+            const cur = JSON.parse(localStorage.getItem('rf_active_render_job') || '{}');
+            cur.filename = data.filename;
+            localStorage.setItem('rf_active_render_job', JSON.stringify(cur));
+          } catch (e) {}
+        }
         return;
       }
 
@@ -4250,6 +4352,7 @@ const htmlContent = `<!DOCTYPE html>
         stopBgAudioKeepAlive();
         releaseRenderWakeLock();
         resetRenderBtns();
+        try { localStorage.removeItem('rf_active_render_job'); } catch (e) {}
 
         const exactBytes = data.record?.bytes || data.metrics?.mp4SizeBytes || 0;
         const sizeFormatted = exactBytes >= 1024 * 1024 
@@ -4352,9 +4455,7 @@ const htmlContent = `<!DOCTYPE html>
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           loadHistory();
-          if (activeRenderFilename || activeRenderStartTime) {
-            startBackgroundPollRecovery(activeRenderFilename, activeRenderStartTime);
-          }
+          checkActiveJobRecovery();
         }
       });
     }
@@ -4853,6 +4954,8 @@ const htmlContent = `<!DOCTYPE html>
       setupDropzone();
       await detectRuntimeMode();
       await loadHistory();
+      if (typeof prewarmCloudEngine === 'function') prewarmCloudEngine();
+      if (typeof checkActiveJobRecovery === 'function') checkActiveJobRecovery();
       // Start clean without dummy PainForge video
     });
   </script>

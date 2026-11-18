@@ -142,11 +142,12 @@ async def proxy_to_node(request: Request, path_with_query: str):
 def root_status():
     return {
         "status": "online",
-        "service": "RenderFlow Cloud Engine",
-        "hardware": "Hugging Face ZeroGPU",
+        "service": "RenderFlow Cloud Acceleration Engine",
+        "hardware": "GPU Hardware NVENC / Direct3D11 Pipeline",
         "routes": {
             "render_html": "/api/render-html",
             "render_code": "/api/render-code-sse",
+            "render_status": "/api/render-status",
             "history": "/api/history",
             "status": "/api/status",
             "node_log": "/api/node-log"

@@ -65,7 +65,12 @@ class RendererEngine extends EventEmitter {
       '--disable-dev-shm-usage',
       '--allow-file-access-from-files',
       '--autoplay-policy=no-user-gesture-required',
-      '--window-size=1920,1920'
+      '--window-size=1920,1920',
+      '--disable-breakpad',
+      '--disable-extensions',
+      '--disable-default-apps',
+      '--mute-audio',
+      '--disable-features=Translate,OptimizationHints,MediaRouter'
     ];
 
     if (useHardwareGpu) {
@@ -220,14 +225,18 @@ class RendererEngine extends EventEmitter {
     if (height % 2 !== 0) height++;
 
     let duration = renderOptions.duration || pageMeta.dur;
-    if (!renderOptions.duration || renderOptions.duration === this.defaultDuration) {
-      try {
-        const fileContent = fs.readFileSync(targetHtmlPath, 'utf8');
-        const dMatch = fileContent.match(/(?:(?:window\.)?(?:TOTAL_DURATION|DURATION|ANIM_DURATION|VIDEO_DURATION)|(?:\b|[,;\s])D)\s*=\s*(\d+(?:\.\d+)?)/i);
-        if (dMatch && parseFloat(dMatch[1]) > 0) {
-          duration = parseFloat(dMatch[1]);
-        }
-      } catch (e) {}
+    if (!renderOptions.duration) {
+      if (pageMeta.dur && pageMeta.dur !== this.defaultDuration) {
+        duration = pageMeta.dur;
+      } else {
+        try {
+          const fileContent = fs.readFileSync(targetHtmlPath, 'utf8');
+          const dMatch = fileContent.match(/(?:(?:window\.)?(?:TOTAL_DURATION|DURATION|ANIM_DURATION|VIDEO_DURATION)|(?:\b|[,;\s])D)\s*=\s*(\d+(?:\.\d+)?)/i);
+          if (dMatch && parseFloat(dMatch[1]) > 0) {
+            duration = parseFloat(dMatch[1]);
+          }
+        } catch (e) {}
+      }
     }
     const totalFrames = Math.round(duration * fps);
 
@@ -258,6 +267,7 @@ class RendererEngine extends EventEmitter {
       message: 'Extracting audio channels (Web Audio / PCM / Media Elements)...'
     });
 
+    const tempMp4Path = `${outputMp4Path}.tmp.mp4`;
     const tempAudioWav = outputMp4Path.replace(/\.mp4$/i, '-audio.wav');
     const audioResult = await this.audioCapturer.captureAudio(page, targetHtmlPath, tempAudioWav, duration);
 
@@ -276,7 +286,7 @@ class RendererEngine extends EventEmitter {
       '-c:a', 'aac',
       '-b:a', '192k',
       '-shortest',
-      outputMp4Path
+      tempMp4Path
     ];
 
     const ffmpegProcess = spawn(FFMPEG_PATH, ffmpegArgs, { stdio: ['pipe', 'pipe', 'pipe'] });
@@ -315,7 +325,7 @@ class RendererEngine extends EventEmitter {
 
       const screenshot = await cdpClient.send('Page.captureScreenshot', {
         format: 'jpeg',
-        quality: 82,
+        quality: 80,
         optimizeForSpeed: true
       });
 
@@ -357,10 +367,19 @@ class RendererEngine extends EventEmitter {
       ffmpegProcess.on('error', reject);
     });
 
+    // Atomically promote completed file to destination filename
+    if (fs.existsSync(tempMp4Path)) {
+      if (fs.existsSync(outputMp4Path)) {
+        try { fs.unlinkSync(outputMp4Path); } catch (e) {}
+      }
+      fs.renameSync(tempMp4Path, outputMp4Path);
+    }
+
     await browser.close();
 
     // Clean up temporary compiled HTML or audio WAV
     try { if (fs.existsSync(tempAudioWav)) fs.unlinkSync(tempAudioWav); } catch(e) {}
+    try { if (fs.existsSync(tempMp4Path)) fs.unlinkSync(tempMp4Path); } catch(e) {}
     try { if (tempCompiledHtml && fs.existsSync(tempCompiledHtml)) fs.unlinkSync(tempCompiledHtml); } catch(e) {}
 
     const totalRenderSec = (Date.now() - startTime) / 1000;

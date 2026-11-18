@@ -44,14 +44,24 @@ class HistoryStore {
   syncFromDisk() {
     const existing = this.readRecords();
     const existingMap = new Map(existing.map(r => [r.filename, r]));
-    const files = fs.readdirSync(OUTPUT_DIR).filter(f => f.endsWith('.mp4'));
+    const files = fs.readdirSync(OUTPUT_DIR).filter(f => 
+      f.endsWith('.mp4') && 
+      !f.endsWith('.tmp.mp4') && 
+      !f.includes('.tmp.') &&
+      !f.endsWith('.part')
+    );
 
     let changed = false;
     for (const f of files) {
       if (!existingMap.has(f)) {
         const fullPath = path.join(OUTPUT_DIR, f);
         const stat = fs.statSync(fullPath);
+        if (stat.size < 50000) continue; // Skip incomplete or empty files
+
         const probe = probeMedia(fullPath);
+        if (!probe.videoCodec || probe.videoCodec === 'None' || probe.resolution === 'Unknown') {
+          continue; // In-progress render or corrupt stream
+        }
 
         const record = {
           id: 'rec_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
@@ -73,8 +83,12 @@ class HistoryStore {
       }
     }
 
-    // Filter out files that no longer exist on disk
-    const valid = existing.filter(r => fs.existsSync(path.join(OUTPUT_DIR, r.filename)));
+    // Filter out files that no longer exist on disk or are corrupted/incomplete
+    const valid = existing.filter(r => 
+      fs.existsSync(path.join(OUTPUT_DIR, r.filename)) &&
+      r.resolution !== 'Unknown' &&
+      r.videoCodec !== 'None'
+    );
     if (valid.length !== existing.length || changed) {
       this.writeRecords(valid);
     }
