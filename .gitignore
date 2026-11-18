@@ -11,12 +11,17 @@ Thumbs.db
 # Rendered Video Outputs (Exclude large binary media from git)
 output/*.mp4
 output/*.wav
-output/latest-master.json
+output/*.png
+output/*.json
+!output/history.json
 public/output/*.mp4
 
 # Uploads & Scratch Test Runs
 uploads/*.png
 uploads/*.html
 uploads/*.md
+uploads/audit/
+tmp-downloads*/
+tmp-*/
 
 ux_package/

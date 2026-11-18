@@ -2437,7 +2437,7 @@ const htmlContent = `<!DOCTYPE html>
 
     <!-- VIEW 1: HOME -->
     <section id="viewLandingTab" class="tab-view active page shell">
-      <section class="home-hero">
+      <section id="landingHeroSection" class="home-hero">
         <div class="hero-left">
           <h1>
             Transform <span class="hero-magic-word html-word">HTML</span> &amp; <span class="hero-magic-word md-word">Markdown</span> into high-impact <span class="hero-magic-word video-word">videos.</span>
@@ -2446,9 +2446,13 @@ const htmlContent = `<!DOCTYPE html>
             Drop in your <span class="code-badge-inline badge-html-inline">.html</span> animation or <span class="code-badge-inline badge-md-inline">.md</span> presentation. Preview in real time with hardware-accelerated playback and render master 1080p MP4s in seconds.
           </p>
           <div class="hero-actions">
-            <button class="btn primary large" onclick="startNewVideo()">
+            <button id="btnHeroBake" class="btn primary large" onclick="startNewVideo()">
               Create a video
               <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </button>
+            <button id="btnViewLive" class="btn secondary large" onclick="loadSampleAndPreview()">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Try live sample
             </button>
             <button class="btn secondary large" onclick="switchNav('history')">
               <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -2833,7 +2837,7 @@ const htmlContent = `<!DOCTYPE html>
 
             <div class="preview-stage">
               <div id="viewportWrap" class="vid-preview vertical">
-                <iframe id="studioPreviewIframe" sandbox="allow-scripts allow-same-origin" src="about:blank" title="Live Preview"></iframe>
+                <iframe id="studioPreviewIframe" src="about:blank" title="Live Preview"></iframe>
               </div>
             </div>
 
@@ -3124,7 +3128,7 @@ const htmlContent = `<!DOCTYPE html>
   <!-- TOAST NOTIFICATIONS -->
   <div class="toast" id="toast"></div>
 
-  <!-- PRESERVED INTEGRITY CONTAINER (Keeps all 89 legacy IDs for script/test compatibility) -->
+  <!-- PRESERVED INTEGRITY CONTAINER (Keeps legacy IDs for script/test compatibility) -->
   <div id="preservedIntegrityElements" style="display:none;" aria-hidden="true">
     <div id="authScreen">
       <form id="authForm">
@@ -3133,15 +3137,12 @@ const htmlContent = `<!DOCTYPE html>
         <div id="authSystemState"></div>
         <div id="authFormTitle"></div>
         <div id="authFormSub"></div>
-        <input id="authEmail" type="text" value="user@renderflow.local">
-        <input id="authPassword" type="password" value="password123">
+        <input id="authEmail" type="text" value="user@renderflow.local" autocomplete="username">
+        <input id="authPassword" type="password" value="password123" autocomplete="current-password">
         <button id="btnAuthAction" type="submit"></button>
         <button id="btnTabSignIn" type="button"></button>
         <button id="btnTabSignUp" type="button"></button>
       </form>
-    </div>
-    <div id="landingHeroSection">
-      <button id="btnHeroBake" type="button"></button>
     </div>
     <div id="chipHeaderStatus"></div>
     <div id="formatDropdownMenu"></div>
@@ -3155,7 +3156,6 @@ const htmlContent = `<!DOCTYPE html>
     <div id="subTabFile"></div>
     <div id="subTabCode"></div>
     <div id="studioModeFile"></div>
-    <div id="btnViewLive"></div>
     <div id="btnViewVideo"></div>
     <div id="resultPanel"></div>
     <input type="file" id="nativeFileInputHtml">
@@ -3228,6 +3228,19 @@ const htmlContent = `<!DOCTYPE html>
           tx.oncomplete = () => resolve(true);
           tx.onerror = e => reject(e.target.error);
         });
+      },
+      async getVideo(id) {
+        try {
+          const db = await this.getDB();
+          return new Promise((resolve) => {
+            const tx = db.transaction('videos', 'readonly');
+            const req = tx.objectStore('videos').get(id);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+          });
+        } catch(e) {
+          return null;
+        }
       }
     };
 
@@ -3238,6 +3251,10 @@ const htmlContent = `<!DOCTYPE html>
     let currentResultUrl = '';
     let currentResultFilename = 'renderflow-export.mp4';
     let currentResultBlob = null;
+    window.currentResultUrl = '';
+    window.currentResultFilename = 'renderflow-export.mp4';
+    window.currentResultBlob = null;
+    const blobCache = new Map();
 
     function apiUrl(endpoint) {
       return endpoint;
@@ -3248,13 +3265,34 @@ const htmlContent = `<!DOCTYPE html>
       return downloadFileFromUrl(e, currentResultUrl, currentResultFilename);
     }
 
-    async function downloadFileFromUrl(e, url, filename) {
-      const targetFilename = filename || currentResultFilename || 'renderflow-export.mp4';
+    async function downloadFileFromUrl(e, url, filename, recordId) {
+      if (e && e.preventDefault) e.preventDefault();
+      const targetFilename = (filename && filename.endsWith('.mp4')) 
+        ? filename 
+        : (filename ? filename + '.mp4' : (currentResultFilename || 'renderflow-export.mp4'));
       
-      // 1. If in-memory binary Blob is already cached, trigger instant zero-latency download
-      if (currentResultBlob) {
-        if (e && e.preventDefault) e.preventDefault();
-        const blobUrl = URL.createObjectURL(currentResultBlob);
+      const targetUrl = url || currentResultUrl;
+
+      // 1. Check for cached in-memory binary Blob for instant zero-latency save
+      let targetBlob = null;
+      if (!url || url === currentResultUrl) {
+        targetBlob = currentResultBlob;
+      }
+      if (!targetBlob && recordId) {
+        targetBlob = blobCache.get(recordId);
+        if (!targetBlob) {
+          try {
+            const rec = await JaneVaultDB.getVideo(recordId);
+            if (rec && rec.blob) targetBlob = rec.blob;
+          } catch(err) {}
+        }
+      }
+      if (!targetBlob && targetUrl) {
+        targetBlob = blobCache.get(targetUrl) || blobCache.get(targetFilename);
+      }
+
+      if (targetBlob) {
+        const blobUrl = URL.createObjectURL(targetBlob);
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = blobUrl;
@@ -3269,9 +3307,7 @@ const htmlContent = `<!DOCTYPE html>
         return;
       }
 
-      const targetUrl = url || currentResultUrl;
       if (!targetUrl) {
-        if (e && e.preventDefault) e.preventDefault();
         showToast('No video ready yet. Please click Create MP4 video first.');
         return;
       }
@@ -3287,9 +3323,9 @@ const htmlContent = `<!DOCTYPE html>
 
       showToast('Downloading MP4 video...');
 
-      // Update button href directly so native click handles it
+      // Update button href directly if on step 3
       const btn = $('btnDownloadResult');
-      if (btn) {
+      if (btn && (!url || url === currentResultUrl)) {
         btn.href = downloadParamUrl;
         btn.setAttribute('download', targetFilename);
       }
@@ -3309,8 +3345,14 @@ const htmlContent = `<!DOCTYPE html>
         .then(r => r.ok ? r.blob() : null)
         .then(b => {
           if (b && !b.type.includes('text') && !b.type.includes('html') && b.size > 1000) {
-            currentResultBlob = b;
-            if (btn) btn.href = URL.createObjectURL(b);
+            blobCache.set(downloadParamUrl, b);
+            blobCache.set(targetUrl, b);
+            if (recordId) blobCache.set(recordId, b);
+            blobCache.set(targetFilename, b);
+            if (btn && (!url || url === currentResultUrl)) {
+              currentResultBlob = b;
+              btn.href = URL.createObjectURL(b);
+            }
           }
         })
         .catch(() => {});
@@ -3803,6 +3845,9 @@ const htmlContent = `<!DOCTYPE html>
         currentResultUrl = finalUrl;
         currentResultFilename = data.filename || 'export.mp4';
         currentResultBlob = null;
+        window.currentResultUrl = finalUrl;
+        window.currentResultFilename = data.filename || 'export.mp4';
+        window.currentResultBlob = null;
 
         const v = $('resultVideo');
         v.src = finalUrl;
@@ -3882,7 +3927,13 @@ const htmlContent = `<!DOCTYPE html>
       bakeBtn.onclick = cancelCurrentRender;
 
       $('progressHud').style.display = 'block';
-      $('hudPhaseText').textContent = 'In-Browser WebCodecs Render...';
+      $('hudPct').textContent = '0%';
+      $('hudBarFill').style.width = '0%';
+      $('hudPhaseText').textContent = 'Initializing in-browser hardware video encoder...';
+      if ($('hudFrameVal')) $('hudFrameVal').textContent = '0 / --';
+      if ($('hudFpsVal')) $('hudFpsVal').textContent = '-- FPS';
+      if ($('hudMsVal')) $('hudMsVal').textContent = '-- ms';
+      if ($('hudEtaVal')) $('hudEtaVal').textContent = '-- s';
 
       try {
         const code = $('codeEditorStudio').value;
@@ -3894,17 +3945,24 @@ const htmlContent = `<!DOCTYPE html>
 
         const userDur = parseFloat($('cfgDuration').value);
         const duration = (!isNaN(userDur) && userDur > 0) ? userDur : (extractDurationFromCode(code) || 5);
-        const fps = Math.min(30, parseInt($('cfgFps').value, 10) || 30);
+        const fps = Math.min(60, parseInt($('cfgFps').value, 10) || 30);
 
         const engine = new ClientRenderEngine({
           width, height, fps, duration,
+          onStatus: s => {
+            if (s && s.message && $('hudPhaseText')) {
+              $('hudPhaseText').textContent = s.message;
+            }
+          },
           onProgress: p => {
             const rawPct = p.pct !== undefined ? p.pct : (p.frame && p.totalFrames ? Math.round((p.frame / p.totalFrames) * 100) : 0);
             const pct = Math.min(100, Math.max(0, Math.round(rawPct)));
             $('hudPct').textContent = pct + '%';
             $('hudBarFill').style.width = pct + '%';
-            $('hudFrameVal').textContent = p.frame + ' / ' + p.totalFrames;
-            $('hudFpsVal').textContent = (p.fps || '--') + ' FPS';
+            if ($('hudFrameVal')) $('hudFrameVal').textContent = p.frame + ' / ' + p.totalFrames;
+            if ($('hudFpsVal')) $('hudFpsVal').textContent = (p.fps || '--') + ' FPS';
+            if ($('hudMsVal')) $('hudMsVal').textContent = (p.avgFrameMs || '--') + ' ms';
+            if ($('hudEtaVal')) $('hudEtaVal').textContent = (p.etaSeconds !== undefined ? p.etaSeconds : '--') + ' s';
             $('hudPhaseText').textContent = 'Encoding Frames In-Browser (' + pct + '%)...';
           }
         });
@@ -3944,9 +4002,17 @@ const htmlContent = `<!DOCTYPE html>
         currentResultBlob = result.blob;
         currentResultUrl = blobUrl;
         currentResultFilename = record.filename;
+        window.currentResultBlob = result.blob;
+        window.currentResultUrl = blobUrl;
+        window.currentResultFilename = record.filename;
 
         $('btnDownloadResult').href = blobUrl;
         $('btnDownloadResult').download = record.filename;
+
+        if ($('hudPhaseText')) $('hudPhaseText').textContent = 'Render Complete!';
+        if ($('hudPct')) $('hudPct').textContent = '100%';
+        if ($('hudBarFill')) $('hudBarFill').style.width = '100%';
+        if ($('hudEtaVal')) $('hudEtaVal').textContent = '0 s';
 
         resetRenderBtns();
         setCreateStep(3);
@@ -4071,7 +4137,12 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     async function loadHistory() {
-      let records = [];
+      let serverRecords = [];
+      let localRecords = [];
+
+      try {
+        localRecords = await JaneVaultDB.getAllVideos();
+      } catch (e) {}
 
       if (currentAppMode === 'MODE_B') {
         try {
@@ -4083,17 +4154,72 @@ const htmlContent = `<!DOCTYPE html>
           const res = await fetch(apiUrl('/api/history?' + query.toString()));
           if (res.ok) {
             const data = await res.json();
-            records = data.records || [];
+            serverRecords = data.records || [];
           }
         } catch (e) {}
       }
 
-      if (!records.length) {
-        records = await JaneVaultDB.getAllVideos();
+      // Merge records uniquely by id and filename
+      const seenIds = new Set();
+      const combined = [];
+
+      // Add local client records (in-browser WebCodecs renders)
+      for (const r of localRecords) {
+        const key = r.id || r.filename;
+        if (key && !seenIds.has(key)) {
+          seenIds.add(key);
+          if (r.id) seenIds.add(r.id);
+          if (r.filename) seenIds.add(r.filename);
+          if (r.blob) {
+            blobCache.set(r.id, r.blob);
+            if (r.filename) blobCache.set(r.filename, r.blob);
+            if (!r.url || !r.url.startsWith('blob:')) {
+              try { r.url = URL.createObjectURL(r.blob); } catch(e) {}
+            }
+          }
+          combined.push(r);
+        }
       }
 
-      renderHistoryGrid(records);
-      updateProductionShowcase(records);
+      // Add server records
+      for (const r of serverRecords) {
+        const key = r.id || r.filename;
+        if (key && !seenIds.has(key)) {
+          seenIds.add(key);
+          if (r.id) seenIds.add(r.id);
+          if (r.filename) seenIds.add(r.filename);
+          combined.push(r);
+        }
+      }
+
+      const now = Date.now();
+      const filtered = combined.filter(r => {
+        if (historySearchQuery) {
+          const q = historySearchQuery.toLowerCase();
+          const match = (r.filename && r.filename.toLowerCase().includes(q)) ||
+                        (r.originalName && r.originalName.toLowerCase().includes(q));
+          if (!match) return false;
+        }
+        if (historyFilter === 'today') {
+          const startOfToday = new Date().setHours(0, 0, 0, 0);
+          return (r.createdAt || 0) >= startOfToday;
+        } else if (historyFilter === 'week') {
+          return (r.createdAt || 0) >= (now - 7 * 86400000);
+        } else if (historyFilter === 'month') {
+          return (r.createdAt || 0) >= (now - 30 * 86400000);
+        }
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        if (historySortOrder === 'oldest') {
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        }
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
+
+      renderHistoryGrid(filtered);
+      updateProductionShowcase(filtered);
     }
 
     function cleanTitle(str) {
@@ -4113,7 +4239,7 @@ const htmlContent = `<!DOCTYPE html>
       }
     }
 
-    function openHistoryVideo(url, name, sizeStr, dur, res) {
+    function openHistoryVideo(url, name, sizeStr, dur, res, recordId) {
       const finalUrl = (url && (url.startsWith('http') || url.startsWith('blob:'))) ? url : apiUrl(url || '');
       const downloadUrl = finalUrl.includes('?') ? (finalUrl + '&download=1') : (finalUrl + '?download=1');
       currentResultUrl = finalUrl;
@@ -4133,7 +4259,23 @@ const htmlContent = `<!DOCTYPE html>
       btnDl.setAttribute('download', currentResultFilename);
       btnDl.setAttribute('target', '_blank');
 
-      if (finalUrl) {
+      if (recordId) {
+        let cached = blobCache.get(recordId);
+        if (cached) {
+          currentResultBlob = cached;
+          btnDl.href = URL.createObjectURL(cached);
+        } else {
+          JaneVaultDB.getVideo(recordId).then(rec => {
+            if (rec && rec.blob) {
+              currentResultBlob = rec.blob;
+              blobCache.set(recordId, rec.blob);
+              btnDl.href = URL.createObjectURL(rec.blob);
+            }
+          });
+        }
+      }
+
+      if (finalUrl && !currentResultBlob) {
         fetch(downloadUrl)
           .then(res => res.ok ? res.blob() : null)
           .then(blob => {
@@ -4192,8 +4334,8 @@ const htmlContent = `<!DOCTYPE html>
         return \`
           <div class="record" data-name="\${title.toLowerCase()}">
             <div class="record-title">
-              <div class="thumbnail" onclick="openHistoryVideo('\${targetUrl}', '\${title}', '\${sizeMb}', '\${dur}', '\${r.resolution || '1080p'}')">
-                <video src="\${targetUrl}#t=0.5" preload="metadata" muted playsinline onerror="this.style.display='none'"></video>
+              <div class="thumbnail" onmouseenter="try{const v=this.querySelector('video');if(v&&v.preload==='none'&&v.getAttribute('src')){v.preload='metadata';}}catch(e){}" onclick="openHistoryVideo('\${targetUrl}', '\${title}', '\${sizeMb}', '\${dur}', '\${r.resolution || '1080p'}', '\${r.id}')">
+                <video src="\${targetUrl}" preload="none" muted playsinline onerror="this.onerror=null;this.removeAttribute('src');this.style.display='none';"></video>
               </div>
               <div>
                 <strong>\${title}</strong>
@@ -4203,7 +4345,7 @@ const htmlContent = `<!DOCTYPE html>
             <div class="meta created">\${dateStr}</div>
             <div class="meta">\${r.resolution || '1080p'}</div>
             <div class="record-actions">
-              <a href="\${targetDlUrl}" class="btn secondary" download="\${safeFilename}" target="_blank" onclick="downloadFileFromUrl(event, '\${targetDlUrl}', '\${safeFilename}')">Download</a>
+              <a href="\${targetDlUrl}" class="btn secondary" download="\${safeFilename}" target="_blank" onclick="downloadFileFromUrl(event, '\${targetDlUrl}', '\${safeFilename}', '\${r.id}')">Download</a>
               <button class="btn-del" onclick="deleteHistoryRecord('\${r.id}')" title="Delete">✕</button>
             </div>
           </div>

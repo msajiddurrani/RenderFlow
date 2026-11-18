@@ -71,7 +71,7 @@ app.get(['/output/:filename', '/download/:filename'], (req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
     res.setHeader('Access-Control-Expose-Headers', '*');
     res.setHeader('Accept-Ranges', 'bytes');
-    const isDownload = req.path.startsWith('/download') || req.query.download === '1' || !req.headers.range;
+    const isDownload = req.path.startsWith('/download') || req.query.download === '1';
     if (isDownload) {
       res.setHeader('Content-Disposition', `attachment; filename="${req.params.filename}"`);
     } else {

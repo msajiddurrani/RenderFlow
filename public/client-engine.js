@@ -48,9 +48,11 @@ class ClientRenderEngine {
    * Render an HTML animation directly to MP4 in memory using WebCodecs (Untainted Canvas)
    */
   async renderHtmlToMp4(htmlCode, options = {}) {
-    const fps = Math.min(30, options.fps || this.fps || 30);
-    const width = options.width || this.width || 1920;
-    const height = options.height || this.height || 1080;
+    const fps = Math.min(60, options.fps || this.fps || 30);
+    const rawWidth = options.width || this.width || 1920;
+    const rawHeight = options.height || this.height || 1080;
+    const width = rawWidth % 2 === 0 ? rawWidth : rawWidth - 1;
+    const height = rawHeight % 2 === 0 ? rawHeight : rawHeight - 1;
     const duration = options.duration || this.duration || 5;
     const totalFrames = Math.max(1, Math.round(duration * fps));
     const isVertical = height > width;
@@ -323,7 +325,8 @@ class ClientRenderEngine {
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold ' + (isVertical ? '56px' : '64px') + ' sans-serif';
     const maxTitleWidth = width - (padX * 2);
-    const titleLines = this.wrapText(ctx, section.title, maxTitleWidth);
+    const secTitle = (section && section.title) ? section.title : 'RenderFlow Motion';
+    const titleLines = this.wrapText(ctx, secTitle, maxTitleWidth);
     titleLines.forEach(tl => {
       ctx.fillText(tl, padX, currY);
       currY += isVertical ? 66 : 74;
@@ -335,7 +338,7 @@ class ClientRenderEngine {
     ctx.font = (isVertical ? '28px' : '32px') + ' sans-serif';
     ctx.fillStyle = '#CBD5E1';
 
-    (section.items || []).slice(0, 4).forEach(item => {
+    (section && section.items ? section.items : []).slice(0, 4).forEach(item => {
       ctx.fillStyle = '#6366F1';
       ctx.beginPath();
       ctx.arc(padX + 10, currY - 10, 5, 0, Math.PI * 2);
@@ -367,16 +370,24 @@ class ClientRenderEngine {
    * Render a Markdown slide deck directly to MP4 in memory
    */
   async renderMarkdownToMp4(markdownText, options = {}) {
-    const fps = options.fps || this.fps || 30;
-    const width = options.width || this.width || 1920;
-    const height = options.height || this.height || 1080;
-    const secondsPerSlide = options.secondsPerSlide || 4;
+    const fps = Math.min(60, options.fps || this.fps || 30);
+    const rawWidth = options.width || this.width || 1920;
+    const rawHeight = options.height || this.height || 1080;
+    const width = rawWidth % 2 === 0 ? rawWidth : rawWidth - 1;
+    const height = rawHeight % 2 === 0 ? rawHeight : rawHeight - 1;
 
-    const rawSlides = markdownText.split(/\n\s*---\s*\n/).map(s => s.trim()).filter(Boolean);
-    const slides = rawSlides.length > 0 ? rawSlides : [markdownText.trim()];
-    const totalSlides = slides.length;
-    const duration = totalSlides * secondsPerSlide;
-    const totalFrames = Math.round(duration * fps);
+    const rawSlides = (markdownText || '').split(/\n\s*---\s*\n/).map(s => s.trim()).filter(Boolean);
+    const slides = rawSlides.length > 0 ? rawSlides : [(markdownText || '').trim() || 'RenderFlow Presentation'];
+    const totalSlides = Math.max(1, slides.length);
+
+    let duration = options.duration || this.duration;
+    let secondsPerSlide = options.secondsPerSlide || 4;
+    if (duration && duration > 0) {
+      secondsPerSlide = duration / totalSlides;
+    } else {
+      duration = totalSlides * secondsPerSlide;
+    }
+    const totalFrames = Math.max(1, Math.round(duration * fps));
 
     this.onStatus({ phase: 'init', message: 'Initializing in-browser hardware video encoder...' });
 
@@ -388,12 +399,31 @@ class ClientRenderEngine {
 
     // 2. Synthesize audio buffer via OfflineAudioContext
     this.onStatus({ phase: 'audio', message: 'Synthesizing harmonic slide-transition audio chimes...' });
-    const audioBuffer = await this.synthesizeSlideAudio(totalSlides, secondsPerSlide, duration);
+    let audioBuffer = null;
+    try {
+      audioBuffer = await this.synthesizeSlideAudio(totalSlides, secondsPerSlide, duration);
+    } catch (e) {
+      console.warn('Audio synthesis warning:', e);
+    }
 
-    // 3. Initialize MP4 Muxer in browser memory
+    // 3. Probe AudioEncoder configuration support before initializing Muxer
+    let canEncodeAudio = false;
+    if (typeof window.AudioEncoder !== 'undefined' && audioBuffer) {
+      try {
+        const support = await window.AudioEncoder.isConfigSupported({
+          codec: 'mp4a.40.2',
+          numberOfChannels: 1,
+          sampleRate: 44100,
+          bitrate: 128_000
+        });
+        canEncodeAudio = !!(support && support.supported);
+      } catch (e) {
+        canEncodeAudio = false;
+      }
+    }
+
+    // 4. Initialize MP4 Muxer in browser memory
     const target = new window.Mp4Muxer.ArrayBufferTarget();
-    const hasAudioEncoder = typeof window.AudioEncoder !== 'undefined';
-
     const muxerOptions = {
       target,
       video: {
@@ -405,7 +435,7 @@ class ClientRenderEngine {
       firstTimestampBehavior: 'offset'
     };
 
-    if (hasAudioEncoder && audioBuffer) {
+    if (canEncodeAudio) {
       muxerOptions.audio = {
         codec: 'aac',
         numberOfChannels: 1,
@@ -415,7 +445,7 @@ class ClientRenderEngine {
 
     const muxer = new window.Mp4Muxer.Muxer(muxerOptions);
 
-    // 4. Configure WebCodecs VideoEncoder (Hardware Accelerated)
+    // 5. Configure WebCodecs VideoEncoder (Hardware Accelerated)
     let encoderError = null;
     const videoEncoder = new window.VideoEncoder({
       output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
@@ -436,9 +466,9 @@ class ClientRenderEngine {
       hardwareAcceleration: 'prefer-hardware'
     });
 
-    // 5. Configure AudioEncoder if available
+    // 6. Configure AudioEncoder if available
     let audioEncoder = null;
-    if (hasAudioEncoder && audioBuffer) {
+    if (canEncodeAudio && audioBuffer) {
       try {
         audioEncoder = new window.AudioEncoder({
           output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
@@ -456,32 +486,36 @@ class ClientRenderEngine {
       }
     }
 
-    // 6. Encode Audio Chunks
+    // 7. Encode Audio Chunks
     if (audioEncoder && audioBuffer) {
-      const channelData = audioBuffer.getChannelData(0);
-      const chunkSize = 1024;
-      const numChunks = Math.ceil(channelData.length / chunkSize);
+      try {
+        const channelData = audioBuffer.getChannelData(0);
+        const chunkSize = 1024;
+        const numChunks = Math.ceil(channelData.length / chunkSize);
 
-      for (let c = 0; c < numChunks; c++) {
-        const start = c * chunkSize;
-        const end = Math.min(start + chunkSize, channelData.length);
-        const pcmSub = channelData.subarray(start, end);
-        const floatData = new Float32Array(pcmSub.length);
-        floatData.set(pcmSub);
+        for (let c = 0; c < numChunks; c++) {
+          const start = c * chunkSize;
+          const end = Math.min(start + chunkSize, channelData.length);
+          const pcmSub = channelData.subarray(start, end);
+          const floatData = new Float32Array(pcmSub.length);
+          floatData.set(pcmSub);
 
-        const audioData = new window.AudioData({
-          format: 'f32-planar',
-          sampleRate: 44100,
-          numberOfFrames: floatData.length,
-          numberOfChannels: 1,
-          timestamp: Math.round((start / 44100) * 1_000_000),
-          data: floatData
-        });
+          const audioData = new window.AudioData({
+            format: 'f32-planar',
+            sampleRate: 44100,
+            numberOfFrames: floatData.length,
+            numberOfChannels: 1,
+            timestamp: Math.round((start / 44100) * 1_000_000),
+            data: floatData
+          });
 
-        audioEncoder.encode(audioData);
-        audioData.close();
+          audioEncoder.encode(audioData);
+          audioData.close();
+        }
+        await audioEncoder.flush();
+      } catch (e) {
+        console.warn('Audio encoding skipped:', e);
       }
-      await audioEncoder.flush();
     }
 
     // 7. Step through animation frames and encode
@@ -624,7 +658,7 @@ class ClientRenderEngine {
     }
 
     // Parse slide lines
-    const lines = slideText.split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = String(slideText || '').split('\n').map(l => l.trim()).filter(Boolean);
     let title = lines[0] || 'RenderFlow Presentation';
     const bodyLines = lines.slice(1);
 
@@ -662,6 +696,7 @@ class ClientRenderEngine {
 
     // Render Title
     if (title.startsWith('#')) title = title.replace(/^#+\s*/, '');
+    title = title.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/`([^`]+)`/g, '$1');
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold ' + (isVertical ? '56px' : '64px') + ' sans-serif';
     
@@ -685,6 +720,7 @@ class ClientRenderEngine {
         isBullet = true;
         text = text.substring(2);
       }
+      text = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/`([^`]+)`/g, '$1');
 
       if (isBullet) {
         ctx.fillStyle = '#6366F1';
