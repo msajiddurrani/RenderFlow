@@ -3935,6 +3935,7 @@ const htmlContent = `<!DOCTYPE html>
     let activeRenderFilename = null;
     let activeRenderStartTime = 0;
     let bgPollInterval = null;
+    let coldStartTimer = null;
 
     async function requestRenderWakeLock() {
       try {
@@ -4132,6 +4133,13 @@ const htmlContent = `<!DOCTYPE html>
       activeRenderStartTime = Date.now();
       activeRenderFilename = null;
 
+      if (coldStartTimer) clearTimeout(coldStartTimer);
+      coldStartTimer = setTimeout(() => {
+        if ($('hudPct') && $('hudPct').textContent === '0%') {
+          $('hudPhaseText').textContent = 'Allocating Cloud ZeroGPU replica (Cold start 15–30s)...';
+        }
+      }, 4000);
+
       try {
         const renderUrl = apiUrl('/api/render-code-sse');
         const isStaticHost = !serverBaseUrl && !cloudBackendUrl && (renderUrl.startsWith('/') || (typeof window !== 'undefined' && renderUrl.startsWith(window.location.origin)));
@@ -4200,6 +4208,10 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     function handleServerEvent(event, data) {
+      if (coldStartTimer) {
+        clearTimeout(coldStartTimer);
+        coldStartTimer = null;
+      }
       if (event === 'init') {
         if (data && data.filename) activeRenderFilename = data.filename;
         return;
@@ -4320,6 +4332,10 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     function resetRenderBtns() {
+      if (coldStartTimer) {
+        clearTimeout(coldStartTimer);
+        coldStartTimer = null;
+      }
       releaseRenderWakeLock();
       stopBgAudioKeepAlive();
       stopBackgroundPollRecovery();

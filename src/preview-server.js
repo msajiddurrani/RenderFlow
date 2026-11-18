@@ -285,11 +285,13 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
     'Connection': 'keep-alive',
     'X-Accel-Buffering': 'no'
   });
+  if (typeof res.flushHeaders === 'function') res.flushHeaders();
 
   const sendSSE = (event, data) => {
     if (res.writableEnded || res.destroyed) return;
     try {
       res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+      if (typeof res.flush === 'function') res.flush();
     } catch (e) {}
   };
 
@@ -321,8 +323,15 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
       useGpu
     });
 
+    let lastProgressTime = 0;
     engine.on('status', data => sendSSE('status', data));
-    engine.on('progress', data => sendSSE('progress', data));
+    engine.on('progress', data => {
+      const now = Date.now();
+      if (data.percent === 100 || (now - lastProgressTime) >= 120) {
+        lastProgressTime = now;
+        sendSSE('progress', data);
+      }
+    });
 
     const metrics = await engine.renderHtmlToMp4(inputPath, outputPath, {
       width,

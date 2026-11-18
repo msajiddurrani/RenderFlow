@@ -110,10 +110,16 @@ async def proxy_to_node(request: Request, path_with_query: str):
             finally:
                 await resp.aclose()
 
+        media_type = "text/event-stream" if "text/event-stream" in resp.headers.get("content-type", "") else None
+        if media_type:
+            resp_headers["x-accel-buffering"] = "no"
+            resp_headers["cache-control"] = "no-cache, no-transform"
+
         return StreamingResponse(
             stream_generator(),
             status_code=resp.status_code,
-            headers=resp_headers
+            headers=resp_headers,
+            media_type=media_type
         )
     except Exception as exc:
         log_snippet = ""
