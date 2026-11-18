@@ -293,6 +293,13 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
     } catch (e) {}
   };
 
+  // Announce initiated job metadata immediately for resilient mobile background tracking
+  sendSSE('init', {
+    filename: outputName,
+    url: `/output/${outputName}`,
+    timestamp: Date.now()
+  });
+
   // Heartbeat to keep SSE socket active
   const heartbeat = setInterval(() => {
     if (!res.writableEnded && !res.destroyed) {

@@ -3931,6 +3931,11 @@ const htmlContent = `<!DOCTYPE html>
 
     // MOBILE SCREEN WAKE LOCK & BACKGROUND PRESERVATION
     let renderWakeLock = null;
+    let bgAudioKeepAlive = null;
+    let activeRenderFilename = null;
+    let activeRenderStartTime = 0;
+    let bgPollInterval = null;
+
     async function requestRenderWakeLock() {
       try {
         if ('wakeLock' in navigator && !renderWakeLock) {
@@ -3945,6 +3950,157 @@ const htmlContent = `<!DOCTYPE html>
         try { renderWakeLock.release(); } catch (e) {}
         renderWakeLock = null;
       }
+    }
+
+    function startBgAudioKeepAlive() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        const gain = ctx.createGain();
+        gain.gain.value = 0.0001;
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        source.start();
+        bgAudioKeepAlive = { ctx, source };
+      } catch (e) {}
+    }
+
+    function stopBgAudioKeepAlive() {
+      if (bgAudioKeepAlive) {
+        try {
+          bgAudioKeepAlive.source.stop();
+          bgAudioKeepAlive.ctx.close();
+        } catch (e) {}
+        bgAudioKeepAlive = null;
+      }
+    }
+
+    async function requestNotificationPermission() {
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        if (Notification.permission === 'default') {
+          try {
+            await Notification.requestPermission();
+          } catch (e) {}
+        }
+      }
+    }
+
+    function playCompletionChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now);
+        gain1.gain.setValueAtTime(0.12, now);
+        gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.35);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880, now + 0.12);
+        gain2.gain.setValueAtTime(0.15, now + 0.12);
+        gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.6);
+      } catch (e) {}
+    }
+
+    function triggerCompletionNotification(title, body, url) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          const notif = new Notification(title || 'RenderFlow — Video Ready! 🎬', {
+            body: body || 'Your 1080p MP4 master video has finished rendering.',
+            icon: '/RenderFlow_Logo_Transparent.png',
+            badge: '/RenderFlow_Logo_Transparent.png',
+            tag: 'renderflow-export',
+            renotify: true
+          });
+          notif.onclick = () => {
+            window.focus();
+            switchNav('studio');
+            setCreateStep(3);
+            notif.close();
+          };
+        } catch (e) {}
+      }
+
+      playCompletionChime();
+
+      if ('vibrate' in navigator) {
+        try { navigator.vibrate([200, 100, 200]); } catch (e) {}
+      }
+    }
+
+    function startBackgroundPollRecovery(targetFilename, startTime) {
+      if (bgPollInterval) clearInterval(bgPollInterval);
+      let pollCount = 0;
+      const maxPolls = 100;
+
+      bgPollInterval = setInterval(async () => {
+        pollCount++;
+        try {
+          const res = await fetch(apiUrl('/api/history?limit=10'));
+          if (res.ok) {
+            const data = await res.json();
+            const records = data.records || [];
+            const found = records.find(r => 
+              (targetFilename && r.filename === targetFilename) ||
+              (startTime && r.timestamp && r.timestamp >= startTime - 5000)
+            );
+
+            if (found) {
+              clearInterval(bgPollInterval);
+              bgPollInterval = null;
+              activeRenderFilename = null;
+              activeRenderStartTime = 0;
+              handleServerEvent('complete', {
+                success: true,
+                filename: found.filename,
+                url: found.url || ('/output/' + found.filename),
+                record: found,
+                metrics: found.metrics,
+                probe: found.probe
+              });
+              return;
+            }
+          }
+        } catch (e) {}
+
+        if (pollCount >= maxPolls) {
+          clearInterval(bgPollInterval);
+          bgPollInterval = null;
+          activeRenderFilename = null;
+          activeRenderStartTime = 0;
+          releaseRenderWakeLock();
+          stopBgAudioKeepAlive();
+          $('hudPhaseText').textContent = 'Render completed or timed out. Check History tab.';
+          resetRenderBtns();
+        }
+      }, 3000);
+    }
+
+    function stopBackgroundPollRecovery() {
+      if (bgPollInterval) {
+        clearInterval(bgPollInterval);
+        bgPollInterval = null;
+      }
+      activeRenderFilename = null;
+      activeRenderStartTime = 0;
     }
 
     // SERVER RENDER VIA SSE
@@ -3970,7 +4126,11 @@ const htmlContent = `<!DOCTYPE html>
       $('hudBarFill').style.width = '0%';
       $('hudPhaseText').textContent = 'Connecting to Hardware GPU Engine...';
 
+      await requestNotificationPermission();
       await requestRenderWakeLock();
+      startBgAudioKeepAlive();
+      activeRenderStartTime = Date.now();
+      activeRenderFilename = null;
 
       try {
         const renderUrl = apiUrl('/api/render-code-sse');
@@ -3995,10 +4155,20 @@ const htmlContent = `<!DOCTYPE html>
         await readStream(response);
       } catch (err) {
         console.error('Server render error:', err);
-        releaseRenderWakeLock();
-        $('hudPhaseText').textContent = 'Error: ' + err.message;
-        resetRenderBtns();
-        showToast('Render failed: ' + err.message);
+        // If render already initiated on server and stream dropped due to backgrounding,
+        // seamlessly transition to background recovery polling instead of erroring out!
+        if (activeRenderFilename || (activeRenderStartTime && Date.now() - activeRenderStartTime > 1500)) {
+          $('hudPhaseText').textContent = 'Synthesizing in cloud background... (Live sync)';
+          $('hudPct').textContent = 'Cloud Active';
+          startBackgroundPollRecovery(activeRenderFilename, activeRenderStartTime);
+        } else {
+          releaseRenderWakeLock();
+          stopBgAudioKeepAlive();
+          stopBackgroundPollRecovery();
+          $('hudPhaseText').textContent = 'Error: ' + err.message;
+          resetRenderBtns();
+          showToast('Render failed: ' + err.message);
+        }
       }
     }
 
@@ -4030,6 +4200,11 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     function handleServerEvent(event, data) {
+      if (event === 'init') {
+        if (data && data.filename) activeRenderFilename = data.filename;
+        return;
+      }
+
       if (event === 'status') {
         $('hudPhaseText').textContent = data.message || data.phase || 'Processing hardware synthesis...';
       }
@@ -4059,6 +4234,9 @@ const htmlContent = `<!DOCTYPE html>
         $('hudPct').textContent = '100%';
         $('hudBarFill').style.width = '100%';
         $('hudPhaseText').textContent = 'Render Complete!';
+        stopBackgroundPollRecovery();
+        stopBgAudioKeepAlive();
+        releaseRenderWakeLock();
         resetRenderBtns();
 
         const exactBytes = data.record?.bytes || data.metrics?.mp4SizeBytes || 0;
@@ -4115,10 +4293,14 @@ const htmlContent = `<!DOCTYPE html>
 
         setCreateStep(3);
         loadHistory();
+        triggerCompletionNotification('RenderFlow — Video Ready! 🎬', 'Your 1080p MP4 master video has finished rendering.', finalUrl);
         showToast('Video ready! Click Download MP4.');
       }
 
       if (event === 'error') {
+        stopBackgroundPollRecovery();
+        stopBgAudioKeepAlive();
+        releaseRenderWakeLock();
         $('hudPhaseText').textContent = 'Error: ' + data.error;
         resetRenderBtns();
         showToast('Render error: ' + (data.error || 'Server error'));
@@ -4139,6 +4321,8 @@ const htmlContent = `<!DOCTYPE html>
 
     function resetRenderBtns() {
       releaseRenderWakeLock();
+      stopBgAudioKeepAlive();
+      stopBackgroundPollRecovery();
       const btn = $('btnStudioBake');
       if (btn) {
         btn.textContent = 'Create MP4 video';
@@ -4152,6 +4336,9 @@ const htmlContent = `<!DOCTYPE html>
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           loadHistory();
+          if (activeRenderFilename || activeRenderStartTime) {
+            startBackgroundPollRecovery(activeRenderFilename, activeRenderStartTime);
+          }
         }
       });
     }
