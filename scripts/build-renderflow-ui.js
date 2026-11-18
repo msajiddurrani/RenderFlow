@@ -182,6 +182,15 @@ const htmlContent = `<!DOCTYPE html>
         inset -2.5px -2.5px 5px rgba(18, 24, 88, 0.35),
         0 10px 24px -2px rgba(61, 73, 219, 0.38);
     }
+    .btn-nav-plus {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+      display: inline-block;
+    }
+    .btn-nav-text {
+      display: inline-block;
+    }
     .btn.primary:hover {
       background: linear-gradient(135deg, #5B6AF0 0%, #3440D4 100%);
       transform: translateY(-2px);
@@ -2100,21 +2109,87 @@ const htmlContent = `<!DOCTYPE html>
       .clay-scene-wrapper { height: 350px; }
     }
     @media (max-width: 768px) {
+      .site-footer {
+        padding-top: 32px !important;
+        padding-bottom: 24px !important;
+        margin-top: 40px !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+      }
+      .footer-shell {
+        padding: 0 16px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+      }
       .footer-main-row {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 22px;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 20px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
       .footer-left {
-        align-items: center;
-        text-align: center;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        max-width: 100% !important;
+        justify-self: center !important;
+        gap: 8px !important;
+      }
+      .footer-brand-header {
+        justify-content: center !important;
+      }
+      .footer-tagline {
+        text-align: center !important;
+        font-size: 13.5px !important;
+        max-width: 340px !important;
+        margin: 0 auto !important;
+        color: #64748B !important;
       }
       .footer-nav-wrap {
-        gap: 16px;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 20px !important;
+        width: 100% !important;
+        justify-self: center !important;
       }
       .footer-nav-divider {
-        display: none;
+        display: none !important;
+      }
+      .footer-nav-link {
+        font-size: 14.5px !important;
+        padding: 4px 8px !important;
+      }
+      .footer-social-wrap {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        justify-self: center !important;
+        gap: 14px !important;
+        width: 100% !important;
+      }
+      .footer-social-card {
+        width: 44px !important;
+        height: 44px !important;
+      }
+      .footer-copyright-row {
+        margin-top: 18px !important;
+        text-align: center !important;
+        border-top: 1px solid #F1F5F9 !important;
+        padding-top: 16px !important;
+        width: 100% !important;
+      }
+      .footer-copyright-row p {
+        font-size: 12.5px !important;
+        color: #94A3B8 !important;
+        margin: 0 !important;
+        text-align: center !important;
       }
     }
     @media (max-width: 640px) {
@@ -2124,35 +2199,69 @@ const htmlContent = `<!DOCTYPE html>
         box-sizing: border-box;
       }
       .nav {
-        height: 64px;
+        height: 58px;
       }
       .nav-in {
         padding: 0 12px;
-        gap: 6px;
+        gap: 8px;
         justify-content: space-between;
+        display: flex;
+        align-items: center;
       }
       .mode-badge {
         display: none;
       }
       .brand {
-        font-size: 17px;
-        gap: 8px;
+        font-size: 16px;
+        gap: 7px;
+        flex-shrink: 0;
       }
       .brand img.logo-mark {
-        width: 28px;
-        height: 28px;
+        width: 26px;
+        height: 26px;
       }
       .nav-links {
-        gap: 2px;
+        gap: 4px;
+        display: flex;
+        align-items: center;
+        flex-shrink: 1;
       }
       .nav-links button {
-        padding: 6px 9px;
-        font-size: 12.5px;
+        padding: 6px 8px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .nav-count-badge {
+        font-size: 10px;
+        padding: 1px 5px;
+      }
+      .nav-actions {
+        gap: 0;
+        flex-shrink: 0;
       }
       .nav-actions .btn {
-        padding: 6px 12px;
-        font-size: 12px;
-        white-space: nowrap;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        padding: 0 !important;
+        border-radius: 10px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 20px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        gap: 0 !important;
+      }
+      .btn-nav-text {
+        display: none !important;
+      }
+      .btn-nav-plus {
+        display: inline-block !important;
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
       }
       .home-hero {
         padding: 20px 0 30px;
@@ -2378,16 +2487,29 @@ const htmlContent = `<!DOCTYPE html>
       }
     }
     @media (max-width: 420px) {
+      .nav-in {
+        padding: 0 10px !important;
+        gap: 6px !important;
+      }
       .brand span {
-        font-size: 15px;
+        font-size: 15px !important;
+      }
+      .brand img.logo-mark {
+        width: 24px !important;
+        height: 24px !important;
       }
       .nav-links button {
-        padding: 5px 6px;
-        font-size: 11.5px;
+        padding: 5px 6px !important;
+        font-size: 11.5px !important;
       }
       .nav-actions .btn {
-        padding: 5px 8px;
-        font-size: 11.5px;
+        width: 34px !important;
+        min-width: 34px !important;
+        height: 34px !important;
+        min-height: 34px !important;
+      }
+      .btn-nav-plus {
+        font-size: 20px !important;
       }
       .clay-scene-wrapper {
         height: 265px;
@@ -2397,6 +2519,10 @@ const htmlContent = `<!DOCTYPE html>
       }
     }
     @media (max-width: 360px) {
+      .nav-links button {
+        padding: 4px 5px !important;
+        font-size: 11px !important;
+      }
       .clay-scene-wrapper {
         height: 235px;
       }
@@ -2427,9 +2553,9 @@ const htmlContent = `<!DOCTYPE html>
             <span class="mode-dot"></span>
             <span id="appModeLabel">Detecting mode...</span>
           </span>
-          <button class="btn primary" onclick="startNewVideo()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
-            New video
+          <button class="btn primary btn-nav-action" onclick="startNewVideo()" title="New video" aria-label="New video">
+            <span class="btn-nav-plus">+</span>
+            <span class="btn-nav-text">New</span>
           </button>
         </div>
       </div>
@@ -2944,9 +3070,9 @@ const htmlContent = `<!DOCTYPE html>
                   <option value="client-gpu">In-Browser Engine (Client GPU)</option>
                 </select>
               </div>
-              <div class="adv-row" style="display:none;">
+              <div class="adv-row">
                 <label for="cfgCloudUrl">Cloud Backend URL</label>
-                <input type="text" id="cfgCloudUrl" class="adv-input" placeholder="e.g. https://your-space.hf.space" style="width:190px;font-size:11px;" onchange="handleCloudUrlChange(this.value)">
+                <input type="text" id="cfgCloudUrl" class="adv-input" placeholder="e.g. https://durrani6969-renderflow-engine.hf.space" style="width:230px;font-size:11.5px;" onchange="handleCloudUrlChange(this.value)">
               </div>
 
               <details id="sysInfoDetails" style="margin-top:10px;padding-top:10px;border-top:1px solid #E1E6EF;">
@@ -3240,9 +3366,21 @@ const htmlContent = `<!DOCTYPE html>
       }
     };
 
-    // IN-BROWSER HARDWARE-ACCELERATED ENGINE (ZERO EXTERNAL BACKEND)
+    // CLOUD BACKEND INTEGRATION (HUGGING FACE ZEROGPU ENGINE)
+    const OFFICIAL_CLOUD_ENGINE = 'https://durrani6969-renderflow-engine.hf.space';
     let cloudBackendUrl = '';
-    try { localStorage.removeItem('rf_cloud_backend_url'); } catch (e) {}
+    try {
+      const savedCloud = localStorage.getItem('rf_cloud_backend_url');
+      if (savedCloud) {
+        cloudBackendUrl = savedCloud.trim().replace(new RegExp('/+$'), '');
+      } else if (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        cloudBackendUrl = OFFICIAL_CLOUD_ENGINE;
+      }
+    } catch (e) {
+      if (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        cloudBackendUrl = OFFICIAL_CLOUD_ENGINE;
+      }
+    }
 
     let currentResultUrl = '';
     let currentResultFilename = 'renderflow-export.mp4';
@@ -3254,8 +3392,12 @@ const htmlContent = `<!DOCTYPE html>
     let serverBaseUrl = '';
 
     function apiUrl(endpoint) {
-      if (serverBaseUrl && endpoint.startsWith('/')) {
-        return serverBaseUrl + endpoint;
+      if (!endpoint || !endpoint.startsWith('/')) return endpoint || '';
+      if (serverBaseUrl) {
+        return serverBaseUrl.replace(new RegExp('/+$'), '') + endpoint;
+      }
+      if (cloudBackendUrl) {
+        return cloudBackendUrl.replace(new RegExp('/+$'), '') + endpoint;
       }
       return endpoint;
     }
@@ -3358,13 +3500,24 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     function handleCloudUrlChange(val) {
-      cloudBackendUrl = '';
+      const cleaned = (val || '').trim().replace(new RegExp('/+$'), '');
+      cloudBackendUrl = cleaned;
+      try {
+        if (cleaned) {
+          localStorage.setItem('rf_cloud_backend_url', cleaned);
+        } else {
+          localStorage.removeItem('rf_cloud_backend_url');
+        }
+      } catch (e) {}
       detectRuntimeMode();
     }
 
     // RUNTIME MODE DETECTION
     async function detectRuntimeMode() {
-      if ($('cfgCloudUrl')) $('cfgCloudUrl').value = '';
+      const candidateCloud = cloudBackendUrl || OFFICIAL_CLOUD_ENGINE;
+      if ($('cfgCloudUrl')) {
+        $('cfgCloudUrl').value = cloudBackendUrl || candidateCloud;
+      }
       let hasLocalServer = false;
       try {
         const res = await fetch('/api/history?limit=1');
@@ -3402,15 +3555,44 @@ const htmlContent = `<!DOCTYPE html>
           optCloud.textContent = 'Automatic (Hardware GPU · Studio Engine)';
         }
         if (diagMode) diagMode.textContent = 'Local Hardware Engine (Chrome + FFmpeg)';
+        return;
+      }
+
+      // Check Cloud Backend when running remotely or on mobile
+      let hasCloudServer = false;
+      if (candidateCloud) {
+        try {
+          const testUrl = candidateCloud.replace(new RegExp('/+$'), '') + '/api/history?limit=1';
+          const cRes = await fetch(testUrl);
+          const cType = cRes.headers.get('content-type') || '';
+          if (cRes.ok && cType.includes('application/json')) {
+            hasCloudServer = true;
+            cloudBackendUrl = candidateCloud;
+          }
+        } catch (e) {
+          hasCloudServer = false;
+        }
+      }
+
+      if (hasCloudServer) {
+        currentAppMode = 'MODE_B';
+        serverBaseUrl = '';
+        if ($('cfgEngineMode')) $('cfgEngineMode').value = 'server-gpu';
+        if (modeLabel) modeLabel.textContent = 'Cloud Engine (Hugging Face ZeroGPU)';
+        if (optCloud) {
+          optCloud.disabled = false;
+          optCloud.textContent = 'Automatic (Cloud Chromium + FFmpeg)';
+        }
+        if (diagMode) diagMode.textContent = 'Hugging Face Spaces (2 vCPU · ZeroGPU · FFmpeg)';
       } else {
         currentAppMode = 'MODE_A';
         if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
-        if (modeLabel) modeLabel.textContent = 'In-Browser Engine (Client GPU)';
+        if (modeLabel) modeLabel.textContent = 'Cloud Engine (Connecting/Standby)';
         if (optCloud) {
-          optCloud.disabled = true;
-          optCloud.textContent = 'Desktop Server (Run npm start on port 3333)';
+          optCloud.disabled = false;
+          optCloud.textContent = 'Automatic (Cloud Chromium + FFmpeg)';
         }
-        if (diagMode) diagMode.textContent = 'WebCodecs In-Browser (Zero Backend Needed)';
+        if (diagMode) diagMode.textContent = candidateCloud ? 'Hugging Face Cloud Engine Standby' : 'Client Mode';
       }
     }
 
@@ -3771,7 +3953,13 @@ const htmlContent = `<!DOCTYPE html>
       $('hudPhaseText').textContent = 'Connecting to Hardware GPU Engine...';
 
       try {
-        const response = await fetch(apiUrl('/api/render-code-sse'), {
+        const renderUrl = apiUrl('/api/render-code-sse');
+        const isStaticHost = !serverBaseUrl && !cloudBackendUrl && (renderUrl.startsWith('/') || (typeof window !== 'undefined' && renderUrl.startsWith(window.location.origin)));
+        if (isStaticHost && typeof window !== 'undefined' && window.location && window.location.hostname.includes('vercel.app')) {
+          throw new Error('No Cloud Engine connected. Please configure your Cloud Backend URL in Advanced Settings.');
+        }
+
+        const response = await fetch(renderUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code, resolution: resMode, width, height, fps, duration, gpu: true })
@@ -3779,6 +3967,9 @@ const htmlContent = `<!DOCTYPE html>
 
         if (!response.ok) {
           const errText = await response.text();
+          if (response.status === 405) {
+            throw new Error('Host returned HTTP 405 Method Not Allowed. Please verify your Cloud Backend URL in Advanced Settings.');
+          }
           throw new Error('Hardware engine returned HTTP ' + response.status + ': ' + errText.slice(0, 100));
         }
         await readStream(response);

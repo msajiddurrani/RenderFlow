@@ -15,6 +15,7 @@
     "test:e2e-download": "node scripts/test-full-render-and-download.js",
     "test:audit": "node scripts/test-exhaustive-audit.js",
     "test:qa": "node scripts/run-qa-step-by-step.js",
+    "test:mobile": "node scripts/verify-mobile-ui.js",
     "test:real-html": "node scripts/test-real-html-e2e.js",
     "test:spike": "node src/run-sprint0-spike.js"
   },
