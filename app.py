@@ -84,9 +84,19 @@ async def proxy_to_node(request: Request, path_with_query: str):
         resp_headers.pop("content-length", None)
         resp_headers.pop("transfer-encoding", None)
         resp_headers.pop("content-encoding", None)
-        resp_headers.pop("access-control-allow-origin", None)
-        resp_headers.pop("access-control-allow-methods", None)
-        resp_headers.pop("access-control-allow-headers", None)
+
+        # Enforce permissive CORS for cross-origin web clients
+        resp_headers["access-control-allow-origin"] = "*"
+        resp_headers["access-control-allow-methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+        resp_headers["access-control-allow-headers"] = "*"
+        resp_headers["access-control-expose-headers"] = "*"
+
+        # Enforce binary MP4 attachment download headers for /output/
+        if path_with_query.startswith("/output/"):
+            base_fname = os.path.basename(path_with_query.split("?")[0])
+            if base_fname.endswith(".mp4"):
+                resp_headers["content-type"] = "video/mp4"
+                resp_headers["content-disposition"] = f'attachment; filename="{base_fname}"'
 
         async def stream_generator():
             try:
