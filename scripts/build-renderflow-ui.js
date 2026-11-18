@@ -2452,11 +2452,7 @@ const htmlContent = `<!DOCTYPE html>
             </button>
             <button id="btnViewLive" class="btn secondary large" onclick="loadSampleAndPreview()">
               <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Try live sample
-            </button>
-            <button class="btn secondary large" onclick="switchNav('history')">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              View History
+              Try an example
             </button>
           </div>
           <div class="hero-proof">
@@ -3255,8 +3251,12 @@ const htmlContent = `<!DOCTYPE html>
     window.currentResultFilename = 'renderflow-export.mp4';
     window.currentResultBlob = null;
     const blobCache = new Map();
+    let serverBaseUrl = '';
 
     function apiUrl(endpoint) {
+      if (serverBaseUrl && endpoint.startsWith('/')) {
+        return serverBaseUrl + endpoint;
+      }
       return endpoint;
     }
 
@@ -3335,7 +3335,6 @@ const htmlContent = `<!DOCTYPE html>
       a.style.display = 'none';
       a.href = downloadParamUrl;
       a.download = targetFilename;
-      a.target = '_blank';
       document.body.appendChild(a);
       a.click();
       setTimeout(() => document.body.removeChild(a), 1500);
@@ -3372,9 +3371,21 @@ const htmlContent = `<!DOCTYPE html>
         const cType = res.headers.get('content-type') || '';
         if (res.ok && cType.includes('application/json')) {
           hasLocalServer = true;
+          serverBaseUrl = '';
         }
       } catch (e) {
         hasLocalServer = false;
+      }
+
+      if (!hasLocalServer) {
+        try {
+          const res = await fetch('http://localhost:3333/api/history?limit=1');
+          const cType = res.headers.get('content-type') || '';
+          if (res.ok && cType.includes('application/json')) {
+            hasLocalServer = true;
+            serverBaseUrl = 'http://localhost:3333';
+          }
+        } catch (e) {}
       }
 
       const modeBadge = $('appModeBadge');
@@ -3534,8 +3545,8 @@ const htmlContent = `<!DOCTYPE html>
       m = code.match(/name=["']render-duration["']\\s+content=["'](\\d+(\\.\\d+)?)["']/i);
       if (m) return parseFloat(m[1]);
 
-      // 3. const/let/var TOTAL_DURATION or DURATION or ANIM_DURATION
-      m = code.match(/(?:const|let|var)\\s+(?:TOTAL_DURATION|DURATION|ANIM_DURATION|VIDEO_DURATION)\\s*=\\s*(\\d+(\\.\\d+)?)/i);
+      // 3. const/let/var or standalone duration assignment (D=46, DUR=46, DURATION=46)
+      m = code.match(/(?:(?:window\\.)?(?:TOTAL_DURATION|DURATION|ANIM_DURATION|VIDEO_DURATION)|(?:\\b|[,;\\s])D)\\s*=\\s*(\\d+(?:\\.\\d+)?)/i);
       if (m) return parseFloat(m[1]);
 
       // 4. Timeline totalDuration e.g. tl.totalDuration(30) or tl.duration(30)
@@ -3723,8 +3734,13 @@ const htmlContent = `<!DOCTYPE html>
         return;
       }
 
+      const isMarkdown = !/^\\s*<!DOCTYPE\\s+html/i.test(code) && 
+                         !/^\\s*<html/i.test(code) && 
+                         (/\\n\\s*---\\s*\\n/.test(code) || /^\\s*#\\s+/m.test(code) || !/<[a-z][\\s\\S]*>/i.test(code));
+
       const selectedEngine = $('cfgEngineMode') ? $('cfgEngineMode').value : 'server-gpu';
-      if (currentAppMode === 'MODE_B' || selectedEngine === 'server-gpu') {
+      // HTML animations require headless Chromium with real DOM/WebGL/GSAP synthesis
+      if (!isMarkdown || currentAppMode === 'MODE_B' || selectedEngine === 'server-gpu') {
         executeServerSideRender();
       } else {
         executeClientSideRender();
@@ -3863,7 +3879,7 @@ const htmlContent = `<!DOCTYPE html>
         const btnDl = $('btnDownloadResult');
         btnDl.href = downloadUrl;
         btnDl.setAttribute('download', data.filename || 'export.mp4');
-        btnDl.setAttribute('target', '_blank');
+        btnDl.removeAttribute('target');
 
         // Pre-fetch Blob in background for zero-latency download
         if (finalUrl) {

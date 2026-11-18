@@ -168,6 +168,13 @@ class RendererEngine extends EventEmitter {
     const pageMeta = await page.evaluate((defaultDur) => {
       let dur = defaultDur;
       if (typeof window.DUR === 'number' && window.DUR > 0) dur = window.DUR;
+      else if (typeof window.DURATION === 'number' && window.DURATION > 0) dur = window.DURATION;
+      else if (typeof window.D === 'number' && window.D > 0) dur = window.D;
+      else if (typeof window.TOTAL_DURATION === 'number' && window.TOTAL_DURATION > 0) dur = window.TOTAL_DURATION;
+      else if (typeof window.gsap !== 'undefined' && window.gsap.globalTimeline) {
+        const gd = window.gsap.globalTimeline.totalDuration();
+        if (gd && gd > 0) dur = gd;
+      }
       const meta = document.querySelector('meta[name="render-duration"]');
       if (meta) {
         const val = parseFloat(meta.getAttribute('content'));
@@ -212,7 +219,16 @@ class RendererEngine extends EventEmitter {
     if (width % 2 !== 0) width++;
     if (height % 2 !== 0) height++;
 
-    const duration = renderOptions.duration || pageMeta.dur;
+    let duration = renderOptions.duration || pageMeta.dur;
+    if (!renderOptions.duration || renderOptions.duration === this.defaultDuration) {
+      try {
+        const fileContent = fs.readFileSync(targetHtmlPath, 'utf8');
+        const dMatch = fileContent.match(/(?:(?:window\.)?(?:TOTAL_DURATION|DURATION|ANIM_DURATION|VIDEO_DURATION)|(?:\b|[,;\s])D)\s*=\s*(\d+(?:\.\d+)?)/i);
+        if (dMatch && parseFloat(dMatch[1]) > 0) {
+          duration = parseFloat(dMatch[1]);
+        }
+      } catch (e) {}
+    }
     const totalFrames = Math.round(duration * fps);
 
     await page.setViewport({ width, height, deviceScaleFactor: 1 });

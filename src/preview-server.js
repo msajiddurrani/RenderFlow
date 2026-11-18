@@ -49,13 +49,18 @@ const upload = multer({
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
-// Full Cross-Origin Resource Sharing (CORS) for Cloud & Vercel Client Hosting
+// Full Cross-Origin Resource Sharing (CORS) & Cache Controls
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
+  }
+  if (req.path === '/' || req.path.endsWith('.html') || req.path.endsWith('.js')) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
   }
   next();
 });
@@ -269,10 +274,16 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
   const outputName = `render-${Date.now()}-${baseCleanName}.mp4`;
   const outputPath = path.join(outputDir, outputName);
 
+  try {
+    if (req.socket) req.socket.setTimeout(0);
+    if (res.socket) res.socket.setTimeout(0);
+  } catch(e) {}
+
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no'
   });
 
   const sendSSE = (event, data) => {
@@ -379,5 +390,9 @@ const server = app.listen(PORT, () => {
   console.log(`  History URL: http://localhost:${PORT}/history`);
   console.log(`======================================================\n`);
 });
+
+server.timeout = 0;
+server.keepAliveTimeout = 0;
+if (server.requestTimeout !== undefined) server.requestTimeout = 0;
 
 module.exports = app;
