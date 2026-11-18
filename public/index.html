@@ -3227,7 +3227,12 @@
     };
 
     // CLOUD BACKEND INTEGRATION (HUGGING FACE SPACES / RAILWAY / RENDER)
-    let cloudBackendUrl = localStorage.getItem('rf_cloud_backend_url') || '';
+    const DEFAULT_CLOUD_ENGINE = 'https://durrani6969-renderflow-engine.hf.space';
+    let cloudBackendUrl = localStorage.getItem('rf_cloud_backend_url');
+    if (cloudBackendUrl === null) {
+      // Default to Hugging Face Cloud Engine on public domains (Vercel, etc.)
+      cloudBackendUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : DEFAULT_CLOUD_ENGINE;
+    }
 
     function apiUrl(endpoint) {
       if (cloudBackendUrl) {
