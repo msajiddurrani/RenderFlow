@@ -17,7 +17,7 @@ process.on('unhandledRejection', reason => {
 });
 
 const app = express();
-const PORT = process.env.PORT || 3333;
+const PORT = process.env.PORT || (process.env.SPACE_ID ? 7860 : 3333);
 
 const uploadDir = path.resolve(__dirname, '../uploads');
 const previewsDir = path.resolve(__dirname, '../uploads/previews');
@@ -48,6 +48,17 @@ const upload = multer({
 
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+
+// Full Cross-Origin Resource Sharing (CORS) for Cloud & Vercel Client Hosting
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Static mounts
 app.use(express.static(publicDir));

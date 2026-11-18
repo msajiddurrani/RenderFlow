@@ -2944,6 +2944,10 @@ const htmlContent = `<!DOCTYPE html>
                   <option value="client-gpu">In-Browser WebCodecs</option>
                 </select>
               </div>
+              <div class="adv-row" style="margin-top:6px;">
+                <label for="cfgCloudUrl">Cloud Backend URL</label>
+                <input type="text" id="cfgCloudUrl" class="adv-input" placeholder="e.g. https://your-space.hf.space" style="width:190px;font-size:11px;" onchange="handleCloudUrlChange(this.value)">
+              </div>
 
               <details id="sysInfoDetails" style="margin-top:10px;padding-top:10px;border-top:1px solid #E1E6EF;">
                 <summary style="cursor:pointer;font-weight:600;color:#556275;">System Information</summary>
@@ -3227,11 +3231,35 @@ const htmlContent = `<!DOCTYPE html>
       }
     };
 
+    // CLOUD BACKEND INTEGRATION (HUGGING FACE SPACES / RAILWAY / RENDER)
+    let cloudBackendUrl = localStorage.getItem('rf_cloud_backend_url') || '';
+
+    function apiUrl(endpoint) {
+      if (cloudBackendUrl) {
+        return cloudBackendUrl.replace(new RegExp('/+$'), '') + endpoint;
+      }
+      return endpoint;
+    }
+
+    function handleCloudUrlChange(val) {
+      cloudBackendUrl = (val || '').trim();
+      if (cloudBackendUrl) {
+        localStorage.setItem('rf_cloud_backend_url', cloudBackendUrl);
+        showToast('Saved Cloud Backend URL');
+      } else {
+        localStorage.removeItem('rf_cloud_backend_url');
+        showToast('Cleared Cloud Backend URL');
+      }
+      detectRuntimeMode();
+    }
+
     // RUNTIME MODE DETECTION
     async function detectRuntimeMode() {
+      if ($('cfgCloudUrl')) $('cfgCloudUrl').value = cloudBackendUrl;
       let mode = 'MODE_A';
       try {
-        const res = await fetch('/api/history?limit=1');
+        const targetUrl = apiUrl('/api/history?limit=1');
+        const res = await fetch(targetUrl);
         const cType = res.headers.get('content-type') || '';
         if (res.ok && cType.includes('application/json')) {
           mode = 'MODE_B';
@@ -3247,19 +3275,20 @@ const htmlContent = `<!DOCTYPE html>
 
       if (mode === 'MODE_B') {
         currentAppMode = 'MODE_B';
-        if (modeLabel) modeLabel.textContent = 'Desktop Engine (Port 3333)';
+        const isCloud = !!cloudBackendUrl;
+        if (modeLabel) modeLabel.textContent = isCloud ? 'Cloud Engine (Hugging Face)' : 'Desktop Engine (Port 3333)';
         if (optCloud) {
           optCloud.disabled = false;
-          optCloud.textContent = 'Automatic (Direct3D11 GPU)';
+          optCloud.textContent = isCloud ? 'Automatic (Cloud Chromium + FFmpeg)' : 'Automatic (Direct3D11 GPU)';
         }
         if ($('cfgEngineMode')) $('cfgEngineMode').value = 'server-gpu';
-        if (diagMode) diagMode.textContent = 'Direct3D11 Hardware GPU';
+        if (diagMode) diagMode.textContent = isCloud ? 'Hugging Face Spaces (2 vCPU · 16 GB RAM)' : 'Direct3D11 Hardware GPU';
       } else {
         currentAppMode = 'MODE_A';
         if (modeLabel) modeLabel.textContent = 'Web Engine (Vercel)';
         if (optCloud) {
           optCloud.disabled = true;
-          optCloud.textContent = 'Desktop Server (Unavailable in Mode A)';
+          optCloud.textContent = 'Cloud / Desktop Server (Offline)';
         }
         if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
         if (diagMode) diagMode.textContent = 'WebCodecs In-Browser';
@@ -3613,7 +3642,7 @@ const htmlContent = `<!DOCTYPE html>
       $('hudPhaseText').textContent = 'Connecting to Direct3D11 Engine...';
 
       try {
-        const response = await fetch('/api/render-code-sse', {
+        const response = await fetch(apiUrl('/api/render-code-sse'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code, resolution: resMode, width, height, fps, duration, gpu: true })
@@ -3692,9 +3721,10 @@ const htmlContent = `<!DOCTYPE html>
           : (exactBytes / 1024).toFixed(1) + ' KB';
 
         const exactDur = data.record?.duration || (data.probe?.duration ? data.probe.duration + 's' : (data.metrics?.durationSec ? data.metrics.durationSec + 's' : '46.0s'));
+        const finalUrl = data.url ? (data.url.startsWith('http') ? data.url : apiUrl(data.url)) : '';
 
         const v = $('resultVideo');
-        v.src = data.url;
+        v.src = finalUrl;
         v.load();
 
         $('resMetaFilename').textContent = data.filename || 'export.mp4';
@@ -3704,7 +3734,7 @@ const htmlContent = `<!DOCTYPE html>
         $('resMetaTime').textContent = data.metrics?.totalRenderTimeSec ? (data.metrics.totalRenderTimeSec + 's') : 'Completed';
         $('resMetaFps').textContent = 'Full HD · ' + (data.metrics?.fps || 30) + ' FPS';
 
-        $('btnDownloadResult').href = data.url;
+        $('btnDownloadResult').href = finalUrl;
         $('btnDownloadResult').download = data.filename || 'export.mp4';
 
         setCreateStep(3);
@@ -3937,7 +3967,7 @@ const htmlContent = `<!DOCTYPE html>
             search: historySearchQuery,
             sort: historySortOrder
           });
-          const res = await fetch('/api/history?' + query.toString());
+          const res = await fetch(apiUrl('/api/history?' + query.toString()));
           if (res.ok) {
             const data = await res.json();
             records = data.records || [];
@@ -4049,7 +4079,7 @@ const htmlContent = `<!DOCTYPE html>
       
       if (currentAppMode === 'MODE_B') {
         try {
-          const res = await fetch('/api/history/' + encodeURIComponent(id), { method: 'DELETE' });
+          const res = await fetch(apiUrl('/api/history/' + encodeURIComponent(id)), { method: 'DELETE' });
           if (!res.ok) console.warn('Server delete status:', res.status);
         } catch (e) {
           console.error('Failed to delete on server:', e);

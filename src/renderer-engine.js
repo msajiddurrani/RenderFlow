@@ -7,8 +7,13 @@ const AudioCapturer = require('./audio-capturer');
 const { compileMarkdownToHtml } = require('./markdown-compiler');
 const EventEmitter = require('events');
 
-const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const FFMPEG_PATH = ffmpegInstaller.path;
+const CHROME_PATH = process.env.CHROME_PATH || 
+                    process.env.PUPPETEER_EXECUTABLE_PATH || 
+                    process.env.CHROME_BIN || 
+                    (process.platform === 'win32' 
+                      ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
+                      : (fs.existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : '/usr/bin/google-chrome-stable'));
+const FFMPEG_PATH = process.env.FFMPEG_PATH || (ffmpegInstaller && ffmpegInstaller.path) || 'ffmpeg';
 
 class RendererEngine extends EventEmitter {
   constructor(options = {}) {
