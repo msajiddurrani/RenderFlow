@@ -3929,6 +3929,24 @@ const htmlContent = `<!DOCTYPE html>
       }
     }
 
+    // MOBILE SCREEN WAKE LOCK & BACKGROUND PRESERVATION
+    let renderWakeLock = null;
+    async function requestRenderWakeLock() {
+      try {
+        if ('wakeLock' in navigator && !renderWakeLock) {
+          renderWakeLock = await navigator.wakeLock.request('screen');
+          renderWakeLock.addEventListener('release', () => { renderWakeLock = null; });
+        }
+      } catch (e) {}
+    }
+
+    function releaseRenderWakeLock() {
+      if (renderWakeLock) {
+        try { renderWakeLock.release(); } catch (e) {}
+        renderWakeLock = null;
+      }
+    }
+
     // SERVER RENDER VIA SSE
     async function executeServerSideRender() {
       const code = $('codeEditorStudio').value;
@@ -3951,6 +3969,8 @@ const htmlContent = `<!DOCTYPE html>
       $('hudPct').textContent = '0%';
       $('hudBarFill').style.width = '0%';
       $('hudPhaseText').textContent = 'Connecting to Hardware GPU Engine...';
+
+      await requestRenderWakeLock();
 
       try {
         const renderUrl = apiUrl('/api/render-code-sse');
@@ -3975,6 +3995,7 @@ const htmlContent = `<!DOCTYPE html>
         await readStream(response);
       } catch (err) {
         console.error('Server render error:', err);
+        releaseRenderWakeLock();
         $('hudPhaseText').textContent = 'Error: ' + err.message;
         resetRenderBtns();
         showToast('Render failed: ' + err.message);
@@ -4117,6 +4138,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     function resetRenderBtns() {
+      releaseRenderWakeLock();
       const btn = $('btnStudioBake');
       if (btn) {
         btn.textContent = 'Create MP4 video';
@@ -4124,6 +4146,14 @@ const htmlContent = `<!DOCTYPE html>
         btn.onclick = executeRenderJob;
       }
       activeClientEngine = null;
+    }
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          loadHistory();
+        }
+      });
     }
 
     // CLIENT ENGINE RENDER (VERCEL)
