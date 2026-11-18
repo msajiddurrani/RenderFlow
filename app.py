@@ -4,62 +4,44 @@ import time
 import subprocess
 import threading
 import httpx
-import uvicorn
-from fastapi import FastAPI, Request, Response
-from fastapi.responses import StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
 import spaces
+import torch
 import gradio as gr
+from fastapi import Request, Response
+from fastapi.responses import StreamingResponse
 
 # ==============================================================================
-# 1. ZeroGPU Hook (Mandatory for Hugging Face ZeroGPU startup scanner)
+# 1. ZeroGPU Hook Function
 # ==============================================================================
 @spaces.GPU
 def renderflow_gpu_probe(message: str = "ping"):
     """
     ZeroGPU registered function to satisfy Hugging Face ZeroGPU supervisor.
     """
-    return f"RenderFlow ZeroGPU Engine Online! (Received: {message})"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    t = torch.zeros(1, device=device)
+    return f"RenderFlow ZeroGPU Engine Online! Compute Device: {device}, Ping: {message}"
 
 # ==============================================================================
-# 2. Gradio Interface (Mounted at root "/" so visitors see status UI)
+# 2. Gradio Interface
 # ==============================================================================
-with gr.Blocks(title="RenderFlow Cloud Engine") as demo:
-    gr.Markdown("# 🚀 RenderFlow Cloud Engine")
-    gr.Markdown("Headless HTML5 / Three.js / WebGL 60 FPS video synthesis backend powered by Hugging Face ZeroGPU.")
-    with gr.Row():
-        probe_input = gr.Textbox(value="ping", label="ZeroGPU Status Probe")
-        probe_output = gr.Textbox(label="Status Response")
-    probe_button = gr.Button("Test ZeroGPU Hardware")
-    probe_button.click(fn=renderflow_gpu_probe, inputs=probe_input, outputs=probe_output)
-    gr.Markdown("---")
-    gr.Markdown(
-        "**Vercel Client Connection:** Point your RenderFlow web UI to `https://durrani6969-renderflow-engine.hf.space` "
-        "to render exact 60 FPS MP4 videos without freezing your browser."
-    )
-
-# ==============================================================================
-# 3. FastAPI App & Reverse Proxy to Internal Node.js Engine
-# ==============================================================================
-app = FastAPI(title="RenderFlow Cloud Backend")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+demo = gr.Interface(
+    fn=renderflow_gpu_probe,
+    inputs=gr.Textbox(value="ping", label="ZeroGPU Status Probe"),
+    outputs=gr.Textbox(label="Status Response"),
+    title="RenderFlow Cloud Engine",
+    description="Headless HTML5 / Three.js / WebGL 60 FPS video synthesis backend powered by Hugging Face ZeroGPU."
 )
 
+# ==============================================================================
+# 3. FastAPI Reverse Proxy to Internal Node.js Engine
+# ==============================================================================
+fastapi_app = demo.app
 NODE_PORT = 3333
 NODE_BASE_URL = f"http://127.0.0.1:{NODE_PORT}"
 http_client = httpx.AsyncClient(base_url=NODE_BASE_URL, timeout=3600.0)
 
 async def proxy_to_node(request: Request, path_with_query: str):
-    """
-    Reverse proxies any HTTP request to the internal Node.js Puppeteer engine,
-    fully supporting Server-Sent Events (SSE) streaming and large file transfers.
-    """
     url = httpx.URL(path=path_with_query, query=request.url.query.encode("utf-8"))
     body = await request.body()
     
@@ -80,7 +62,7 @@ async def proxy_to_node(request: Request, path_with_query: str):
         resp_headers.pop("content-length", None)
         resp_headers.pop("transfer-encoding", None)
         resp_headers.pop("content-encoding", None)
-        # Avoid duplicate CORS headers from downstream
+        # Prevent duplicated CORS headers
         resp_headers.pop("access-control-allow-origin", None)
         resp_headers.pop("access-control-allow-methods", None)
         resp_headers.pop("access-control-allow-headers", None)
@@ -104,28 +86,25 @@ async def proxy_to_node(request: Request, path_with_query: str):
             media_type="application/json"
         )
 
-@app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"])
+@fastapi_app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"])
 async def route_api(request: Request, path: str):
     return await proxy_to_node(request, f"/api/{path}")
 
-@app.api_route("/output/{path:path}", methods=["GET", "HEAD"])
+@fastapi_app.api_route("/output/{path:path}", methods=["GET", "HEAD"])
 async def route_output(request: Request, path: str):
     return await proxy_to_node(request, f"/output/{path}")
 
-@app.api_route("/uploads/{path:path}", methods=["GET", "HEAD"])
+@fastapi_app.api_route("/uploads/{path:path}", methods=["GET", "HEAD"])
 async def route_uploads(request: Request, path: str):
     return await proxy_to_node(request, f"/uploads/{path}")
 
-@app.api_route("/previews/{path:path}", methods=["GET", "HEAD"])
+@fastapi_app.api_route("/previews/{path:path}", methods=["GET", "HEAD"])
 async def route_previews(request: Request, path: str):
     return await proxy_to_node(request, f"/previews/{path}")
 
-@app.api_route("/fixtures/{path:path}", methods=["GET", "HEAD"])
+@fastapi_app.api_route("/fixtures/{path:path}", methods=["GET", "HEAD"])
 async def route_fixtures(request: Request, path: str):
     return await proxy_to_node(request, f"/fixtures/{path}")
-
-# Mount Gradio app at root "/"
-app = gr.mount_gradio_app(app, demo, path="/")
 
 # ==============================================================================
 # 4. Background Node.js Engine Starter
@@ -154,10 +133,8 @@ def start_node_engine():
 
 if __name__ == "__main__":
     node_proc = start_node_engine()
-    
-    # Wait for Node server to start listening
-    time.sleep(3)
-    
-    print("[RenderFlow] Launching Uvicorn server on port 7860...")
+    time.sleep(2)
+    print("[RenderFlow] Starting Gradio server on port 7860...")
     sys.stdout.flush()
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    demo.queue()
+    demo.launch(server_name="0.0.0.0", server_port=7860)
