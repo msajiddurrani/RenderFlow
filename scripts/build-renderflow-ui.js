@@ -4023,8 +4023,8 @@ const htmlContent = `<!DOCTYPE html>
     function triggerCompletionNotification(title, body, url) {
       if ('Notification' in window && Notification.permission === 'granted') {
         try {
-          const notif = new Notification(title || 'RenderFlow — Video Ready! 🎬', {
-            body: body || 'Your 1080p MP4 master video has finished rendering.',
+          const notif = new Notification(title || 'RenderFlow', {
+            body: body || 'Your 1080p MP4 master video is ready to download.',
             icon: '/RenderFlow_Logo_Transparent.png',
             badge: '/RenderFlow_Logo_Transparent.png',
             tag: 'renderflow-export',
@@ -4293,7 +4293,7 @@ const htmlContent = `<!DOCTYPE html>
 
         setCreateStep(3);
         loadHistory();
-        triggerCompletionNotification('RenderFlow — Video Ready! 🎬', 'Your 1080p MP4 master video has finished rendering.', finalUrl);
+        triggerCompletionNotification('RenderFlow', 'Your 1080p MP4 master video is ready to download.', finalUrl);
         showToast('Video ready! Click Download MP4.');
       }
 
