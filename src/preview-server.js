@@ -63,14 +63,20 @@ app.use((req, res, next) => {
 // Static mounts & Direct MP4 attachment download handler
 app.use(express.static(publicDir));
 
-app.get('/output/:filename', (req, res, next) => {
+app.get(['/output/:filename', '/download/:filename'], (req, res, next) => {
   const filePath = path.join(outputDir, req.params.filename);
   if (fs.existsSync(filePath)) {
     res.setHeader('Content-Type', 'video/mp4');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
     res.setHeader('Access-Control-Expose-Headers', '*');
-    res.setHeader('Content-Disposition', `attachment; filename="${req.params.filename}"`);
+    res.setHeader('Accept-Ranges', 'bytes');
+    const isDownload = req.path.startsWith('/download') || req.query.download === '1' || !req.headers.range;
+    if (isDownload) {
+      res.setHeader('Content-Disposition', `attachment; filename="${req.params.filename}"`);
+    } else {
+      res.setHeader('Content-Disposition', `inline; filename="${req.params.filename}"`);
+    }
     return res.sendFile(filePath);
   }
   next();

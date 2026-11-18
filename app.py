@@ -96,7 +96,12 @@ async def proxy_to_node(request: Request, path_with_query: str):
             base_fname = os.path.basename(path_with_query.split("?")[0])
             if base_fname.endswith(".mp4"):
                 resp_headers["content-type"] = "video/mp4"
-                resp_headers["content-disposition"] = f'attachment; filename="{base_fname}"'
+                is_download = "download=1" in path_with_query or "download" in str(request.query_params)
+                if is_download or "range" not in request.headers:
+                    resp_headers["content-disposition"] = f'attachment; filename="{base_fname}"'
+                else:
+                    resp_headers["content-disposition"] = f'inline; filename="{base_fname}"'
+                resp_headers["accept-ranges"] = "bytes"
 
         async def stream_generator():
             try:
@@ -158,6 +163,10 @@ async def route_api(request: Request, path: str):
 @app.api_route("/output/{path:path}", methods=["GET", "HEAD"])
 async def route_output(request: Request, path: str):
     return await proxy_to_node(request, f"/output/{path}")
+
+@app.api_route("/download/{path:path}", methods=["GET", "HEAD"])
+async def route_download(request: Request, path: str):
+    return await proxy_to_node(request, f"/output/{path}?download=1")
 
 @app.api_route("/uploads/{path:path}", methods=["GET", "HEAD"])
 async def route_uploads(request: Request, path: str):

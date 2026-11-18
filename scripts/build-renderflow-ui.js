@@ -3231,17 +3231,13 @@ const htmlContent = `<!DOCTYPE html>
       }
     };
 
-    // CLOUD BACKEND INTEGRATION (HUGGING FACE SPACES / RAILWAY / RENDER)
-    const DEFAULT_CLOUD_ENGINE = 'https://durrani6969-renderflow-engine.hf.space';
-    let savedCloudUrl = localStorage.getItem('rf_cloud_backend_url');
-    // Sanitize saved URL: purge truncated or malformed values
-    if (savedCloudUrl && (!savedCloudUrl.startsWith('http') || !savedCloudUrl.includes('.'))) {
-      try { localStorage.removeItem('rf_cloud_backend_url'); } catch (e) {}
-      savedCloudUrl = null;
-    }
-    let cloudBackendUrl = (savedCloudUrl !== null && savedCloudUrl !== '') 
-      ? savedCloudUrl 
-      : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : DEFAULT_CLOUD_ENGINE);
+    // CLOUD BACKEND INTEGRATION (HUGGING FACE ZERO-GPU ENGINE)
+    const OFFICIAL_CLOUD_ENGINE = 'https://durrani6969-renderflow-engine.hf.space';
+    try { localStorage.removeItem('rf_cloud_backend_url'); } catch (e) {}
+
+    let cloudBackendUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+      ? '' 
+      : OFFICIAL_CLOUD_ENGINE;
 
     let currentResultUrl = '';
     let currentResultFilename = 'renderflow-export.mp4';
@@ -3249,97 +3245,86 @@ const htmlContent = `<!DOCTYPE html>
 
     function apiUrl(endpoint) {
       if (cloudBackendUrl) {
-        return cloudBackendUrl.replace(new RegExp('/+$'), '') + endpoint;
+        return OFFICIAL_CLOUD_ENGINE.replace(new RegExp('/+$'), '') + endpoint;
       }
       return endpoint;
     }
 
-    // ROBUST BINARY MP4 DOWNLOAD HANDLER
+    // GUARANTEED DUAL-ACTION MP4 DOWNLOAD HANDLER
     async function downloadCurrentResult(e) {
-      if (e && e.preventDefault) e.preventDefault();
       return downloadFileFromUrl(e, currentResultUrl, currentResultFilename);
     }
 
     async function downloadFileFromUrl(e, url, filename) {
-      if (e && e.preventDefault) e.preventDefault();
+      const targetFilename = filename || currentResultFilename || 'renderflow-export.mp4';
       
-      const targetFilename = filename || 'renderflow-export.mp4';
-      if (!url && !currentResultBlob) {
-        showToast('No video ready yet. Please click Create MP4 video first.');
-        return;
-      }
-
-      const btn = $('btnDownloadResult');
-      const origText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = 'Downloading MP4...';
-        btn.style.pointerEvents = 'none';
-      }
-
-      showToast('Downloading video: ' + targetFilename + '...');
-
-      try {
-        // 1. If we already hold the binary Blob in memory
-        if (currentResultBlob && (!url || url.startsWith('blob:'))) {
-          const blobUrl = URL.createObjectURL(currentResultBlob);
-          const a = document.createElement('a');
-          a.style.display = 'none';
-          a.href = blobUrl;
-          a.download = targetFilename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
-          showToast('MP4 video saved successfully!');
-          return;
-        }
-
-        // 2. Fetch binary stream from Cloud / Localhost
-        const finalFetchUrl = (url && (url.startsWith('http') || url.startsWith('blob:'))) ? url : apiUrl(url || '');
-        const res = await fetch(finalFetchUrl);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-
-        const blob = await res.blob();
-        // Guard against HTML error pages being saved as MP4
-        if (blob.type.includes('text') || blob.type.includes('html')) {
-          const errText = await blob.text();
-          throw new Error('Server returned text instead of video: ' + errText.slice(0, 80));
-        }
-
-        currentResultBlob = blob;
-        const blobUrl = URL.createObjectURL(blob);
+      // 1. If in-memory binary Blob is already cached, trigger instant zero-latency download
+      if (currentResultBlob) {
+        if (e && e.preventDefault) e.preventDefault();
+        const blobUrl = URL.createObjectURL(currentResultBlob);
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = blobUrl;
         a.download = targetFilename;
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        }, 30000);
         showToast('MP4 video saved successfully!');
-      } catch (err) {
-        console.error('Download error:', err);
-        showToast('Download error: ' + err.message);
-        if (url && url.startsWith('http')) {
-          window.open(url, '_blank');
-        }
-      } finally {
-        if (btn) {
-          btn.innerHTML = origText;
-          btn.style.pointerEvents = 'auto';
-        }
+        return;
       }
+
+      const targetUrl = url || currentResultUrl;
+      if (!targetUrl) {
+        if (e && e.preventDefault) e.preventDefault();
+        showToast('No video ready yet. Please click Create MP4 video first.');
+        return;
+      }
+
+      // 2. Direct native browser download via forced attachment URL
+      const finalFetchUrl = (targetUrl.startsWith('http') || targetUrl.startsWith('blob:')) 
+        ? targetUrl 
+        : apiUrl(targetUrl);
+      
+      const downloadParamUrl = finalFetchUrl.includes('?') 
+        ? (finalFetchUrl + '&download=1') 
+        : (finalFetchUrl + '?download=1');
+
+      showToast('Downloading MP4 video...');
+
+      // Update button href directly so native click handles it
+      const btn = $('btnDownloadResult');
+      if (btn) {
+        btn.href = downloadParamUrl;
+        btn.setAttribute('download', targetFilename);
+      }
+
+      // Trigger fallback download anchor
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = downloadParamUrl;
+      a.download = targetFilename;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => document.body.removeChild(a), 1500);
+
+      // In the background, also pre-fetch and store blob for instant re-download
+      fetch(downloadParamUrl)
+        .then(r => r.ok ? r.blob() : null)
+        .then(b => {
+          if (b && !b.type.includes('text') && !b.type.includes('html') && b.size > 1000) {
+            currentResultBlob = b;
+            if (btn) btn.href = URL.createObjectURL(b);
+          }
+        })
+        .catch(() => {});
     }
 
     function handleCloudUrlChange(val) {
-      cloudBackendUrl = (val || '').trim();
-      if (cloudBackendUrl) {
-        localStorage.setItem('rf_cloud_backend_url', cloudBackendUrl);
-        showToast('Saved Cloud Backend URL');
-      } else {
-        localStorage.removeItem('rf_cloud_backend_url');
-        showToast('Cleared Cloud Backend URL');
-      }
+      cloudBackendUrl = OFFICIAL_CLOUD_ENGINE;
       detectRuntimeMode();
     }
 
@@ -3821,6 +3806,7 @@ const htmlContent = `<!DOCTYPE html>
 
         const exactDur = data.record?.duration || (data.probe?.duration ? data.probe.duration + 's' : (data.metrics?.durationSec ? data.metrics.durationSec + 's' : '46.0s'));
         const finalUrl = data.url ? (data.url.startsWith('http') ? data.url : apiUrl(data.url)) : '';
+        const downloadUrl = finalUrl.includes('?') ? (finalUrl + '&download=1') : (finalUrl + '?download=1');
 
         currentResultUrl = finalUrl;
         currentResultFilename = data.filename || 'export.mp4';
@@ -3837,8 +3823,23 @@ const htmlContent = `<!DOCTYPE html>
         $('resMetaTime').textContent = data.metrics?.totalRenderTimeSec ? (data.metrics.totalRenderTimeSec + 's') : 'Completed';
         $('resMetaFps').textContent = 'Full HD · ' + (data.metrics?.fps || 30) + ' FPS';
 
-        $('btnDownloadResult').href = finalUrl;
-        $('btnDownloadResult').download = data.filename || 'export.mp4';
+        const btnDl = $('btnDownloadResult');
+        btnDl.href = downloadUrl;
+        btnDl.setAttribute('download', data.filename || 'export.mp4');
+        btnDl.setAttribute('target', '_blank');
+
+        // Pre-fetch Blob in background for zero-latency download
+        if (finalUrl) {
+          fetch(downloadUrl)
+            .then(res => res.ok ? res.blob() : null)
+            .then(blob => {
+              if (blob && !blob.type.includes('text') && !blob.type.includes('html') && blob.size > 1000) {
+                currentResultBlob = blob;
+                btnDl.href = URL.createObjectURL(blob);
+              }
+            })
+            .catch(() => {});
+        }
 
         if (data.record) {
           JaneVaultDB.saveVideo({
@@ -4122,6 +4123,7 @@ const htmlContent = `<!DOCTYPE html>
 
     function openHistoryVideo(url, name, sizeStr, dur, res) {
       const finalUrl = (url && (url.startsWith('http') || url.startsWith('blob:'))) ? url : apiUrl(url || '');
+      const downloadUrl = finalUrl.includes('?') ? (finalUrl + '&download=1') : (finalUrl + '?download=1');
       currentResultUrl = finalUrl;
       currentResultFilename = (name && name.endsWith('.mp4')) ? name : (name ? name + '.mp4' : 'export.mp4');
       currentResultBlob = null;
@@ -4133,8 +4135,24 @@ const htmlContent = `<!DOCTYPE html>
       $('resMetaSizeBadge').textContent = sizeStr;
       $('resMetaDuration').textContent = dur;
       $('resMetaResolution').textContent = res || '1080×1920';
-      $('btnDownloadResult').href = finalUrl;
-      $('btnDownloadResult').download = currentResultFilename;
+      
+      const btnDl = $('btnDownloadResult');
+      btnDl.href = downloadUrl;
+      btnDl.setAttribute('download', currentResultFilename);
+      btnDl.setAttribute('target', '_blank');
+
+      if (finalUrl) {
+        fetch(downloadUrl)
+          .then(res => res.ok ? res.blob() : null)
+          .then(blob => {
+            if (blob && !blob.type.includes('text') && !blob.type.includes('html') && blob.size > 1000) {
+              currentResultBlob = blob;
+              btnDl.href = URL.createObjectURL(blob);
+            }
+          })
+          .catch(() => {});
+      }
+
       switchNav('studio');
       setCreateStep(3);
     }
@@ -4176,13 +4194,14 @@ const htmlContent = `<!DOCTYPE html>
         const dateStr = new Date(r.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const title = escapeHtml(cleanTitle(r.originalName || r.filename));
         const targetUrl = (r.url && (r.url.startsWith('http') || r.url.startsWith('blob:'))) ? r.url : apiUrl(r.url || '');
+        const targetDlUrl = targetUrl.includes('?') ? (targetUrl + '&download=1') : (targetUrl + '?download=1');
         const safeFilename = r.filename || 'export.mp4';
 
         return \`
           <div class="record" data-name="\${title.toLowerCase()}">
             <div class="record-title">
               <div class="thumbnail" onclick="openHistoryVideo('\${targetUrl}', '\${title}', '\${sizeMb}', '\${dur}', '\${r.resolution || '1080p'}')">
-                <video src="\${targetUrl}#t=0.5" preload="metadata" muted playsinline></video>
+                <video src="\${targetUrl}#t=0.5" preload="metadata" muted playsinline onerror="this.style.display='none'"></video>
               </div>
               <div>
                 <strong>\${title}</strong>
@@ -4192,7 +4211,7 @@ const htmlContent = `<!DOCTYPE html>
             <div class="meta created">\${dateStr}</div>
             <div class="meta">\${r.resolution || '1080p'}</div>
             <div class="record-actions">
-              <a href="\${targetUrl}" class="btn secondary" download="\${safeFilename}" onclick="downloadFileFromUrl(event, '\${targetUrl}', '\${safeFilename}')">Download</a>
+              <a href="\${targetDlUrl}" class="btn secondary" download="\${safeFilename}" target="_blank" onclick="downloadFileFromUrl(event, '\${targetDlUrl}', '\${safeFilename}')">Download</a>
               <button class="btn-del" onclick="deleteHistoryRecord('\${r.id}')" title="Delete">✕</button>
             </div>
           </div>
