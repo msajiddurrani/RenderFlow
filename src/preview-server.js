@@ -257,6 +257,8 @@ async function handleRenderJob(req, res, inputPath, originalFilename, body) {
     width = 1080; height = 1920;
   } else if (resolution === '1080p' || resolution === 'horizontal') {
     width = 1920; height = 1080;
+  } else if (resolution === 'square' || resolution === '1:1') {
+    width = 1080; height = 1080;
   } else if (resolution === '720p') {
     width = 1280; height = 720;
   } else if (resolution === '4k') {

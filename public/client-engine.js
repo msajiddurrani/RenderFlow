@@ -164,31 +164,58 @@ class ClientRenderEngine {
       const fStart = performance.now();
       const tSec = frameIndex / fps;
 
-      // Allow iframe animations with renderFrame(tSec) to advance
+      // 1. Advance iframe animations with virtual clock or hooks
       if (iframe && iframe.contentWindow) {
+        if (typeof iframe.contentWindow.__stepFrame__ === 'function') {
+          try { iframe.contentWindow.__stepFrame__(frameIndex, tSec, tSec * 1000); } catch (e) {}
+        }
         if (typeof iframe.contentWindow.renderFrame === 'function') {
           try { iframe.contentWindow.renderFrame(tSec); } catch (e) {}
         }
-        if (!innerCanvas && iframe.contentDocument) {
-          innerCanvas = iframe.contentDocument.querySelector('canvas');
+        if (typeof iframe.contentWindow.seek === 'function') {
+          try { iframe.contentWindow.seek(tSec); } catch (e) {}
+        }
+        if (iframe.contentWindow.gsap && iframe.contentWindow.gsap.globalTimeline) {
+          try { iframe.contentWindow.gsap.globalTimeline.time(tSec); } catch (e) {}
         }
       }
 
-      // 1. Draw rich kinetic presentation layer (guarantees text & gradients are NEVER black)
-      const secIdx = Math.min(totalSections - 1, Math.floor(tSec / timePerSection));
-      const secProg = (tSec % timePerSection) / timePerSection;
-      const curSec = sections[secIdx];
-      this.drawHtmlKineticFrame(ctx, curSec, secIdx, totalSections, secProg, width, height, tSec, duration);
-
-      // 2. If preview iframe has an active canvas (Three.js WebGL / Canvas 2D), composite it on top
-      if (innerCanvas && innerCanvas.width > 0 && innerCanvas.height > 0) {
-        try {
-          ctx.save();
-          ctx.drawImage(innerCanvas, 0, 0, width, height);
-          ctx.restore();
-        } catch (e) {
-          // ignore draw failure
+      // 2. Clear canvas with document background or dark aesthetic
+      let docBg = '#09090b';
+      try {
+        if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
+          const cs = iframe.contentWindow.getComputedStyle(iframe.contentDocument.body);
+          if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && cs.backgroundColor !== 'transparent') {
+            docBg = cs.backgroundColor;
+          }
         }
+      } catch (e) {}
+      ctx.fillStyle = docBg;
+      ctx.fillRect(0, 0, width, height);
+
+      // 3. Composite all active canvas elements from the iframe (WebGL & 2D)
+      const iframeCanvases = (iframe && iframe.contentDocument) 
+        ? Array.from(iframe.contentDocument.querySelectorAll('canvas')) 
+        : [];
+
+      let hasDrawnCanvas = false;
+      if (iframeCanvases.length > 0) {
+        for (const c of iframeCanvases) {
+          if (c.width > 0 && c.height > 0) {
+            try {
+              ctx.drawImage(c, 0, 0, width, height);
+              hasDrawnCanvas = true;
+            } catch (e) {}
+          }
+        }
+      }
+
+      // 4. Fallback: only if no canvas elements exist in the document, draw kinetic text slide
+      if (!hasDrawnCanvas) {
+        const secIdx = Math.min(totalSections - 1, Math.floor(tSec / timePerSection));
+        const secProg = (tSec % timePerSection) / timePerSection;
+        const curSec = sections[secIdx];
+        this.drawHtmlKineticFrame(ctx, curSec, secIdx, totalSections, secProg, width, height, tSec, duration);
       }
 
       // Create VideoFrame from Untainted Canvas
@@ -307,19 +334,6 @@ class ClientRenderEngine {
     const yOffset = (1 - alpha) * 20;
     const padX = isVertical ? 64 : 120;
     let currY = isVertical ? 200 + yOffset : 180 + yOffset;
-
-    // Badge
-    ctx.fillStyle = '#6366F1';
-    ctx.beginPath();
-    ctx.arc(padX + 8, currY - 6, 6, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#818CF8';
-    ctx.font = '600 ' + (isVertical ? '20px' : '22px') + ' sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('HTML5 MOTION COMPOSITION', padX + 26, currY);
-
-    currY += isVertical ? 54 : 64;
 
     // Title
     ctx.fillStyle = '#FFFFFF';

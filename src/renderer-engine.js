@@ -34,7 +34,7 @@ class RendererEngine extends EventEmitter {
     const fps = renderOptions.fps || this.fps;
     const useHardwareGpu = renderOptions.useGpu !== undefined ? renderOptions.useGpu : this.useGpu;
 
-    let targetHtmlPath = inputFilePath;
+    let targetHtmlPath = path.resolve(inputFilePath);
     let tempCompiledHtml = null;
 
     // Handle Markdown (.md) input
@@ -46,7 +46,7 @@ class RendererEngine extends EventEmitter {
         width: renderOptions.width || this.width,
         height: renderOptions.height || this.height
       });
-      tempCompiledHtml = inputFilePath.replace(/\.md$/i, '-compiled.html');
+      tempCompiledHtml = path.resolve(inputFilePath.replace(/\.md$/i, '-compiled.html'));
       fs.writeFileSync(tempCompiledHtml, compiledHtml, 'utf8');
       targetHtmlPath = tempCompiledHtml;
     }

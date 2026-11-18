@@ -2944,8 +2944,8 @@ const htmlContent = `<!DOCTYPE html>
               <div class="adv-row">
                 <label for="cfgEngineMode">Processing engine</label>
                 <select id="cfgEngineMode" class="adv-select">
-                  <option value="client-gpu" selected>Automatic (In-Browser GPU · Instant 0s Download)</option>
-                  <option value="server-gpu" id="optCloudServer">Desktop Server Engine (Port 3333)</option>
+                  <option value="server-gpu" id="optCloudServer" selected>Automatic (Hardware GPU · Studio Engine)</option>
+                  <option value="client-gpu">In-Browser Engine (Client GPU)</option>
                 </select>
               </div>
               <div class="adv-row" style="display:none;">
@@ -3382,23 +3382,22 @@ const htmlContent = `<!DOCTYPE html>
       const optCloud = $('optCloudServer');
       const diagMode = $('diagActiveMode');
 
-      // ALWAYS DEFAULT TO CLIENT-GPU (IN-BROWSER HARDWARE ACCELERATION)
-      if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
-
       if (hasLocalServer) {
         currentAppMode = 'MODE_B';
-        if (modeLabel) modeLabel.textContent = 'Hardware GPU (In-Browser · Instant Download)';
+        if ($('cfgEngineMode')) $('cfgEngineMode').value = 'server-gpu';
+        if (modeLabel) modeLabel.textContent = 'Hardware GPU (Studio Engine · 0s Local)';
         if (optCloud) {
           optCloud.disabled = false;
-          optCloud.textContent = 'Desktop Server Engine (Port 3333)';
+          optCloud.textContent = 'Automatic (Hardware GPU · Studio Engine)';
         }
-        if (diagMode) diagMode.textContent = 'WebCodecs GPU + Local Port 3333';
+        if (diagMode) diagMode.textContent = 'Local Hardware Engine (Chrome + FFmpeg)';
       } else {
         currentAppMode = 'MODE_A';
-        if (modeLabel) modeLabel.textContent = 'Hardware GPU (In-Browser · Instant Download)';
+        if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
+        if (modeLabel) modeLabel.textContent = 'In-Browser Engine (Client GPU)';
         if (optCloud) {
           optCloud.disabled = true;
-          optCloud.textContent = 'Desktop Server (Run npm start for Port 3333)';
+          optCloud.textContent = 'Desktop Server (Run npm start on port 3333)';
         }
         if (diagMode) diagMode.textContent = 'WebCodecs In-Browser (Zero Backend Needed)';
       }
@@ -3724,11 +3723,11 @@ const htmlContent = `<!DOCTYPE html>
         return;
       }
 
-      const selectedEngine = $('cfgEngineMode') ? $('cfgEngineMode').value : 'client-gpu';
-      if (selectedEngine === 'client-gpu') {
-        executeClientSideRender();
-      } else {
+      const selectedEngine = $('cfgEngineMode') ? $('cfgEngineMode').value : 'server-gpu';
+      if (currentAppMode === 'MODE_B' || selectedEngine === 'server-gpu') {
         executeServerSideRender();
+      } else {
+        executeClientSideRender();
       }
     }
 
@@ -3744,6 +3743,7 @@ const htmlContent = `<!DOCTYPE html>
       if (resMode === '1080p') { width = 1920; height = 1080; }
       else if (resMode === 'square') { width = 1080; height = 1080; }
       else if (resMode === '720p') { width = 1280; height = 720; }
+      else if (resMode === '1080p-v') { width = 1080; height = 1920; }
 
       const bakeBtn = $('btnStudioBake');
       bakeBtn.textContent = 'Rendering...';
@@ -3752,7 +3752,7 @@ const htmlContent = `<!DOCTYPE html>
       $('progressHud').style.display = 'block';
       $('hudPct').textContent = '0%';
       $('hudBarFill').style.width = '0%';
-      $('hudPhaseText').textContent = 'Connecting to Cloud GPU Engine...';
+      $('hudPhaseText').textContent = 'Connecting to Hardware GPU Engine...';
 
       try {
         const response = await fetch(apiUrl('/api/render-code-sse'), {
@@ -3763,7 +3763,7 @@ const htmlContent = `<!DOCTYPE html>
 
         if (!response.ok) {
           const errText = await response.text();
-          throw new Error('Cloud engine returned HTTP ' + response.status + ': ' + errText.slice(0, 100));
+          throw new Error('Hardware engine returned HTTP ' + response.status + ': ' + errText.slice(0, 100));
         }
         await readStream(response);
       } catch (err) {
