@@ -2935,8 +2935,8 @@
               <div class="adv-row">
                 <label for="cfgEngineMode">Processing engine</label>
                 <select id="cfgEngineMode" class="adv-select">
-                  <option value="server-gpu" id="optCloudServer">Automatic (Direct3D11 GPU)</option>
-                  <option value="client-gpu">In-Browser WebCodecs</option>
+                  <option value="client-gpu" selected>Automatic (In-Browser GPU · Instant 0s Download)</option>
+                  <option value="server-gpu" id="optCloudServer">Desktop Server Engine (Port 3333)</option>
                 </select>
               </div>
               <div class="adv-row" style="display:none;">
@@ -3226,22 +3226,15 @@
       }
     };
 
-    // CLOUD BACKEND INTEGRATION (HUGGING FACE ZERO-GPU ENGINE)
-    const OFFICIAL_CLOUD_ENGINE = 'https://durrani6969-renderflow-engine.hf.space';
+    // IN-BROWSER HARDWARE-ACCELERATED ENGINE (ZERO EXTERNAL BACKEND)
+    let cloudBackendUrl = '';
     try { localStorage.removeItem('rf_cloud_backend_url'); } catch (e) {}
-
-    let cloudBackendUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
-      ? '' 
-      : OFFICIAL_CLOUD_ENGINE;
 
     let currentResultUrl = '';
     let currentResultFilename = 'renderflow-export.mp4';
     let currentResultBlob = null;
 
     function apiUrl(endpoint) {
-      if (cloudBackendUrl) {
-        return OFFICIAL_CLOUD_ENGINE.replace(new RegExp('/+$'), '') + endpoint;
-      }
       return endpoint;
     }
 
@@ -3319,23 +3312,22 @@
     }
 
     function handleCloudUrlChange(val) {
-      cloudBackendUrl = OFFICIAL_CLOUD_ENGINE;
+      cloudBackendUrl = '';
       detectRuntimeMode();
     }
 
     // RUNTIME MODE DETECTION
     async function detectRuntimeMode() {
-      if ($('cfgCloudUrl')) $('cfgCloudUrl').value = cloudBackendUrl;
-      let mode = 'MODE_A';
+      if ($('cfgCloudUrl')) $('cfgCloudUrl').value = '';
+      let hasLocalServer = false;
       try {
-        const targetUrl = apiUrl('/api/history?limit=1');
-        const res = await fetch(targetUrl);
+        const res = await fetch('/api/history?limit=1');
         const cType = res.headers.get('content-type') || '';
         if (res.ok && cType.includes('application/json')) {
-          mode = 'MODE_B';
+          hasLocalServer = true;
         }
       } catch (e) {
-        mode = 'MODE_A';
+        hasLocalServer = false;
       }
 
       const modeBadge = $('appModeBadge');
@@ -3343,25 +3335,25 @@
       const optCloud = $('optCloudServer');
       const diagMode = $('diagActiveMode');
 
-      if (mode === 'MODE_B') {
+      // ALWAYS DEFAULT TO CLIENT-GPU (IN-BROWSER HARDWARE ACCELERATION)
+      if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
+
+      if (hasLocalServer) {
         currentAppMode = 'MODE_B';
-        const isCloud = !!cloudBackendUrl;
-        if (modeLabel) modeLabel.textContent = isCloud ? 'Cloud Engine (Hugging Face)' : 'Desktop Engine (Port 3333)';
+        if (modeLabel) modeLabel.textContent = 'Hardware GPU (In-Browser · Instant Download)';
         if (optCloud) {
           optCloud.disabled = false;
-          optCloud.textContent = isCloud ? 'Automatic (Cloud Chromium + FFmpeg)' : 'Automatic (Direct3D11 GPU)';
+          optCloud.textContent = 'Desktop Server Engine (Port 3333)';
         }
-        if ($('cfgEngineMode')) $('cfgEngineMode').value = 'server-gpu';
-        if (diagMode) diagMode.textContent = isCloud ? 'Hugging Face Spaces (2 vCPU · 16 GB RAM)' : 'Direct3D11 Hardware GPU';
+        if (diagMode) diagMode.textContent = 'WebCodecs GPU + Local Port 3333';
       } else {
         currentAppMode = 'MODE_A';
-        if (modeLabel) modeLabel.textContent = 'Web Engine (Vercel)';
+        if (modeLabel) modeLabel.textContent = 'Hardware GPU (In-Browser · Instant Download)';
         if (optCloud) {
           optCloud.disabled = true;
-          optCloud.textContent = 'Cloud / Desktop Server (Offline)';
+          optCloud.textContent = 'Desktop Server (Run npm start for Port 3333)';
         }
-        if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
-        if (diagMode) diagMode.textContent = 'WebCodecs In-Browser';
+        if (diagMode) diagMode.textContent = 'WebCodecs In-Browser (Zero Backend Needed)';
       }
     }
 
@@ -3685,7 +3677,7 @@
         return;
       }
 
-      const selectedEngine = $('cfgEngineMode') ? $('cfgEngineMode').value : 'server-gpu';
+      const selectedEngine = $('cfgEngineMode') ? $('cfgEngineMode').value : 'client-gpu';
       if (selectedEngine === 'client-gpu') {
         executeClientSideRender();
       } else {
