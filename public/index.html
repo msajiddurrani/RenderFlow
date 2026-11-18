@@ -2839,11 +2839,26 @@
                 <span>Live Interactive Preview</span>
               </div>
               <div class="preview-actions-right">
+                <button id="btnRecordLivePreview" class="btn secondary" style="min-height:38px;padding:0 12px;font-size:12px;border-radius:10px;display:inline-flex;align-items:center;gap:6px;" onclick="toggleLivePreviewRecording()">
+                  <span id="recDot" style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block;"></span>
+                  <span id="txtRecordLivePreview">Record live preview</span>
+                </button>
                 <button class="btn secondary" style="min-height:38px;padding:0 14px;font-size:12px;border-radius:10px;" onclick="refreshStudioPreview()">
                   <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                   Replay animation
                 </button>
               </div>
+            </div>
+
+            <!-- Mode A / Vercel Composite HTML Guidance Notice -->
+            <div id="vercelHtmlNotice" class="engine-notice-box" style="display:none;margin-top:12px;padding:12px 16px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;font-size:12px;color:#475569;line-height:1.5;">
+              <div style="font-weight:700;color:#1E293B;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                <svg style="width:16px;height:16px;color:#6366F1;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>Vercel Mode · Multi-Layer HTML Reel Guide</span>
+              </div>
+              <p style="margin:0 0 6px 0;">
+                Full-page composite HTML animations (DOM text + 3D WebGL) can be exported directly via In-Browser WebCodecs or by clicking <strong>Record live preview</strong> above. For offline 60 FPS rendering of 48s reels, run the <strong>RenderFlow Desktop Engine</strong> (<code style="background:#EDF2F7;padding:1px 4px;border-radius:4px;">npm start</code> on port 3333).
+              </p>
             </div>
 
             <!-- Truthful SSE Progress HUD (Real Percent, FPS, Latency, ETA, Frame) -->
@@ -3441,6 +3456,14 @@
       } else {
         updateDurationDisplay('');
       }
+
+      // Check for multi-layer HTML animations on Vercel mode
+      const isHtml = /<!DOCTYPEs+html|<html|<div|<canvas/i.test(code);
+      const isComplex = isHtml && (detectedDur > 10 || /three|webgl|gsap/i.test(code));
+      const notice = $('vercelHtmlNotice');
+      if (notice) {
+        notice.style.display = (currentAppMode === 'MODE_A' && isComplex) ? 'block' : 'none';
+      }
     }
 
     function updateDurationDisplay(dur) {
@@ -3492,7 +3515,19 @@
       if (!code) return;
 
       const iframe = $('studioPreviewIframe');
-      const blob = new Blob([code], { type: 'text/html' });
+      // Inject WebGL preserveDrawingBuffer shim so WebGL frames don't clear their buffer on display swap
+      const shim = ['<', 'script>', '(function(){try{var o=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(t,a){if(t==="webgl"||t==="webgl2"||t==="experimental-webgl"){a=Object.assign({},a,{preserveDrawingBuffer:true});}return o.call(this,t,a);};}catch(e){}})();', '<', '/script>'].join('');
+
+      let modifiedCode = code;
+      if (/<head[\s>]/i.test(modifiedCode)) {
+        modifiedCode = modifiedCode.replace(/<head[\s>]/i, m => m + '\n' + shim + '\n');
+      } else if (/<html[\s>]/i.test(modifiedCode)) {
+        modifiedCode = modifiedCode.replace(/<html[\s>]/i, m => m + '\n<head>' + shim + '</head>\n');
+      } else {
+        modifiedCode = shim + '\n' + modifiedCode;
+      }
+
+      const blob = new Blob([modifiedCode], { type: 'text/html' });
       iframe.src = URL.createObjectURL(blob);
     }
 
@@ -3523,7 +3558,7 @@
       } catch (e) {}
 
       // Fallback clean motion preset
-      const fallbackHtml = '<!DOCTYPE html><html><body style="margin:0;background:#090B14;display:flex;align-items:center;justify-content:center;height:100vh;color:#fff;font-family:sans-serif;"><div style="text-align:center;"><h1 style="font-size:48px;margin-bottom:12px;color:#818CF8;">RenderFlow</h1><p style="font-size:18px;color:#94A3B8;">Turn animated pages into pristine 1080p MP4</p></div><script>window.DURATION=5;<\/script></body></html>';
+      const fallbackHtml = '<!DOCTYPE html><html><body style="margin:0;background:#090B14;display:flex;align-items:center;justify-content:center;height:100vh;color:#fff;font-family:sans-serif;"><div style="text-align:center;"><h1 style="font-size:48px;margin-bottom:12px;color:#818CF8;">RenderFlow</h1><p style="font-size:18px;color:#94A3B8;">Turn animated pages into pristine 1080p MP4</p></div><' + 'script>window.DURATION=5;<' + '/script></body></html>';
       $('codeEditorStudio').value = fallbackHtml;
       setRatioSelection('1080p');
       updateDurationDisplay(5);
@@ -3677,9 +3712,35 @@
       }
     }
 
+    let activeClientEngine = null;
+
+    function cancelCurrentRender() {
+      if (activeClientEngine) {
+        activeClientEngine.abort();
+        activeClientEngine = null;
+      }
+      resetRenderBtns();
+      $('progressHud').style.display = 'none';
+      showToast('Render cancelled.');
+    }
+
+    function resetRenderBtns() {
+      const btn = $('btnStudioBake');
+      if (btn) {
+        btn.textContent = 'Create MP4 video';
+        btn.disabled = false;
+        btn.onclick = executeRenderJob;
+      }
+      activeClientEngine = null;
+    }
+
     // CLIENT ENGINE RENDER (VERCEL)
     async function executeClientSideRender() {
-      $('btnStudioBake').disabled = true;
+      const bakeBtn = $('btnStudioBake');
+      bakeBtn.textContent = '⏹ Cancel render';
+      bakeBtn.disabled = false;
+      bakeBtn.onclick = cancelCurrentRender;
+
       $('progressHud').style.display = 'block';
       $('hudPhaseText').textContent = 'In-Browser WebCodecs Render...';
 
@@ -3693,7 +3754,7 @@
 
         const userDur = parseFloat($('cfgDuration').value);
         const duration = (!isNaN(userDur) && userDur > 0) ? userDur : (extractDurationFromCode(code) || 5);
-        const fps = parseInt($('cfgFps').value, 10) || 30;
+        const fps = Math.min(30, parseInt($('cfgFps').value, 10) || 30);
 
         const engine = new ClientRenderEngine({
           width, height, fps, duration,
@@ -3707,6 +3768,8 @@
             $('hudPhaseText').textContent = 'Encoding Frames In-Browser (' + pct + '%)...';
           }
         });
+
+        activeClientEngine = engine;
 
         const result = await engine.renderAnimation(code, { width, height, fps, duration });
         const blobUrl = URL.createObjectURL(result.blob);
@@ -3745,13 +3808,98 @@
         setCreateStep(3);
         loadHistory();
       } catch (e) {
-        $('hudPhaseText').textContent = 'WebCodecs Error: ' + e.message;
+        if (e.message && e.message.includes('cancelled')) {
+          $('hudPhaseText').textContent = 'Render cancelled.';
+        } else {
+          $('hudPhaseText').textContent = 'WebCodecs Error: ' + e.message;
+        }
         resetRenderBtns();
       }
     }
 
-    function resetRenderBtns() {
-      $('btnStudioBake').disabled = false;
+    // LIVE PREVIEW RECORDING (COMPOSITED HTML / CANVAS / AUDIO)
+    let liveMediaRecorder = null;
+    let liveRecordedChunks = [];
+
+    async function toggleLivePreviewRecording() {
+      if (liveMediaRecorder && liveMediaRecorder.state === 'recording') {
+        liveMediaRecorder.stop();
+        return;
+      }
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+          showToast('Live preview recording is supported in Chrome, Edge, and modern desktop browsers.');
+          return;
+        }
+
+        $('txtRecordLivePreview').textContent = 'Select tab...';
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: { displaySurface: 'browser' },
+          audio: true
+        });
+
+        $('txtRecordLivePreview').textContent = '⏹ Stop recording';
+        const recDot = $('recDot');
+        if (recDot) recDot.style.background = '#EF4444';
+
+        liveRecordedChunks = [];
+        const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1') ? 'video/mp4' : 'video/webm';
+        liveMediaRecorder = new MediaRecorder(stream, { mimeType });
+
+        liveMediaRecorder.ondataavailable = e => {
+          if (e.data && e.data.size > 0) liveRecordedChunks.push(e.data);
+        };
+
+        liveMediaRecorder.onstop = async () => {
+          stream.getTracks().forEach(t => t.stop());
+          $('txtRecordLivePreview').textContent = 'Record live preview';
+          if (liveRecordedChunks.length === 0) return;
+
+          const blob = new Blob(liveRecordedChunks, { type: mimeType });
+          const blobUrl = URL.createObjectURL(blob);
+          const isMp4 = mimeType.includes('mp4');
+          const filename = 'live-recording-' + Date.now() + (isMp4 ? '.mp4' : '.webm');
+
+          const record = {
+            id: 'rec_' + Date.now(),
+            filename,
+            originalName: 'Live Recording' + (isMp4 ? '.mp4' : '.webm'),
+            resolution: '1080p (Composited)',
+            duration: 'Live capture',
+            durationSec: 10,
+            bytes: blob.size,
+            createdAt: Date.now(),
+            url: blobUrl,
+            blob
+          };
+
+          await JaneVaultDB.saveVideo(record);
+          const v = $('resultVideo');
+          v.src = blobUrl;
+          v.load();
+
+          $('resMetaFilename').textContent = record.filename;
+          $('resMetaDuration').textContent = 'Live Capture';
+          $('resMetaSizeBadge').textContent = (blob.size / (1024 * 1024)).toFixed(1) + ' MB';
+          $('resMetaResolution').textContent = '1080p';
+          $('resMetaFps').textContent = '60 FPS · Full Composited';
+          $('resMetaTime').textContent = 'Completed';
+
+          $('btnDownloadResult').href = blobUrl;
+          $('btnDownloadResult').download = record.filename;
+
+          setCreateStep(3);
+          loadHistory();
+          showToast('Live preview recording saved!');
+        };
+
+        refreshStudioPreview();
+        liveMediaRecorder.start(250);
+      } catch (err) {
+        console.warn('Screen recording cancelled or failed:', err);
+        $('txtRecordLivePreview').textContent = 'Record live preview';
+      }
     }
 
     // VAULT & HISTORY

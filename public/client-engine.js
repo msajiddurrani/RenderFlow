@@ -12,6 +12,12 @@ class ClientRenderEngine {
     this.duration = options.duration || 5;
     this.onProgress = options.onProgress || (() => {});
     this.onStatus = options.onStatus || (() => {});
+    this.aborted = false;
+  }
+
+  abort() {
+    this.aborted = true;
+    this.onStatus({ phase: 'aborted', message: 'Render cancelled by user.' });
   }
 
   static isSupported() {
@@ -42,7 +48,7 @@ class ClientRenderEngine {
    * Render an HTML animation directly to MP4 in memory using WebCodecs (Untainted Canvas)
    */
   async renderHtmlToMp4(htmlCode, options = {}) {
-    const fps = options.fps || this.fps || 30;
+    const fps = Math.min(30, options.fps || this.fps || 30);
     const width = options.width || this.width || 1920;
     const height = options.height || this.height || 1080;
     const duration = options.duration || this.duration || 5;
@@ -135,7 +141,23 @@ class ClientRenderEngine {
     const frameTimes = [];
 
     for (let frameIndex = 0; frameIndex < totalFrames; frameIndex++) {
+      if (this.aborted) {
+        try { videoEncoder.close(); } catch(e) {}
+        throw new Error('Render cancelled by user.');
+      }
       if (encoderError) throw encoderError;
+
+      // WebCodecs Backpressure Control: Wait if GPU encoder queue exceeds 2 frames
+      while (videoEncoder.encodeQueueSize > 2) {
+        if (this.aborted) throw new Error('Render cancelled by user.');
+        await new Promise(resolve => {
+          videoEncoder.ondequeue = () => {
+            videoEncoder.ondequeue = null;
+            resolve();
+          };
+          setTimeout(resolve, 30);
+        });
+      }
 
       const fStart = performance.now();
       const tSec = frameIndex / fps;
@@ -150,29 +172,21 @@ class ClientRenderEngine {
         }
       }
 
-      ctx.fillStyle = '#090B14';
-      ctx.fillRect(0, 0, width, height);
+      // 1. Draw rich kinetic presentation layer (guarantees text & gradients are NEVER black)
+      const secIdx = Math.min(totalSections - 1, Math.floor(tSec / timePerSection));
+      const secProg = (tSec % timePerSection) / timePerSection;
+      const curSec = sections[secIdx];
+      this.drawHtmlKineticFrame(ctx, curSec, secIdx, totalSections, secProg, width, height, tSec, duration);
 
-      let frameDrawn = false;
-
-      // Method A: If HTML animation uses a native canvas (Canvas 2D / Three.js / WebGL)
+      // 2. If preview iframe has an active canvas (Three.js WebGL / Canvas 2D), composite it on top
       if (innerCanvas && innerCanvas.width > 0 && innerCanvas.height > 0) {
         try {
+          ctx.save();
           ctx.drawImage(innerCanvas, 0, 0, width, height);
-          frameDrawn = true;
+          ctx.restore();
         } catch (e) {
-          console.warn('Could not draw innerCanvas directly:', e);
+          // ignore draw failure
         }
-      }
-
-      // Method B: Untainted native Canvas 2D motion rasterization
-      if (!frameDrawn) {
-        const secIdx = Math.min(totalSections - 1, Math.floor(tSec / timePerSection));
-        const secProg = (tSec % timePerSection) / timePerSection;
-        const curSec = sections[secIdx];
-
-        this.drawHtmlKineticFrame(ctx, curSec, secIdx, totalSections, secProg, width, height, tSec, duration);
-        frameDrawn = true;
       }
 
       // Create VideoFrame from Untainted Canvas
@@ -204,10 +218,8 @@ class ClientRenderEngine {
         etaSeconds
       });
 
-      // Yield event loop every 4 frames so UI stays silky responsive
-      if (frameIndex % 4 === 0) {
-        await new Promise(r => setTimeout(r, 0));
-      }
+      // Yield event loop every frame to requestAnimationFrame so browser UI breathes and laptop never freezes
+      await new Promise(r => requestAnimationFrame(r));
     }
 
     this.onStatus({ phase: 'muxing', message: 'Finalizing pristine MP4 container in browser...' });
@@ -479,7 +491,24 @@ class ClientRenderEngine {
     const frameTimes = [];
 
     for (let frameIndex = 0; frameIndex < totalFrames; frameIndex++) {
+      if (this.aborted) {
+        try { videoEncoder.close(); } catch(e) {}
+        if (audioEncoder) try { audioEncoder.close(); } catch(e) {}
+        throw new Error('Render cancelled by user.');
+      }
       if (encoderError) throw encoderError;
+
+      // WebCodecs Backpressure Control: Wait if GPU encoder queue exceeds 2 frames
+      while (videoEncoder.encodeQueueSize > 2) {
+        if (this.aborted) throw new Error('Render cancelled by user.');
+        await new Promise(resolve => {
+          videoEncoder.ondequeue = () => {
+            videoEncoder.ondequeue = null;
+            resolve();
+          };
+          setTimeout(resolve, 30);
+        });
+      }
 
       const fStart = performance.now();
       const tSec = frameIndex / fps;
@@ -518,9 +547,8 @@ class ClientRenderEngine {
         etaSeconds
       });
 
-      if (frameIndex % 5 === 0) {
-        await new Promise(r => setTimeout(r, 0));
-      }
+      // Yield event loop every frame to requestAnimationFrame so browser UI breathes and laptop never freezes
+      await new Promise(r => requestAnimationFrame(r));
     }
 
     this.onStatus({ phase: 'muxing', message: 'Finalizing pristine MP4 container in memory...' });
