@@ -1,6 +1,13 @@
 import os
 import subprocess
 import sys
+import spaces
+import gradio as gr
+
+# Mandatory for Hugging Face ZeroGPU startup scanner
+@spaces.GPU
+def renderflow_gpu_hook():
+    return "RenderFlow ZeroGPU Engine Online"
 
 print("[RenderFlow] Initializing cloud engine on Hugging Face Spaces...")
 
