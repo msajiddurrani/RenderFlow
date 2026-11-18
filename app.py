@@ -8,7 +8,7 @@ import spaces
 import torch
 import gradio as gr
 from fastapi import Request, Response
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, PlainTextResponse
 
 # ==============================================================================
 # 1. ZeroGPU Hook Function
@@ -33,9 +33,6 @@ demo = gr.Interface(
     description="Headless HTML5 / Three.js / WebGL 60 FPS video synthesis backend powered by Hugging Face ZeroGPU."
 )
 
-# ==============================================================================
-# 3. FastAPI Reverse Proxy to Internal Node.js Engine
-# ==============================================================================
 fastapi_app = demo.app
 NODE_PORT = 3333
 NODE_BASE_URL = f"http://127.0.0.1:{NODE_PORT}"
@@ -86,25 +83,28 @@ async def proxy_to_node(request: Request, path_with_query: str):
             media_type="application/json"
         )
 
-@fastapi_app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"])
-async def route_api(request: Request, path: str):
-    return await proxy_to_node(request, f"/api/{path}")
+# ==============================================================================
+# 3. HTTP Middleware (Intercepts before Gradio SPA router)
+# ==============================================================================
+@fastapi_app.middleware("http")
+async def reverse_proxy_middleware(request: Request, call_next):
+    path = request.url.path
 
-@fastapi_app.api_route("/output/{path:path}", methods=["GET", "HEAD"])
-async def route_output(request: Request, path: str):
-    return await proxy_to_node(request, f"/output/{path}")
+    # Diagnostic endpoint to view Node server logs
+    if path == "/api/node-log":
+        if os.path.exists("node_server.log"):
+            with open("node_server.log", "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()[-10000:]
+            return PlainTextResponse(content)
+        return PlainTextResponse("node_server.log does not exist yet")
 
-@fastapi_app.api_route("/uploads/{path:path}", methods=["GET", "HEAD"])
-async def route_uploads(request: Request, path: str):
-    return await proxy_to_node(request, f"/uploads/{path}")
+    # Proxy all backend routes to Node.js
+    PROXIED_PREFIXES = ("/api/", "/output/", "/uploads/", "/previews/", "/fixtures/")
+    if any(path.startswith(prefix) for prefix in PROXIED_PREFIXES):
+        return await proxy_to_node(request, path)
 
-@fastapi_app.api_route("/previews/{path:path}", methods=["GET", "HEAD"])
-async def route_previews(request: Request, path: str):
-    return await proxy_to_node(request, f"/previews/{path}")
-
-@fastapi_app.api_route("/fixtures/{path:path}", methods=["GET", "HEAD"])
-async def route_fixtures(request: Request, path: str):
-    return await proxy_to_node(request, f"/fixtures/{path}")
+    # Let Gradio handle the rest (UI, static files, WebSocket)
+    return await call_next(request)
 
 # ==============================================================================
 # 4. Background Node.js Engine Starter
@@ -128,7 +128,13 @@ def start_node_engine():
 
     print(f"[RenderFlow] Launching Node.js engine on internal port {NODE_PORT}...")
     sys.stdout.flush()
-    proc = subprocess.Popen(["node", "src/preview-server.js"], env=env)
+    node_log = open("node_server.log", "w", encoding="utf-8")
+    proc = subprocess.Popen(
+        ["node", "src/preview-server.js"],
+        env=env,
+        stdout=node_log,
+        stderr=subprocess.STDOUT
+    )
     return proc
 
 if __name__ == "__main__":
