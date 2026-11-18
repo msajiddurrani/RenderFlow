@@ -1,0 +1,7 @@
+nodejs
+npm
+chromium
+ffmpeg
+fonts-liberation
+fonts-noto-color-emoji
+fonts-freefont-ttf
