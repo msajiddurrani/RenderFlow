@@ -2944,7 +2944,7 @@ const htmlContent = `<!DOCTYPE html>
                   <option value="client-gpu">In-Browser WebCodecs</option>
                 </select>
               </div>
-              <div class="adv-row" style="margin-top:6px;">
+              <div class="adv-row" style="display:none;">
                 <label for="cfgCloudUrl">Cloud Backend URL</label>
                 <input type="text" id="cfgCloudUrl" class="adv-input" placeholder="e.g. https://your-space.hf.space" style="width:190px;font-size:11px;" onchange="handleCloudUrlChange(this.value)">
               </div>
