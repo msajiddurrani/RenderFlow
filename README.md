@@ -1,3 +1,13 @@
+---
+title: RenderFlow Engine
+emoji: 🚀
+colorFrom: indigo
+colorTo: blue
+sdk: gradio
+app_file: app.py
+pinned: false
+---
+
 <p align="center">
   <img src="public/RenderFlow_Logo_Transparent.png" alt="RenderFlow Logo" width="130" />
 </p>
