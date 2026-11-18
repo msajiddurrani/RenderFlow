@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="render-duration" content="4">
+  <meta name="render-fps" content="30">
+  <title>Markdown Presentation Video</title>
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card: #12141c;
+      --border: #232733;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --code-bg: #0d1117;
+      --success: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      position: relative;
+    }
+    #stage {
+      width: 1920px;
+      height: 1080px;
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, #151926 0%, #090a0f 80%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 100px 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+    }
+    .slide-content {
+      max-width: 1640px;
+      margin: auto 0;
+    }
+    h1 {
+      font-size: 76px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 28px;
+      color: #ffffff;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 38px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #e2e8f0;
+    }
+    p, li {
+      font-size: 32px;
+      line-height: 1.5;
+      color: #cbd5e1;
+      margin-bottom: 18px;
+    }
+    ul, ol {
+      margin-left: 48px;
+      margin-bottom: 24px;
+    }
+    li {
+      margin-bottom: 14px;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 36px;
+      margin: 24px 0;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    code {
+      font-family: "JetBrains Mono", "SF Mono", Consolas, Menlo, monospace;
+      font-size: 26px;
+      line-height: 1.45;
+      color: #38bdf8;
+    }
+    p code, li code {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 26px;
+    }
+    blockquote {
+      border-left: 6px solid var(--accent);
+      padding: 20px 32px;
+      background: rgba(56, 189, 248, 0.05);
+      border-radius: 0 14px 14px 0;
+      margin: 24px 0;
+      font-style: italic;
+      color: #e2e8f0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      padding: 18px 24px;
+      font-size: 26px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #1a1e2d;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      color: var(--muted);
+      font-size: 22px;
+      font-family: monospace;
+    }
+    #progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 8px;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      z-index: 100;
+      transition: width 0.05s linear;
+    }
+    .ambient-glow {
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <div class="ambient-glow"></div>
+    
+    <div class="slide" id="slide-0" style="opacity: 1;">
+      <div class="slide-content">
+        <h1>Context &amp; Role</h1>
+<p>You are a world-class Motion UI/UX Engineer specializing in React, Framer Motion, GSAP, and Tailwind CSS. 
+Your task is to build a cinematic, super-smooth, automated motion graphics sequence (like Apple product pages or Fable&#39;s landing page) for a SaaS platform named &quot;PainForge&quot;. </p>
+<p>This will be a self-contained, auto-playing Hero Component that visually explains how the software works while maintaining a premium, &quot;stealth luxury&quot; dark aesthetic.</p>
+<h1>The Product Context (For UI Text &amp; Copy)</h1>
+<p><strong>The Problem:</strong> Freelancers spend hours mindlessly scrolling forums or competing in crowded bidding wars against thousands of others. When they finally find a post from someone complaining about a problem they can fix, their pitch sounds like a generic robot. They get ignored.
+<strong>The Solution:</strong> PainForge connects directly to Reddit to find people actively complaining about pain points your skills can solve. It then uses advanced AI to instantly generate a hyper-personalized, human-sounding pitch directly addressing their exact problem, complete with your portfolio and links.
+<strong>Security (Architected by Aariz Mehdi):</strong> Enterprise-Grade Security, Decentralized Execution (BYOK), Cryptographic Isolation, Open-Source Verifiability.</p>
+<h1>Aesthetic &amp; Theme</h1>
+<ul>
+<li><strong>Colors:</strong> Stealth dark mode. Charcoal obsidian backdrops (<code>#0B0B0B</code>), matte container finishes, glassmorphism effects for floating panels.</li>
+<li><strong>Accents:</strong> Glowing crimson red (<code>#E63946</code> or the brand red) for buttons, highlights, and glowing borders.</li>
+<li><strong>Motion:</strong> Fluid, physics-based animations using custom Bezier curves. No rigid or linear movements. Everything should feel like it&#39;s breathing.</li>
+</ul>
+<h1>The Animation Sequence (The 4-Step Flow)</h1>
+<p>Please build an animated sequence that cycles through these 4 phases smoothly:</p>
+<h2>Phase 1: Setup Your Profile (The Portal)</h2>
+<ul>
+<li>Start with a dramatic zoom-in on the &quot;PainForge&quot; sign-in / setup portal.</li>
+<li><strong>Action:</strong> Show an elegant, simulated typing animation filling in the user&#39;s details: &quot;Name: Sajid Durrani&quot;, &quot;Portfolio URL&quot;, and &quot;GitHub URL&quot;.</li>
+<li>Text on screen fades in: &quot;Setup Your Profile - This teaches the AI who you are.&quot;</li>
+</ul>
+<h2>Phase 2: Connect OpenRouter (BYOK)</h2>
+<ul>
+<li>Smooth camera pan or slide to the API integration step.</li>
+<li><strong>Action:</strong> A glowing API key (<code>sk-or-v1-...</code>) visually generates from an &quot;OpenRouter&quot; icon and gets injected securely into the PainForge dashboard.</li>
+<li>Text on screen fades in: &quot;Bring Your Own Key (BYOK) - Connect OpenRouter to enable the AI reasoning engine.&quot;</li>
+<li>Emphasize the &quot;Cryptographic Isolation&quot; aspect with a subtle lock icon animation.</li>
+</ul>
+<h2>Phase 3: Target Subreddits (The Hunt)</h2>
+<ul>
+<li>The UI morphs into the target selection screen.</li>
+<li><strong>Action:</strong> Tags pop in with a staggered spring animation: <code>r/startups</code>, <code>r/SaaS</code>, <code>r/freelance</code>. </li>
+<li>Text on screen fades in: &quot;Target Subreddits - Where your ideal clients hang out.&quot;</li>
+</ul>
+<h2>Phase 4: Scan &amp; Generate (The Forge)</h2>
+<ul>
+<li>The view transitions to a dark dashboard. The cursor clicks a glowing red &quot;Scan&quot; button.</li>
+<li><strong>Action:</strong> A radar/scanning effect highlights the screen. A high-value post (e.g., &quot;MOD HERE: $400 - AI Movie Clipping&quot;) flips into view.</li>
+<li>A glowing, AI-processing gradient border wraps around the card. A &quot;hyper-personalized, human-sounding pitch&quot; types out instantly in a glassmorphism panel.</li>
+<li>Text on screen fades in: &quot;Scan &amp; Generate - The AI analyzes posts, scores intent, and writes your pitch.&quot;</li>
+</ul>
+<h1>Technical Requirements</h1>
+<ol>
+<li>Use <code>framer-motion</code> for sequence orchestration (<code>AnimatePresence</code>, <code>variants</code>, <code>layoutId</code>).</li>
+<li>Ensure transitions between the 4 phases overlap slightly to create a continuous cinematic video feel, not a PowerPoint slideshow.</li>
+<li>Build the UI mockups entirely with HTML/CSS/Tailwind. Do not use actual external video files; animate the DOM elements to simulate the app interface.</li>
+<li>Make the component fully responsive and self-contained so it can be dropped directly into a Next.js App Router project.</li>
+</ol>
+
+      </div>
+      <div class="slide-footer">
+        <span class="slide-counter">1 / 1</span>
+        <span class="slide-brand">HTML-to-MP4 Studio</span>
+      </div>
+    </div>
+  
+    <div id="progress-bar"></div>
+  </div>
+
+  <script>
+    const TOTAL_SLIDES = 1;
+    const SECONDS_PER_SLIDE = 4;
+    const DURATION = 4;
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progressBar = document.getElementById('progress-bar');
+
+    window.DUR = DURATION;
+
+    // Timeline seek function called by engine
+    window.seek = function(t) {
+      const normalizedTime = Math.max(0, Math.min(DURATION, t));
+      const progress = normalizedTime / DURATION;
+      if (progressBar) progressBar.style.width = (progress * 100) + '%';
+
+      const currentSlideIdx = Math.min(TOTAL_SLIDES - 1, Math.floor(normalizedTime / SECONDS_PER_SLIDE));
+      const slideProgress = (normalizedTime % SECONDS_PER_SLIDE) / SECONDS_PER_SLIDE;
+
+      slides.forEach((s, idx) => {
+        if (idx === currentSlideIdx) {
+          s.style.opacity = '1';
+          s.style.transform = 'translateY(0) scale(1)';
+        } else if (idx < currentSlideIdx) {
+          s.style.opacity = '0';
+          s.style.transform = 'translateY(-30px) scale(0.98)';
+        } else {
+          s.style.opacity = '0';
+          s.style.transform = 'translateY(30px) scale(0.98)';
+        }
+      });
+    };
+
+    window.renderFrame = function(idx, t) {
+      window.seek(t);
+    };
+
+    // Auto-synthesize cinematic slide transition audio
+    window.pcm = async function() {
+      const sampleRate = 44100;
+      const OfflineCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      const actx = new OfflineCtx(1, sampleRate * DURATION, sampleRate);
+
+      // Add gentle transition chime/sparkle at each slide change
+      for (let s = 0; s < TOTAL_SLIDES; s++) {
+        const slideTime = s * SECONDS_PER_SLIDE;
+        const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        freqs.forEach((freq, fIdx) => {
+          const osc = actx.createOscillator();
+          const gain = actx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, slideTime + fIdx * 0.04);
+          gain.gain.setValueAtTime(0.0001, slideTime + fIdx * 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.15, slideTime + fIdx * 0.04 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, slideTime + fIdx * 0.04 + 0.5);
+          osc.connect(gain);
+          gain.connect(actx.destination);
+          osc.start(slideTime + fIdx * 0.04);
+          osc.stop(slideTime + fIdx * 0.04 + 0.6);
+        });
+      }
+
+      const renderedBuffer = await actx.startRendering();
+      const channelData = renderedBuffer.getChannelData(0);
+      const i16 = new Int16Array(channelData.length);
+      for (let i = 0; i < channelData.length; i++) {
+        i16[i] = Math.max(-1, Math.min(1, channelData[i])) * 32767;
+      }
+      let binary = '';
+      const bytes = new Uint8Array(i16.buffer);
+      for (let i = 0; i < bytes.length; i += 8192) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+      }
+      return btoa(binary);
+    };
+
+    // Auto run in browser preview
+    let startTime = performance.now();
+    function tick(now) {
+      if (window.__STANDALONE_STEPPING__) return;
+      const elapsed = (now - startTime) / 1000;
+      window.seek(elapsed % (DURATION + 1));
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

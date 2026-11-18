@@ -1,0 +1,50 @@
+{
+  "name": "renderflow",
+  "version": "1.0.0",
+  "description": "RenderFlow — Turn HTML animations and Markdown slides into studio-grade 1080p 60 FPS MP4 videos with real-time canvas preview and hardware acceleration.",
+  "main": "src/renderer-engine.js",
+  "bin": {
+    "renderflow": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/preview-server.js",
+    "build": "node scripts/build-renderflow-ui.js",
+    "studio": "node src/preview-server.js",
+    "render": "node src/cli.js",
+    "test:verify": "node scripts/inspect-index.js && node scripts/verify-syntax.js",
+    "test:e2e-download": "node scripts/test-full-render-and-download.js",
+    "test:spike": "node src/run-sprint0-spike.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msajiddurrani/RenderFlow.git"
+  },
+  "keywords": [
+    "renderflow",
+    "html-to-mp4",
+    "markdown-to-video",
+    "webcodecs",
+    "canvas-recording",
+    "direct3d11",
+    "threejs",
+    "mp4-muxer",
+    "ffmpeg",
+    "video-synthesis"
+  ],
+  "author": "Muhammad Sajid Durrani (https://github.com/msajiddurrani)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/msajiddurrani/RenderFlow/issues"
+  },
+  "homepage": "https://github.com/msajiddurrani/RenderFlow#readme",
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "express": "^4.22.3",
+    "marked": "^18.2.1",
+    "mp4-muxer": "^5.2.2",
+    "multer": "^2.5.0",
+    "puppeteer-core": "^24.43.1",
+    "three": "^0.170.0",
+    "ws": "^8.18.0"
+  }
+}
