@@ -12,6 +12,8 @@
     "studio": "node src/preview-server.js",
     "render": "node src/cli.js",
     "test:verify": "node scripts/inspect-index.js && node scripts/verify-syntax.js",
+    "test:mobile": "node scripts/verify-mobile-ui.js",
+    "test:strict-mobile": "node scripts/test-strict-mobile-qa.js",
     "test:e2e-download": "node scripts/test-full-render-and-download.js",
     "test:audit": "node scripts/test-exhaustive-audit.js",
     "test:qa": "node scripts/run-qa-step-by-step.js",

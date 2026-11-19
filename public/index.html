@@ -2653,9 +2653,25 @@
       }
     }
     @media (max-width: 360px) {
+      .nav-in {
+        padding: 0 8px !important;
+        gap: 4px !important;
+      }
+      .brand span {
+        display: none !important;
+      }
+      .nav-links {
+        gap: 2px !important;
+      }
       .nav-links button {
         padding: 4px 5px !important;
         font-size: 11px !important;
+      }
+      .nav-actions .btn {
+        width: 32px !important;
+        min-width: 32px !important;
+        height: 32px !important;
+        min-height: 32px !important;
       }
       .clay-scene-wrapper {
         height: 235px;
@@ -4253,6 +4269,7 @@
       if (titlePulseInterval) clearInterval(titlePulseInterval);
       const orig = 'RenderFlow';
       let flag = true;
+      document.title = '🔔 ' + (msg || 'Video Ready!');
       titlePulseInterval = setInterval(() => {
         document.title = flag ? ('🔔 ' + (msg || 'Video Ready!')) : orig;
         flag = !flag;
