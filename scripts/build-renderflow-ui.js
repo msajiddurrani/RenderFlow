@@ -182,14 +182,153 @@ const htmlContent = `<!DOCTYPE html>
         inset -2.5px -2.5px 5px rgba(18, 24, 88, 0.35),
         0 10px 24px -2px rgba(61, 73, 219, 0.38);
     }
+    .btn-nav-action {
+      width: 36px !important;
+      min-width: 36px !important;
+      height: 36px !important;
+      min-height: 36px !important;
+      padding: 0 !important;
+      border-radius: 10px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      line-height: 1 !important;
+      gap: 0 !important;
+      box-shadow: 
+        inset 1.5px 1.5px 4px rgba(255, 255, 255, 0.45),
+        inset -2px -2px 4px rgba(18, 24, 88, 0.35),
+        0 8px 20px -2px rgba(61, 73, 219, 0.38) !important;
+    }
     .btn-nav-plus {
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1;
-      display: inline-block;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      line-height: 1 !important;
+      display: inline-block !important;
     }
     .btn-nav-text {
-      display: inline-block;
+      display: none !important;
+    }
+    /* DYNAMIC ISLAND PUSH NOTIFICATION BANNER */
+    .rf-push-banner {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120px);
+      z-index: 999999;
+      width: calc(100% - 24px);
+      max-width: 480px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      color: #FFFFFF;
+      padding: 10px 14px;
+      box-sizing: border-box;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .rf-push-banner.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .rf-push-in {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+    .rf-push-icon-wrap {
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.35), rgba(59, 130, 246, 0.35));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rf-push-logo {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .rf-push-body-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+    .rf-push-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.2;
+    }
+    .rf-push-app-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .rf-push-badge {
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(34, 197, 94, 0.25);
+      color: #4ADE80;
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      border-radius: 999px;
+      padding: 1px 6px;
+    }
+    .rf-push-time {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-left: auto;
+    }
+    .rf-push-desc {
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: #CBD5E1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rf-push-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .rf-push-action-btn {
+      background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    }
+    .rf-push-close-btn {
+      background: transparent;
+      color: #94A3B8;
+      border: none;
+      font-size: 18px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+    .rf-push-close-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.1);
     }
     .btn.primary:hover {
       background: linear-gradient(135deg, #5B6AF0 0%, #3440D4 100%);
@@ -2534,6 +2673,27 @@ const htmlContent = `<!DOCTYPE html>
 </head>
 <body>
   <div id="mainApp">
+    <!-- DYNAMIC ISLAND PUSH NOTIFICATION BANNER (MOBILE & DESKTOP) -->
+    <div id="rfPushBanner" class="rf-push-banner" style="display: none;" role="alert" aria-live="assertive">
+      <div class="rf-push-in">
+        <div class="rf-push-icon-wrap">
+          <img src="/RenderFlow_Logo_Transparent.png" alt="RenderFlow" class="rf-push-logo" />
+        </div>
+        <div class="rf-push-body-wrap">
+          <div class="rf-push-header">
+            <span class="rf-push-app-title">RenderFlow</span>
+            <span class="rf-push-badge">Master Ready</span>
+            <span class="rf-push-time">Just now</span>
+          </div>
+          <p id="rfPushMsg" class="rf-push-desc">Your 1080p MP4 master video is ready to download.</p>
+        </div>
+        <div class="rf-push-actions">
+          <button id="rfPushBtnDownload" class="rf-push-action-btn" onclick="handlePushBannerDownload(event)">Download</button>
+          <button class="rf-push-close-btn" onclick="closePushBanner(event)" aria-label="Close notification">×</button>
+        </div>
+      </div>
+    </div>
+
     <!-- NAVIGATION BAR -->
     <header class="nav">
       <div class="shell nav-in">
@@ -2553,9 +2713,9 @@ const htmlContent = `<!DOCTYPE html>
             <span class="mode-dot"></span>
             <span id="appModeLabel">Detecting mode...</span>
           </span>
-          <button class="btn primary btn-nav-action" onclick="startNewVideo()" title="New video" aria-label="New video">
+          <button id="btnNavCreate" class="btn primary btn-nav-action" onclick="startNewVideo()" title="Create new video" aria-label="Create new video">
             <span class="btn-nav-plus">+</span>
-            <span class="btn-nav-text">New</span>
+            <span class="btn-nav-text" style="display:none;"></span>
           </button>
         </div>
       </div>
@@ -3129,14 +3289,18 @@ const htmlContent = `<!DOCTYPE html>
             <div class="detail-row"><span>Quality / FPS</span><b id="resMetaFps">Full HD · 30 FPS</b></div>
             <div class="detail-row"><span>Render time</span><b id="resMetaTime">Completed</b></div>
 
-            <a id="btnDownloadResult" class="btn primary full large" href="#" download="export.mp4" onclick="downloadCurrentResult(event)">
+            <a id="btnDownloadResult" class="btn primary full large" href="#" download="export.mp4" target="_blank" onclick="downloadCurrentResult(event)">
               <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download MP4
+              <span id="btnDownloadResultText">Download Master MP4</span>
             </a>
-            <button class="btn secondary full" onclick="startNewVideo()">
+            <a id="btnOpenVideo" class="btn secondary full" href="#" target="_blank" style="margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Open Video (Save to Photos)</span>
+            </a>
+            <button class="btn secondary full" onclick="startNewVideo()" style="margin-top: 10px;">
               Create another video
             </button>
-            <p class="ready-note">Full 1080p master generated without frame cutoffs.</p>
+            <p class="ready-note">Full 1080p master generated without frame cutoffs. On iPhone: tap Open Video → Share → "Save Video" to save directly to your Camera Roll.</p>
           </aside>
         </div>
       </div>
@@ -3368,18 +3532,16 @@ const htmlContent = `<!DOCTYPE html>
 
     // CLOUD BACKEND INTEGRATION (HUGGING FACE ZEROGPU ENGINE)
     const OFFICIAL_CLOUD_ENGINE = 'https://durrani6969-renderflow-engine.hf.space';
-    let cloudBackendUrl = '';
+    let cloudBackendUrl = OFFICIAL_CLOUD_ENGINE;
     try {
       const savedCloud = localStorage.getItem('rf_cloud_backend_url');
-      if (savedCloud) {
+      if (savedCloud && savedCloud.trim()) {
         cloudBackendUrl = savedCloud.trim().replace(new RegExp('/+$'), '');
-      } else if (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      } else {
         cloudBackendUrl = OFFICIAL_CLOUD_ENGINE;
       }
     } catch (e) {
-      if (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        cloudBackendUrl = OFFICIAL_CLOUD_ENGINE;
-      }
+      cloudBackendUrl = OFFICIAL_CLOUD_ENGINE;
     }
 
     let currentResultUrl = '';
@@ -3396,26 +3558,28 @@ const htmlContent = `<!DOCTYPE html>
       if (serverBaseUrl) {
         return serverBaseUrl.replace(new RegExp('/+$'), '') + endpoint;
       }
-      if (cloudBackendUrl) {
-        return cloudBackendUrl.replace(new RegExp('/+$'), '') + endpoint;
+      const isLocalhost = (typeof window !== 'undefined' && window.location && 
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
+      if (isLocalhost) {
+        return endpoint;
       }
-      return endpoint;
+      const targetCloud = cloudBackendUrl || OFFICIAL_CLOUD_ENGINE;
+      return targetCloud.replace(new RegExp('/+$'), '') + endpoint;
     }
 
-    // GUARANTEED DUAL-ACTION MP4 DOWNLOAD HANDLER
+    // GUARANTEED DUAL-ACTION MP4 DOWNLOAD HANDLER (IOS, ANDROID & DESKTOP)
     async function downloadCurrentResult(e) {
       return downloadFileFromUrl(e, currentResultUrl, currentResultFilename);
     }
 
     async function downloadFileFromUrl(e, url, filename, recordId) {
-      if (e && e.preventDefault) e.preventDefault();
       const targetFilename = (filename && filename.endsWith('.mp4')) 
         ? filename 
         : (filename ? filename + '.mp4' : (currentResultFilename || 'renderflow-export.mp4'));
       
       const targetUrl = url || currentResultUrl;
 
-      // 1. Check for cached in-memory binary Blob for instant zero-latency save
+      // 1. Instant zero-latency download if binary Blob is already loaded in memory
       let targetBlob = null;
       if (!url || url === currentResultUrl) {
         targetBlob = currentResultBlob;
@@ -3434,6 +3598,7 @@ const htmlContent = `<!DOCTYPE html>
       }
 
       if (targetBlob) {
+        if (e && e.preventDefault) e.preventDefault();
         const blobUrl = URL.createObjectURL(targetBlob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -3450,7 +3615,7 @@ const htmlContent = `<!DOCTYPE html>
       }
 
       if (!targetUrl) {
-        showToast('No video ready yet. Please click Create MP4 video first.');
+        showToast('No video ready yet. Please click Create a video first.');
         return;
       }
 
@@ -3459,9 +3624,10 @@ const htmlContent = `<!DOCTYPE html>
         ? targetUrl 
         : apiUrl(targetUrl);
       
-      const downloadParamUrl = finalFetchUrl.includes('?') 
-        ? (finalFetchUrl + '&download=1') 
-        : (finalFetchUrl + '?download=1');
+      const cleanDownloadBase = finalFetchUrl.replace('/output/', '/download/');
+      const downloadParamUrl = cleanDownloadBase.includes('?') 
+        ? (cleanDownloadBase + '&download=1') 
+        : (cleanDownloadBase + '?download=1');
 
       showToast('Downloading MP4 video...');
 
@@ -3470,16 +3636,28 @@ const htmlContent = `<!DOCTYPE html>
       if (btn && (!url || url === currentResultUrl)) {
         btn.href = downloadParamUrl;
         btn.setAttribute('download', targetFilename);
+        btn.setAttribute('target', '_blank');
       }
 
-      // Trigger fallback download anchor
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = downloadParamUrl;
-      a.download = targetFilename;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => document.body.removeChild(a), 1500);
+      const btnOpen = $('btnOpenVideo');
+      if (btnOpen && (!url || url === currentResultUrl)) {
+        btnOpen.href = finalFetchUrl.replace('/download/', '/output/').split('?')[0];
+        btnOpen.setAttribute('target', '_blank');
+      }
+
+      // CRITICAL FIX: If user tapped an actual anchor element with href (like #btnDownloadResult),
+      // DO NOT call e.preventDefault()! Let the browser natively navigate to the attachment URL!
+      // This allows Mobile Safari and Android to trigger their native Download file sheet!
+      if (!e || !e.target || !e.target.closest || !e.target.closest('a[href]')) {
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.target = '_blank';
+        a.href = downloadParamUrl;
+        a.download = targetFilename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => document.body.removeChild(a), 1500);
+      }
 
       // In the background, also pre-fetch and store blob for instant re-download
       fetch(downloadParamUrl)
@@ -4014,7 +4192,24 @@ const htmlContent = `<!DOCTYPE html>
       }
     }
 
+    let sharedAudioCtx = null;
+    function ensureAudioUnlocked() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!sharedAudioCtx && AudioCtx) {
+          sharedAudioCtx = new AudioCtx();
+        }
+        if (sharedAudioCtx && sharedAudioCtx.state === 'suspended') {
+          sharedAudioCtx.resume();
+        }
+      } catch (e) {}
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+        try { Notification.requestPermission(); } catch (e) {}
+      }
+    }
+
     async function requestNotificationPermission() {
+      ensureAudioUnlocked();
       if (typeof window !== 'undefined' && 'Notification' in window) {
         if (Notification.permission === 'default') {
           try {
@@ -4026,35 +4221,109 @@ const htmlContent = `<!DOCTYPE html>
 
     function playCompletionChime() {
       try {
+        ensureAudioUnlocked();
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
+        const ctx = sharedAudioCtx || (AudioCtx ? new AudioCtx() : null);
+        if (!ctx) return;
         const now = ctx.currentTime;
+        
+        // Note 1: High crisp bell (D5 587.33Hz)
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.type = 'sine';
         osc1.frequency.setValueAtTime(587.33, now);
-        gain1.gain.setValueAtTime(0.12, now);
-        gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+        gain1.gain.setValueAtTime(0.22, now);
+        gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
         osc1.connect(gain1);
         gain1.connect(ctx.destination);
         osc1.start(now);
-        osc1.stop(now + 0.35);
+        osc1.stop(now + 0.4);
 
+        // Note 2: Warm harmonic resolution (A5 880Hz)
         const osc2 = ctx.createOscillator();
         const gain2 = ctx.createGain();
         osc2.type = 'sine';
         osc2.frequency.setValueAtTime(880, now + 0.12);
-        gain2.gain.setValueAtTime(0.15, now + 0.12);
-        gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+        gain2.gain.setValueAtTime(0.28, now + 0.12);
+        gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.75);
         osc2.connect(gain2);
         gain2.connect(ctx.destination);
         osc2.start(now + 0.12);
-        osc2.stop(now + 0.6);
+        osc2.stop(now + 0.75);
       } catch (e) {}
     }
 
+    let titlePulseInterval = null;
+    function startTitlePulse(msg) {
+      if (titlePulseInterval) clearInterval(titlePulseInterval);
+      const orig = 'RenderFlow';
+      let flag = true;
+      titlePulseInterval = setInterval(() => {
+        document.title = flag ? ('🔔 ' + (msg || 'Video Ready!')) : orig;
+        flag = !flag;
+      }, 1000);
+      const stopPulse = () => {
+        clearInterval(titlePulseInterval);
+        titlePulseInterval = null;
+        document.title = orig;
+        window.removeEventListener('focus', stopPulse);
+        window.removeEventListener('click', stopPulse);
+        window.removeEventListener('touchstart', stopPulse);
+      };
+      window.addEventListener('focus', stopPulse);
+      window.addEventListener('click', stopPulse);
+      window.addEventListener('touchstart', stopPulse);
+    }
+
+    let pushBannerTimeout = null;
+    function showPushBanner(title, body) {
+      const banner = $('rfPushBanner');
+      if (!banner) return;
+      if ($('rfPushMsg')) $('rfPushMsg').textContent = body || 'Your 1080p MP4 master video is ready to download.';
+      banner.style.display = 'block';
+      void banner.offsetWidth;
+      banner.classList.add('active');
+      if (pushBannerTimeout) clearTimeout(pushBannerTimeout);
+      pushBannerTimeout = setTimeout(() => {
+        closePushBanner();
+      }, 18000);
+    }
+
+    function closePushBanner(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      const banner = $('rfPushBanner');
+      if (!banner) return;
+      banner.classList.remove('active');
+      setTimeout(() => {
+        if (!banner.classList.contains('active')) {
+          banner.style.display = 'none';
+        }
+      }, 450);
+    }
+
+    function handlePushBannerDownload(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      closePushBanner();
+      downloadCurrentResult(e);
+    }
+
+    let hasUnnotifiedRenderCompletion = false;
     function triggerCompletionNotification(title, body, url) {
+      hasUnnotifiedRenderCompletion = true;
+      
+      // 1. Audio Chime & Haptic feedback
+      playCompletionChime();
+      if ('vibrate' in navigator) {
+        try { navigator.vibrate([200, 100, 200, 100, 300]); } catch (e) {}
+      }
+
+      // 2. High-priority In-App Push Banner (iOS Safari & Android Chrome)
+      showPushBanner(title, body);
+
+      // 3. Tab Title Alert
+      startTitlePulse('Video Ready!');
+
+      // 4. Native System Notification (when available and permitted)
       if ('Notification' in window && Notification.permission === 'granted') {
         try {
           const notif = new Notification(title || 'RenderFlow', {
@@ -4072,12 +4341,16 @@ const htmlContent = `<!DOCTYPE html>
           };
         } catch (e) {}
       }
+    }
 
-      playCompletionChime();
-
-      if ('vibrate' in navigator) {
-        try { navigator.vibrate([200, 100, 200]); } catch (e) {}
-      }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && hasUnnotifiedRenderCompletion) {
+          showPushBanner();
+          playCompletionChime();
+          hasUnnotifiedRenderCompletion = false;
+        }
+      });
     }
 
     function startBackgroundPollRecovery(targetFilename, startTime) {
@@ -4361,7 +4634,9 @@ const htmlContent = `<!DOCTYPE html>
 
         const exactDur = data.record?.duration || (data.probe?.duration ? data.probe.duration + 's' : (data.metrics?.durationSec ? data.metrics.durationSec + 's' : '46.0s'));
         const finalUrl = data.url ? (data.url.startsWith('http') ? data.url : apiUrl(data.url)) : '';
-        const downloadUrl = finalUrl.includes('?') ? (finalUrl + '&download=1') : (finalUrl + '?download=1');
+        const cleanDownloadBase = finalUrl.replace('/output/', '/download/');
+        const downloadUrl = cleanDownloadBase.includes('?') ? (cleanDownloadBase + '&download=1') : (cleanDownloadBase + '?download=1');
+        const viewUrl = finalUrl.replace('/download/', '/output/').split('?')[0];
 
         currentResultUrl = finalUrl;
         currentResultFilename = data.filename || 'export.mp4';
@@ -4371,8 +4646,10 @@ const htmlContent = `<!DOCTYPE html>
         window.currentResultBlob = null;
 
         const v = $('resultVideo');
-        v.src = finalUrl;
-        v.load();
+        if (v) {
+          v.src = finalUrl;
+          v.load();
+        }
 
         $('resMetaFilename').textContent = data.filename || 'export.mp4';
         $('resMetaDuration').textContent = exactDur;
@@ -4382,9 +4659,17 @@ const htmlContent = `<!DOCTYPE html>
         $('resMetaFps').textContent = 'Full HD · ' + (data.metrics?.fps || 30) + ' FPS';
 
         const btnDl = $('btnDownloadResult');
-        btnDl.href = downloadUrl;
-        btnDl.setAttribute('download', data.filename || 'export.mp4');
-        btnDl.removeAttribute('target');
+        if (btnDl) {
+          btnDl.href = downloadUrl;
+          btnDl.setAttribute('download', data.filename || 'export.mp4');
+          btnDl.setAttribute('target', '_blank');
+        }
+
+        const btnOpen = $('btnOpenVideo');
+        if (btnOpen) {
+          btnOpen.href = viewUrl;
+          btnOpen.setAttribute('target', '_blank');
+        }
 
         // Pre-fetch Blob in background for zero-latency download
         if (finalUrl) {
@@ -4393,7 +4678,7 @@ const htmlContent = `<!DOCTYPE html>
             .then(blob => {
               if (blob && !blob.type.includes('text') && !blob.type.includes('html') && blob.size > 1000) {
                 currentResultBlob = blob;
-                btnDl.href = URL.createObjectURL(blob);
+                if (btnDl) btnDl.href = URL.createObjectURL(blob);
               }
             })
             .catch(() => {});
@@ -4782,23 +5067,36 @@ const htmlContent = `<!DOCTYPE html>
 
     function openHistoryVideo(url, name, sizeStr, dur, res, recordId) {
       const finalUrl = (url && (url.startsWith('http') || url.startsWith('blob:'))) ? url : apiUrl(url || '');
-      const downloadUrl = finalUrl.includes('?') ? (finalUrl + '&download=1') : (finalUrl + '?download=1');
+      const cleanDownloadBase = finalUrl.replace('/output/', '/download/');
+      const downloadUrl = cleanDownloadBase.includes('?') ? (cleanDownloadBase + '&download=1') : (cleanDownloadBase + '?download=1');
+      const viewUrl = finalUrl.replace('/download/', '/output/').split('?')[0];
+
       currentResultUrl = finalUrl;
       currentResultFilename = (name && name.endsWith('.mp4')) ? name : (name ? name + '.mp4' : 'export.mp4');
       currentResultBlob = null;
 
       const v = $('resultVideo');
-      v.src = finalUrl;
-      v.load();
+      if (v) {
+        v.src = finalUrl;
+        v.load();
+      }
       $('resMetaFilename').textContent = currentResultFilename;
       $('resMetaSizeBadge').textContent = sizeStr;
       $('resMetaDuration').textContent = dur;
       $('resMetaResolution').textContent = res || '1080×1920';
       
       const btnDl = $('btnDownloadResult');
-      btnDl.href = downloadUrl;
-      btnDl.setAttribute('download', currentResultFilename);
-      btnDl.setAttribute('target', '_blank');
+      if (btnDl) {
+        btnDl.href = downloadUrl;
+        btnDl.setAttribute('download', currentResultFilename);
+        btnDl.setAttribute('target', '_blank');
+      }
+
+      const btnOpen = $('btnOpenVideo');
+      if (btnOpen) {
+        btnOpen.href = viewUrl;
+        btnOpen.setAttribute('target', '_blank');
+      }
 
       if (recordId) {
         let cached = blobCache.get(recordId);

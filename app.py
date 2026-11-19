@@ -64,14 +64,36 @@ NODE_BASE_URL = f"http://127.0.0.1:{NODE_PORT}"
 http_client = httpx.AsyncClient(base_url=NODE_BASE_URL, timeout=3600.0)
 
 async def proxy_to_node(request: Request, path_with_query: str):
-    url = httpx.URL(path=path_with_query, query=request.url.query.encode("utf-8"))
-    body = await request.body()
-    
-    headers = dict(request.headers)
-    headers.pop("host", None)
-    headers.pop("content-length", None)
+    if request.method == "OPTIONS":
+        return Response(status_code=200, headers={
+            "access-control-allow-origin": "*",
+            "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD",
+            "access-control-allow-headers": "*",
+            "access-control-max-age": "86400"
+        })
 
     try:
+        # Separate path and query string cleanly for httpx.URL
+        if "?" in path_with_query:
+            clean_path, extra_query = path_with_query.split("?", 1)
+        else:
+            clean_path, extra_query = path_with_query, ""
+
+        req_query = request.url.query
+        if req_query and extra_query:
+            merged_query = f"{req_query}&{extra_query}"
+        elif extra_query:
+            merged_query = extra_query
+        else:
+            merged_query = req_query or ""
+
+        url = httpx.URL(path=clean_path, query=merged_query.encode("utf-8") if merged_query else None)
+        body = await request.body()
+        
+        headers = dict(request.headers)
+        headers.pop("host", None)
+        headers.pop("content-length", None)
+
         req = http_client.build_request(
             request.method,
             url,
@@ -91,12 +113,12 @@ async def proxy_to_node(request: Request, path_with_query: str):
         resp_headers["access-control-allow-headers"] = "*"
         resp_headers["access-control-expose-headers"] = "*"
 
-        # Enforce binary MP4 attachment download headers for /output/
-        if path_with_query.startswith("/output/"):
-            base_fname = os.path.basename(path_with_query.split("?")[0])
+        # Enforce binary MP4 attachment download headers for /output/ and /download/
+        if clean_path.startswith("/output/") or clean_path.startswith("/download/"):
+            base_fname = os.path.basename(clean_path)
             if base_fname.endswith(".mp4"):
                 resp_headers["content-type"] = "video/mp4"
-                is_download = "download=1" in path_with_query or "download" in str(request.query_params)
+                is_download = "download=1" in merged_query or "download" in clean_path or "download" in str(request.query_params)
                 if is_download or "range" not in request.headers:
                     resp_headers["content-disposition"] = f'attachment; filename="{base_fname}"'
                 else:
