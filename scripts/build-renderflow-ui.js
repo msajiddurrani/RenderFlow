@@ -16,6 +16,12 @@ const htmlContent = `<!DOCTYPE html>
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-32x32.png">
   <link rel="shortcut icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/RenderFlow_Logo_Transparent.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RenderFlow">
+  <meta name="theme-color" content="#4F46E5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3262,6 +3268,20 @@ const htmlContent = `<!DOCTYPE html>
             </div>
 
             <div class="side-actions">
+              <!-- MOBILE LOCK SCREEN NOTIFICATION PROMPT -->
+              <div id="notifPermissionBox" class="notif-permission-box" style="margin-bottom: 12px; padding: 10px 14px; background: rgba(79, 70, 229, 0.08); border: 1px solid rgba(79, 70, 229, 0.22); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="font-size: 12px; color: #1E293B; line-height: 1.3;">
+                  <strong style="color: #4F46E5; display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    Phone Notification
+                  </strong>
+                  <div id="notifStatusText" style="color: #64748B; font-size: 11px;">Get notified on your lock screen when video is ready</div>
+                </div>
+                <button id="btnEnableNotif" type="button" class="btn secondary" style="padding: 5px 12px; font-size: 11px; font-weight: 700; white-space: nowrap; border-radius: 8px;" onclick="requestNotificationPermission()">
+                  Enable
+                </button>
+              </div>
+
               <button id="btnStudioBake" class="btn primary full large" onclick="executeRenderJob()">
                 Create MP4 video
                 <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
@@ -3309,14 +3329,14 @@ const htmlContent = `<!DOCTYPE html>
               <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               <span id="btnDownloadResultText">Download Master MP4</span>
             </a>
-            <a id="btnOpenVideo" class="btn secondary full" href="#" target="_blank" style="margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+            <a id="btnOpenVideo" class="btn secondary full" href="#" target="_blank" onclick="handleSaveToPhotos(event)" style="margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
               <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              <span>Open Video (Save to Photos)</span>
+              <span id="btnOpenVideoText">Save to Camera Roll (Photos)</span>
             </a>
             <button class="btn secondary full" onclick="startNewVideo()" style="margin-top: 10px;">
               Create another video
             </button>
-            <p class="ready-note">Full 1080p master generated without frame cutoffs. On iPhone: tap Open Video → Share → "Save Video" to save directly to your Camera Roll.</p>
+            <p class="ready-note">Full 1080p master generated without frame cutoffs. On iPhone: tap "Save to Camera Roll" to save directly to Apple Photos.</p>
           </aside>
         </div>
       </div>
@@ -3585,21 +3605,109 @@ const htmlContent = `<!DOCTYPE html>
 
     // GUARANTEED DUAL-ACTION MP4 DOWNLOAD HANDLER (IOS, ANDROID & DESKTOP)
     async function downloadCurrentResult(e) {
+      if (e && e.preventDefault) e.preventDefault();
       return downloadFileFromUrl(e, currentResultUrl, currentResultFilename);
     }
 
+    // NATIVE CAMERA ROLL / PHOTOS SAVE HANDLER (IPHONE & ANDROID)
+    async function handleSaveToPhotos(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const targetFilename = currentResultFilename || 'renderflow-export.mp4';
+      const targetUrl = currentResultUrl;
+      showToast('Preparing video for Photos app...');
+
+      try {
+        let blob = currentResultBlob;
+        if (!blob && targetUrl) {
+          const cleanDl = targetUrl.replace('/output/', '/download/');
+          const dlUrl = cleanDl.includes('?') ? (cleanDl + '&download=1') : (cleanDl + '?download=1');
+          const res = await fetch(dlUrl);
+          if (res.ok) blob = await res.blob();
+        }
+        if (blob) {
+          currentResultBlob = blob;
+          const file = new File([blob], targetFilename, { type: 'video/mp4' });
+          if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'RenderFlow Video'
+            });
+            showToast('Saved to Camera Roll / Photos!');
+            return;
+          }
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') return; // User closed sheet
+      }
+
+      // Fallback: Open in new tab so user can use native Safari Share -> Save Video
+      const viewUrl = (targetUrl || currentResultUrl).replace('/download/', '/output/').split('?')[0];
+      window.open(viewUrl, '_blank');
+    }
+
+    // AUTOMATIC DOWNLOAD ON RENDER COMPLETE
+    async function autoDownloadResult(url, filename) {
+      if (!url) return;
+      const targetFilename = (filename && filename.endsWith('.mp4')) 
+        ? filename 
+        : (filename ? filename + '.mp4' : (currentResultFilename || 'renderflow-export.mp4'));
+      const cleanDl = url.replace('/output/', '/download/');
+      const downloadParamUrl = cleanDl.includes('?') ? (cleanDl + '&download=1') : (cleanDl + '?download=1');
+
+      try {
+        const res = await fetch(downloadParamUrl);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const blob = await res.blob();
+        currentResultBlob = blob;
+        blobCache.set(downloadParamUrl, blob);
+        blobCache.set(url, blob);
+        blobCache.set(targetFilename, blob);
+
+        const blobUrl = URL.createObjectURL(blob);
+        const btnDl = $('btnDownloadResult');
+        if (btnDl) {
+          btnDl.href = blobUrl;
+          btnDl.setAttribute('download', targetFilename);
+        }
+
+        // Trigger native download
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = blobUrl;
+        a.download = targetFilename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          if (a.parentNode) document.body.removeChild(a);
+        }, 2000);
+        showToast('MP4 video downloaded to your device!');
+      } catch (err) {
+        console.warn('Auto-download blob fetch failed, triggering fallback download:', err);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadParamUrl;
+        a.download = targetFilename;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          if (a.parentNode) document.body.removeChild(a);
+        }, 2000);
+      }
+    }
+
     async function downloadFileFromUrl(e, url, filename, recordId) {
+      if (e && e.preventDefault) e.preventDefault();
       const targetFilename = (filename && filename.endsWith('.mp4')) 
         ? filename 
         : (filename ? filename + '.mp4' : (currentResultFilename || 'renderflow-export.mp4'));
       
       const targetUrl = url || currentResultUrl;
+      const btn = $('btnDownloadResult');
+      const btnText = $('btnDownloadResultText');
 
       // 1. Instant zero-latency download if binary Blob is already loaded in memory
-      let targetBlob = null;
-      if (!url || url === currentResultUrl) {
-        targetBlob = currentResultBlob;
-      }
+      let targetBlob = currentResultBlob;
       if (!targetBlob && recordId) {
         targetBlob = blobCache.get(recordId);
         if (!targetBlob) {
@@ -3614,7 +3722,6 @@ const htmlContent = `<!DOCTYPE html>
       }
 
       if (targetBlob) {
-        if (e && e.preventDefault) e.preventDefault();
         const blobUrl = URL.createObjectURL(targetBlob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -3645,52 +3752,40 @@ const htmlContent = `<!DOCTYPE html>
         ? (cleanDownloadBase + '&download=1') 
         : (cleanDownloadBase + '?download=1');
 
-      showToast('Downloading MP4 video...');
+      if (btnText) btnText.textContent = 'Saving MP4 to device...';
+      showToast('Downloading MP4 video to device...');
 
-      // Update button href directly if on step 3
-      const btn = $('btnDownloadResult');
-      if (btn && (!url || url === currentResultUrl)) {
-        btn.href = downloadParamUrl;
-        btn.setAttribute('download', targetFilename);
-        btn.setAttribute('target', '_blank');
-      }
+      try {
+        const res = await fetch(downloadParamUrl);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const blob = await res.blob();
+        currentResultBlob = blob;
+        blobCache.set(downloadParamUrl, blob);
+        blobCache.set(targetUrl, blob);
+        if (recordId) blobCache.set(recordId, blob);
+        blobCache.set(targetFilename, blob);
 
-      const btnOpen = $('btnOpenVideo');
-      if (btnOpen && (!url || url === currentResultUrl)) {
-        btnOpen.href = finalFetchUrl.replace('/download/', '/output/').split('?')[0];
-        btnOpen.setAttribute('target', '_blank');
-      }
+        const blobUrl = URL.createObjectURL(blob);
+        if (btn) {
+          btn.href = blobUrl;
+          btn.setAttribute('download', targetFilename);
+        }
+        if (btnText) btnText.textContent = 'Download Master MP4';
 
-      // CRITICAL FIX: If user tapped an actual anchor element with href (like #btnDownloadResult),
-      // DO NOT call e.preventDefault()! Let the browser natively navigate to the attachment URL!
-      // This allows Mobile Safari and Android to trigger their native Download file sheet!
-      if (!e || !e.target || !e.target.closest || !e.target.closest('a[href]')) {
         const a = document.createElement('a');
         a.style.display = 'none';
-        a.target = '_blank';
-        a.href = downloadParamUrl;
+        a.href = blobUrl;
         a.download = targetFilename;
         document.body.appendChild(a);
         a.click();
-        setTimeout(() => document.body.removeChild(a), 1500);
-      }
+        setTimeout(() => document.body.removeChild(a), 2000);
 
-      // In the background, also pre-fetch and store blob for instant re-download
-      fetch(downloadParamUrl)
-        .then(r => r.ok ? r.blob() : null)
-        .then(b => {
-          if (b && !b.type.includes('text') && !b.type.includes('html') && b.size > 1000) {
-            blobCache.set(downloadParamUrl, b);
-            blobCache.set(targetUrl, b);
-            if (recordId) blobCache.set(recordId, b);
-            blobCache.set(targetFilename, b);
-            if (btn && (!url || url === currentResultUrl)) {
-              currentResultBlob = b;
-              btn.href = URL.createObjectURL(b);
-            }
-          }
-        })
-        .catch(() => {});
+        showToast('MP4 video saved successfully!');
+      } catch (err) {
+        console.warn('Direct blob fetch failed, falling back to browser navigation:', err);
+        if (btnText) btnText.textContent = 'Download Master MP4';
+        window.open(downloadParamUrl, '_blank');
+      }
     }
 
     function handleCloudUrlChange(val) {
@@ -3864,6 +3959,9 @@ const htmlContent = `<!DOCTYPE html>
 
       if (step === 1 || step === 2) {
         if (typeof prewarmCloudEngine === 'function') prewarmCloudEngine();
+      }
+      if (step === 2 && typeof updateNotifUI === 'function') {
+        updateNotifUI();
       }
     }
 
@@ -4224,15 +4322,69 @@ const htmlContent = `<!DOCTYPE html>
       }
     }
 
+    function updateNotifUI() {
+      const box = $('notifPermissionBox');
+      const btn = $('btnEnableNotif');
+      const statusText = $('notifStatusText');
+      if (!box || !btn || !statusText) return;
+
+      if (typeof window === 'undefined' || !('Notification' in window)) {
+        statusText.textContent = 'Lock screen alerts active via browser';
+        btn.textContent = 'Supported';
+        btn.disabled = true;
+        return;
+      }
+
+      if (Notification.permission === 'granted') {
+        statusText.innerHTML = '<span style="color: #10B981; font-weight: 600;">✓ Active:</span> Phone lock screen alerts enabled';
+        btn.textContent = 'Enabled ✓';
+        btn.disabled = true;
+        btn.style.background = '#10B981';
+        btn.style.borderColor = '#10B981';
+        btn.style.color = '#FFFFFF';
+      } else if (Notification.permission === 'denied') {
+        statusText.innerHTML = '<span style="color: #EF4444; font-weight: 600;">Blocked:</span> Enable notifications in browser settings';
+        btn.textContent = 'Blocked';
+        btn.disabled = true;
+        btn.style.background = '#94A3B8';
+        btn.style.borderColor = '#94A3B8';
+        btn.style.color = '#FFFFFF';
+      } else {
+        statusText.textContent = 'Get notified on your phone lock screen when video is ready';
+        btn.textContent = 'Enable';
+        btn.disabled = false;
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }
+    }
+
     async function requestNotificationPermission() {
       ensureAudioUnlocked();
       if (typeof window !== 'undefined' && 'Notification' in window) {
         if (Notification.permission === 'default') {
           try {
-            await Notification.requestPermission();
+            const res = await Notification.requestPermission();
+            updateNotifUI();
+            if (res === 'granted') {
+              showToast('Phone notifications enabled!');
+              if ('serviceWorker' in navigator) {
+                try {
+                  const reg = await navigator.serviceWorker.ready;
+                  if (reg && reg.showNotification) {
+                    reg.showNotification('RenderFlow Alerts Enabled', {
+                      body: 'You will receive phone notifications here when videos finish rendering.',
+                      icon: '/favicon-192x192.png',
+                      badge: '/favicon-192x192.png'
+                    });
+                  }
+                } catch(e) {}
+              }
+            }
           } catch (e) {}
         }
       }
+      updateNotifUI();
     }
 
     function playCompletionChime() {
@@ -4325,7 +4477,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     let hasUnnotifiedRenderCompletion = false;
-    function triggerCompletionNotification(title, body, url) {
+    async function triggerCompletionNotification(title, body, url) {
       hasUnnotifiedRenderCompletion = true;
       
       // 1. Audio Chime & Haptic feedback
@@ -4340,23 +4492,48 @@ const htmlContent = `<!DOCTYPE html>
       // 3. Tab Title Alert
       startTitlePulse('Video Ready!');
 
-      // 4. Native System Notification (when available and permitted)
-      if ('Notification' in window && Notification.permission === 'granted') {
-        try {
-          const notif = new Notification(title || 'RenderFlow', {
-            body: body || 'Your 1080p MP4 master video is ready to download.',
-            icon: '/RenderFlow_Logo_Transparent.png',
-            badge: '/RenderFlow_Logo_Transparent.png',
-            tag: 'renderflow-export',
-            renotify: true
-          });
-          notif.onclick = () => {
-            window.focus();
-            switchNav('studio');
-            setCreateStep(3);
-            notif.close();
-          };
-        } catch (e) {}
+      // 4. Native System Notification (OUTSIDE THE BROWSER / LOCK SCREEN)
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+        const notifTitle = title || 'RenderFlow';
+        const notifOptions = {
+          body: body || 'Your 1080p MP4 master video is ready to download.',
+          icon: '/favicon-192x192.png',
+          badge: '/favicon-192x192.png',
+          tag: 'renderflow-export-' + Date.now(),
+          renotify: true,
+          requireInteraction: true,
+          vibrate: [300, 150, 300, 150, 400],
+          data: { url: url || currentResultUrl }
+        };
+
+        let shownViaSw = false;
+        // Method A: Via Service Worker Registration (Required on Android Mobile Chrome & PWA)
+        if ('serviceWorker' in navigator) {
+          try {
+            const reg = await navigator.serviceWorker.ready;
+            if (reg && reg.showNotification) {
+              await reg.showNotification(notifTitle, notifOptions);
+              shownViaSw = true;
+            }
+          } catch (swErr) {
+            console.warn('ServiceWorker showNotification failed:', swErr);
+          }
+        }
+
+        // Method B: Via Window Notification constructor (Desktop browser fallback)
+        if (!shownViaSw) {
+          try {
+            const notif = new Notification(notifTitle, notifOptions);
+            notif.onclick = () => {
+              window.focus();
+              switchNav('studio');
+              setCreateStep(3);
+              notif.close();
+            };
+          } catch (winErr) {
+            console.warn('Window Notification fallback failed:', winErr);
+          }
+        }
       }
     }
 
@@ -4711,7 +4888,8 @@ const htmlContent = `<!DOCTYPE html>
         setCreateStep(3);
         loadHistory();
         triggerCompletionNotification('RenderFlow', 'Your 1080p MP4 master video is ready to download.', finalUrl);
-        showToast('Video ready! Click Download MP4.');
+        showToast('Video ready! Saving MP4...');
+        window.lastAutoDownloadPromise = autoDownloadResult(downloadUrl, data.filename || 'export.mp4');
       }
 
       if (event === 'error') {
@@ -5266,11 +5444,24 @@ const htmlContent = `<!DOCTYPE html>
     function renderFrame() {}
 
     window.addEventListener('DOMContentLoaded', async () => {
+      // Register Service Worker for Mobile Lock-Screen & OS Notifications
+      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then((reg) => {
+            window.rfSwRegistration = reg;
+            console.log('[RenderFlow] ServiceWorker registered with scope:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('[RenderFlow] ServiceWorker registration failed:', err);
+          });
+      }
+
       setupDropzone();
       await detectRuntimeMode();
       await loadHistory();
       if (typeof prewarmCloudEngine === 'function') prewarmCloudEngine();
       if (typeof checkActiveJobRecovery === 'function') checkActiveJobRecovery();
+      if (typeof updateNotifUI === 'function') updateNotifUI();
       // Start clean without dummy PainForge video
     });
   </script>

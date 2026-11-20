@@ -9,7 +9,7 @@ import spaces
 import torch
 import gradio as gr
 from fastapi import FastAPI, Request, Response
-from fastapi.responses import StreamingResponse, PlainTextResponse, JSONResponse
+from fastapi.responses import StreamingResponse, PlainTextResponse, JSONResponse, FileResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 # Detect Gradio 5 Server Mode
@@ -191,10 +191,45 @@ async def route_api(request: Request, path: str):
 
 @app.api_route("/output/{path:path}", methods=["GET", "HEAD"])
 async def route_output(request: Request, path: str):
+    base_fname = os.path.basename(path)
+    local_path = os.path.join("output", base_fname)
+    if os.path.exists(local_path) and base_fname.endswith(".mp4"):
+        is_dl = "download=1" in str(request.url.query)
+        headers = {
+            "access-control-allow-origin": "*",
+            "access-control-allow-methods": "GET, HEAD, OPTIONS",
+            "access-control-allow-headers": "*",
+            "access-control-expose-headers": "*",
+            "accept-ranges": "bytes"
+        }
+        return FileResponse(
+            path=local_path,
+            media_type="video/mp4",
+            filename=base_fname if is_dl else None,
+            content_disposition_type="attachment" if is_dl else "inline",
+            headers=headers
+        )
     return await proxy_to_node(request, f"/output/{path}")
 
 @app.api_route("/download/{path:path}", methods=["GET", "HEAD"])
 async def route_download(request: Request, path: str):
+    base_fname = os.path.basename(path)
+    local_path = os.path.join("output", base_fname)
+    if os.path.exists(local_path) and base_fname.endswith(".mp4"):
+        headers = {
+            "access-control-allow-origin": "*",
+            "access-control-allow-methods": "GET, HEAD, OPTIONS",
+            "access-control-allow-headers": "*",
+            "access-control-expose-headers": "*",
+            "accept-ranges": "bytes"
+        }
+        return FileResponse(
+            path=local_path,
+            media_type="video/mp4",
+            filename=base_fname,
+            content_disposition_type="attachment",
+            headers=headers
+        )
     return await proxy_to_node(request, f"/output/{path}?download=1")
 
 @app.api_route("/uploads/{path:path}", methods=["GET", "HEAD"])
