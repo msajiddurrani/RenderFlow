@@ -3277,6 +3277,10 @@
                 </button>
               </div>
 
+              <div id="iosNotifTip" style="display: none; margin-bottom: 12px; font-size: 11px; color: #475569; line-height: 1.4; padding: 8px 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.25); border-radius: 10px;">
+                💡 <strong>iPhone tip:</strong> For lock screen push when leaving Safari, tap Share (bottom icon) → <strong>"Add to Home Screen"</strong>. In Safari tabs, sound & lock-screen player will notify you.
+              </div>
+
               <button id="btnStudioBake" class="btn primary full large" onclick="executeRenderJob()">
                 Create MP4 video
                 <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
@@ -3599,9 +3603,42 @@
     }
 
     // GUARANTEED DUAL-ACTION MP4 DOWNLOAD HANDLER (IOS, ANDROID & DESKTOP)
-    async function downloadCurrentResult(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      return downloadFileFromUrl(e, currentResultUrl, currentResultFilename);
+    function downloadCurrentResult(e) {
+      const targetFilename = currentResultFilename || 'renderflow-export.mp4';
+      const targetUrl = currentResultUrl;
+      const cleanDownloadBase = (targetUrl || '').replace('/output/', '/download/');
+      const downloadParamUrl = cleanDownloadBase.includes('?') 
+        ? (cleanDownloadBase + '&download=1') 
+        : (cleanDownloadBase + '?download=1');
+
+      // 1. If binary blob is cached in memory, trigger zero-latency instant file save
+      if (currentResultBlob) {
+        if (e && e.preventDefault) e.preventDefault();
+        const blobUrl = URL.createObjectURL(currentResultBlob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = blobUrl;
+        a.download = targetFilename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          if (a.parentNode) document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        }, 30000);
+        showToast('MP4 video saved successfully!');
+        return;
+      }
+
+      // 2. If blob is not cached yet, DO NOT preventDefault!
+      // Allow the browser to natively follow href to the attachment endpoint!
+      // This allows Mobile Safari & Android Chrome native download managers to pop up!
+      const btn = $('btnDownloadResult');
+      if (btn) {
+        btn.href = downloadParamUrl;
+        btn.setAttribute('download', targetFilename);
+        btn.setAttribute('target', '_blank');
+      }
+      showToast('Downloading MP4 video to device...');
     }
 
     // NATIVE CAMERA ROLL / PHOTOS SAVE HANDLER (IPHONE & ANDROID)
@@ -3609,35 +3646,29 @@
       if (e && e.preventDefault) e.preventDefault();
       const targetFilename = currentResultFilename || 'renderflow-export.mp4';
       const targetUrl = currentResultUrl;
-      showToast('Preparing video for Photos app...');
+      const viewUrl = (targetUrl || currentResultUrl).replace('/download/', '/output/').split('?')[0];
 
-      try {
-        let blob = currentResultBlob;
-        if (!blob && targetUrl) {
-          const cleanDl = targetUrl.replace('/output/', '/download/');
-          const dlUrl = cleanDl.includes('?') ? (cleanDl + '&download=1') : (cleanDl + '?download=1');
-          const res = await fetch(dlUrl);
-          if (res.ok) blob = await res.blob();
-        }
-        if (blob) {
-          currentResultBlob = blob;
-          const file = new File([blob], targetFilename, { type: 'video/mp4' });
-          if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] })) {
+      // If binary blob is cached in memory, open native system share sheet
+      if (currentResultBlob && typeof navigator !== 'undefined' && navigator.canShare) {
+        const file = new File([currentResultBlob], targetFilename, { type: 'video/mp4' });
+        if (navigator.canShare({ files: [file] })) {
+          try {
             await navigator.share({
               files: [file],
               title: 'RenderFlow Video'
             });
             showToast('Saved to Camera Roll / Photos!');
             return;
+          } catch (err) {
+            if (err.name === 'AbortError') return; // User closed sheet
           }
         }
-      } catch (err) {
-        if (err.name === 'AbortError') return; // User closed sheet
       }
 
-      // Fallback: Open in new tab so user can use native Safari Share -> Save Video
-      const viewUrl = (targetUrl || currentResultUrl).replace('/download/', '/output/').split('?')[0];
+      // Fallback: Open direct clean MP4 stream in a new tab
+      // On iPhone: Safari displays the native video; user taps Share → "Save Video" to Photos!
       window.open(viewUrl, '_blank');
+      showToast('Opening video. On iPhone: tap Share → "Save Video" to save to Photos.');
     }
 
     // AUTOMATIC DOWNLOAD ON RENDER COMPLETE
@@ -3862,12 +3893,12 @@
         currentAppMode = 'MODE_B';
         serverBaseUrl = '';
         if ($('cfgEngineMode')) $('cfgEngineMode').value = 'server-gpu';
-        if (modeLabel) modeLabel.textContent = 'Cloud Engine (Hugging Face ZeroGPU)';
+        if (modeLabel) modeLabel.textContent = 'Hardware GPU (RenderFlow Cloud Engine · Direct3D11)';
         if (optCloud) {
           optCloud.disabled = false;
           optCloud.textContent = 'Automatic (Cloud Chromium + FFmpeg)';
         }
-        if (diagMode) diagMode.textContent = 'Hugging Face Spaces (2 vCPU · ZeroGPU · FFmpeg)';
+        if (diagMode) diagMode.textContent = 'RenderFlow Cloud Hardware Engine (Chromium + FFmpeg · NVENC)';
       } else {
         currentAppMode = 'MODE_A';
         if ($('cfgEngineMode')) $('cfgEngineMode').value = 'client-gpu';
@@ -3876,7 +3907,7 @@
           optCloud.disabled = false;
           optCloud.textContent = 'Automatic (Cloud Chromium + FFmpeg)';
         }
-        if (diagMode) diagMode.textContent = candidateCloud ? 'Hugging Face Cloud Engine Standby' : 'Client Mode';
+        if (diagMode) diagMode.textContent = candidateCloud ? 'RenderFlow Cloud Engine Standby' : 'Client Mode';
       }
     }
 
@@ -4200,6 +4231,16 @@
 
     // RENDER EXECUTION
     function executeRenderJob() {
+      // Direct User Gesture Activation: Request notifications & unlock audio synchronously!
+      ensureAudioUnlocked();
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+        try {
+          Notification.requestPermission().then(() => {
+            if (typeof updateNotifUI === 'function') updateNotifUI();
+          }).catch(() => {});
+        } catch (e) {}
+      }
+
       const code = $('codeEditorStudio').value.trim();
       if (!code) {
         showToast('Please add an HTML or Markdown file first.');
@@ -4251,6 +4292,7 @@
     }
 
     function startBgAudioKeepAlive() {
+      // 1. Silent looping HTML5 audio element
       try {
         let el = document.getElementById('rfBgAudio');
         if (!el) {
@@ -4258,33 +4300,52 @@
           el.id = 'rfBgAudio';
           el.loop = true;
           el.setAttribute('playsinline', '');
-          el.style.display = 'none';
+          el.style.position = 'fixed';
+          el.style.left = '-9999px';
           document.body.appendChild(el);
         }
         if (!el.src || !el.src.startsWith('data:audio/wav')) {
-          el.src = 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA';
+          el.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==';
         }
         el.play().catch(() => {});
       } catch (e) {}
 
+      // 2. Looping Web Audio oscillator keep-alive
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-        const source = ctx.createBufferSource();
-        source.buffer = buffer;
-        source.loop = true;
-        const gain = ctx.createGain();
-        gain.gain.value = 0.0001;
-        source.connect(gain);
-        gain.connect(ctx.destination);
-        source.start();
-        bgAudioKeepAlive = { ctx, source };
+        if (AudioCtx) {
+          const ctx = new AudioCtx();
+          const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+          const source = ctx.createBufferSource();
+          source.buffer = buffer;
+          source.loop = true;
+          const gain = ctx.createGain();
+          gain.gain.value = 0.00001; // Inaudible keep-alive
+          source.connect(gain);
+          gain.connect(ctx.destination);
+          source.start();
+          bgAudioKeepAlive = { ctx, source };
+        }
+      } catch (e) {}
+
+      // 3. System Lock Screen Media Session (Keeps mobile browser awake & displays lock-screen status)
+      try {
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: 'Rendering 1080p MP4 Video...',
+            artist: 'RenderFlow Studio Engine',
+            album: 'Hardware GPU Synthesis Pipeline',
+            artwork: [
+              { src: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
+              { src: '/RenderFlow_Logo_Transparent.png', sizes: '512x512', type: 'image/png' }
+            ]
+          });
+          navigator.mediaSession.playbackState = 'playing';
+        }
       } catch (e) {}
     }
 
-    function stopBgAudioKeepAlive() {
+    function stopBgAudioKeepAlive(completed) {
       try {
         const el = document.getElementById('rfBgAudio');
         if (el) {
@@ -4299,6 +4360,26 @@
         } catch (e) {}
         bgAudioKeepAlive = null;
       }
+
+      // Update lock screen media session
+      try {
+        if ('mediaSession' in navigator) {
+          if (completed) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+              title: '🔔 Video Ready! (1080p MP4)',
+              artist: 'RenderFlow Studio Engine',
+              album: 'Download Ready',
+              artwork: [
+                { src: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
+                { src: '/RenderFlow_Logo_Transparent.png', sizes: '512x512', type: 'image/png' }
+              ]
+            });
+            navigator.mediaSession.playbackState = 'paused';
+          } else {
+            navigator.mediaSession.playbackState = 'none';
+          }
+        }
+      } catch (e) {}
     }
 
     let sharedAudioCtx = null;
@@ -4327,10 +4408,7 @@
         statusText.textContent = 'Lock screen alerts active via browser';
         btn.textContent = 'Supported';
         btn.disabled = true;
-        return;
-      }
-
-      if (Notification.permission === 'granted') {
+      } else if (Notification.permission === 'granted') {
         statusText.innerHTML = '<span style="color: #10B981; font-weight: 600;">✓ Active:</span> Phone lock screen alerts enabled';
         btn.textContent = 'Enabled ✓';
         btn.disabled = true;
@@ -4351,6 +4429,17 @@
         btn.style.background = '';
         btn.style.borderColor = '';
         btn.style.color = '';
+      }
+
+      const iosTip = $('iosNotifTip');
+      if (iosTip) {
+        const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const isStandalone = typeof window !== 'undefined' && (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches);
+        if (isIOS && !isStandalone) {
+          iosTip.style.display = 'block';
+        } else {
+          iosTip.style.display = 'none';
+        }
       }
     }
 
@@ -4693,7 +4782,7 @@
       if (coldStartTimer) clearTimeout(coldStartTimer);
       coldStartTimer = setTimeout(() => {
         if ($('hudPct') && $('hudPct').textContent === '0%') {
-          $('hudPhaseText').textContent = 'Allocating Cloud GPU Acceleration Node (Cold boot 10–20s)...';
+          $('hudPhaseText').textContent = 'Connecting to RenderFlow Cloud Hardware Pipeline...';
         }
       }, 4000);
 
@@ -4811,7 +4900,7 @@
         $('hudBarFill').style.width = '100%';
         $('hudPhaseText').textContent = 'Render Complete!';
         stopBackgroundPollRecovery();
-        stopBgAudioKeepAlive();
+        stopBgAudioKeepAlive(true);
         releaseRenderWakeLock();
         resetRenderBtns();
         try { localStorage.removeItem('rf_active_render_job'); } catch (e) {}
@@ -4867,7 +4956,13 @@
             .then(blob => {
               if (blob && !blob.type.includes('text') && !blob.type.includes('html') && blob.size > 1000) {
                 currentResultBlob = blob;
-                if (btnDl) btnDl.href = URL.createObjectURL(blob);
+                blobCache.set(downloadUrl, blob);
+                blobCache.set(finalUrl, blob);
+                blobCache.set(data.filename || 'export.mp4', blob);
+                if (btnDl) {
+                  btnDl.href = URL.createObjectURL(blob);
+                  btnDl.setAttribute('download', data.filename || 'export.mp4');
+                }
               }
             })
             .catch(() => {});

@@ -3,6 +3,8 @@
   "short_name": "RenderFlow",
   "description": "Turn HTML animations and Markdown into studio-grade 1080p MP4 videos.",
   "start_url": "/",
+  "id": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0F172A",
   "theme_color": "#4F46E5",
@@ -17,7 +19,8 @@
     {
       "src": "/RenderFlow_Logo_Transparent.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
